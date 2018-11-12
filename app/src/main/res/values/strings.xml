@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Qdemy</string>
+    <string name="salveaz">Salvează</string>
+    <string name="parola">Parola</string>
+    <string name="mail_institu_ional">Mail instituțional</string>
+    <string name="nume">Nume</string>
+    <string name="creeaz_cont">Creează cont</string>
+    <string name="intr_n_cont">Intră în cont</string>
+    <string name="istoricul_testelor">Istoricul testelor</string>
+    <string name="acceseaz">ACCESEAZĂ</string>
+    <string name="a_teapt">Așteaptă...</string>
+    <string name="codul_testului">CODUL testului</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="logo">logo</string>
+    <string name="renun">Renunță</string>
+</resources>
