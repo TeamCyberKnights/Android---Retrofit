@@ -20,7 +20,6 @@
         <activity android:name=".StudentActivity" />
         <activity android:name=".StartQuizActivity" />
         <activity android:name=".GrilaQuizActivity" />
-        <activity android:name=".LiberQuizActivity" />
         <activity android:name=".RezultatStudentActivity" />
         <activity android:name=".ProfesorActivity" />
         <activity android:name=".SelecteazaTestActivity" />

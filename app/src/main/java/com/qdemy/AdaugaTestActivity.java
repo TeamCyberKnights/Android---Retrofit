@@ -57,8 +57,6 @@ public class AdaugaTestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //adauga testul
-                Intent intent = new Intent(getApplicationContext(), TesteActivity.class);
-                startActivity(intent);
                 finish();
             }
         });

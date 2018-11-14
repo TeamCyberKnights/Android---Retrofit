@@ -8,14 +8,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_margin="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         android:weightSum="100"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -36,7 +32,7 @@
             android:layout_weight="25"
             android:background="@android:color/holo_blue_dark"
             android:gravity="center"
-            android:text="ASDFGH"
+            android:text="@string/asdfgh"
             android:textColor="@android:color/background_light"
             android:textSize="75sp"
             android:textStyle="bold"
@@ -54,9 +50,9 @@
             android:layout_marginTop="28dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_weight="7"
+            android:layout_weight="10"
             android:gravity="center"
-            android:text="Listă studenți conectați"
+            android:text="@string/list_studen_i_conecta_i"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -77,37 +73,30 @@
                 android:id="@+id/o1_radio_startingQuiz"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="Individual" />
+                android:gravity="center"
+                android:text="@string/individual" />
 
             <RadioButton
                 android:id="@+id/o2_radio_startingQuiz"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
                 android:layout_weight="1"
-                android:text="Echipe" />
+                android:gravity="center"
+                android:text="@string/echipe" />
         </RadioGroup>
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/studenti_list_startingQuiz"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="47"
-            android:orientation="vertical"
-            android:weightSum="75"></LinearLayout>
-
-        <Button
-            android:id="@+id/start_button_startingQuiz"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:layout_weight="10"
-            android:background="@color/colorAccent"
-            android:text="Start"
-            android:textColor="@android:color/background_light"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:layout_weight="45"></ListView>
 
         <TextView
             android:id="@+id/renunta_text_startingQuiz"
@@ -121,12 +110,24 @@
             android:layout_marginRight="8dp"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="Renunță"
+            android:text="@string/renun"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/start_button_startingQuiz"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="0dp"
+            android:layout_weight="10"
+            android:background="@color/colorAccent"
+            android:text="@string/start"
+            android:textColor="@android:color/background_light"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

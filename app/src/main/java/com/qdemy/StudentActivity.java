@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.qdemy.clase.Student;
 
 public class StudentActivity extends AppCompatActivity {
 
@@ -13,6 +16,8 @@ public class StudentActivity extends AppCompatActivity {
     private ImageView setari;
     private ImageView start;
     private Button istoric;
+
+    private Student student;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,9 @@ public class StudentActivity extends AppCompatActivity {
         setari = findViewById(R.id.setari_image_student);
         start = findViewById(R.id.start_image_student);
         istoric = findViewById(R.id.istoric_button_student);
+
+        student = getIntent().getParcelableExtra(Constante.CHEIE_AUTENTIFICARE);
+        Toast.makeText(getApplicationContext(), "Salutare " +student.getNume(), Toast.LENGTH_LONG).show();
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override

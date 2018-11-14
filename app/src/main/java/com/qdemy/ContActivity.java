@@ -1,6 +1,7 @@
 package com.qdemy;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qdemy.clase.Student;
+
 public class ContActivity extends AppCompatActivity {
 
     private TextInputEditText mail;
@@ -16,6 +19,7 @@ public class ContActivity extends AppCompatActivity {
     private TextInputEditText parola;
     private Button salveaza;
     private TextView renunta;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,23 +37,26 @@ public class ContActivity extends AppCompatActivity {
         mail = findViewById(R.id.mail_textInput_cont);
         salveaza = findViewById(R.id.salveaza_button_cont);
         renunta = findViewById(R.id.renunta_textView_cont);
+        intent=getIntent();
 
         salveaza.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(nume.getText().toString().equals(""))
+                if(nume.getText().toString().trim().isEmpty())
                     Toast.makeText(getApplicationContext(),"Completeaza campul - Nume!", Toast.LENGTH_SHORT).show();
 
-                else if(parola.getText().toString().equals(""))
+                else if(parola.getText().toString().trim().isEmpty())
                     Toast.makeText(getApplicationContext(),"Completeaza campul - Parola!", Toast.LENGTH_SHORT).show();
 
-                else if(mail.getText().toString().equals(""))
+                else if(mail.getText().toString().trim().isEmpty())
                     Toast.makeText(getApplicationContext(),"Completeaza campul - Mail institutional!", Toast.LENGTH_SHORT).show();
 
                 else
                 {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
+                    Student student = new Student(nume.getText().toString(), parola.getText().toString(), mail.getText().toString());
+
+                    intent.putExtra(Constante.CHEIE_CONT_NOU, student);
+                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
@@ -58,8 +65,6 @@ public class ContActivity extends AppCompatActivity {
         renunta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
                 finish();
             }
         });

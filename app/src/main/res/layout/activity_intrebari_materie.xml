@@ -36,7 +36,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="1.5"
             android:gravity="center"
-            android:text="Materia"
+            android:text="@string/materia"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -46,12 +46,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.015" />
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/intrebari_list_intrebariMaterie"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="8.5"
-            android:orientation="vertical"></LinearLayout>
+            android:layout_weight="8.5"></ListView>
 
     </LinearLayout>
 
@@ -59,12 +59,13 @@
         android:id="@+id/back_image_intrebariMaterie"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/titlu_image_profesor"
+        android:contentDescription="@string/inapoi"
         app:layout_constraintHorizontal_bias="0.119"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -81,6 +82,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
+        android:contentDescription="@string/adauga"
+        android:focusable="true"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"

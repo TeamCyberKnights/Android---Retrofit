@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.qdemy.clase.Profesor;
 
 public class ProfesorActivity extends AppCompatActivity {
 
@@ -15,6 +18,8 @@ public class ProfesorActivity extends AppCompatActivity {
     private Button desfasurare;
     private ImageView inapoi;
     private ImageView start;
+
+    private Profesor profesor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,9 @@ public class ProfesorActivity extends AppCompatActivity {
         desfasurare = findViewById(R.id.desfasurare_button_profesor);
         inapoi = findViewById(R.id.back_image_profesor);
         start = findViewById(R.id.start_image_profesor);
+
+        profesor = getIntent().getParcelableExtra(Constante.CHEIE_AUTENTIFICARE);
+        Toast.makeText(getApplicationContext(), "Salutare " + profesor.getNume(), Toast.LENGTH_LONG).show();
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,9 +85,9 @@ public class ProfesorActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), StartQuizActivity.class);
+                Intent intent = new Intent(getApplicationContext(), StartingQuizProfesorActivity.class);
                 startActivity(intent);
-                finish();
+
             }
         });
     }

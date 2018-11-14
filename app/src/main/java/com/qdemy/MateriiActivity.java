@@ -3,6 +3,7 @@ package com.qdemy;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -26,7 +27,21 @@ public class MateriiActivity extends AppCompatActivity {
         inapoi = findViewById(R.id.back_image_materii);
         materii = findViewById(R.id.nomenclator_spinner_materii);
         adaugaMaterie = findViewById(R.id.adauga_button_materii);
+
         //initializare nomenclator cu materii
+        String[] nomenclator_materii = new String[] {
+                getString(R.string.poo),
+                getString(R.string.sdd),
+                getString(R.string.java),
+                getString(R.string.paw),
+                getString(R.string.dam),
+                getString(R.string.tw)
+        };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, nomenclator_materii);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        materii.setAdapter(adapter);
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -27,7 +27,8 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="10"
             android:gravity="center"
-            android:text="99:99"
+            android:text="@string/_99_99"
+            android:textColor="@color/colorAccent"
             android:textSize="36sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -50,7 +51,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="35"
             android:gravity="center"
-            android:text="Intrebare"
+            android:text="@string/intrebare"
             android:textSize="36sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +73,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="Sari peste"
+            android:text="@string/sari_peste"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -92,50 +93,62 @@
             <Button
                 android:id="@+id/A_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/B_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/C_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/D_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/E_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/F_button_grila"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="@string/raspuns"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
         </LinearLayout>
 

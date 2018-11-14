@@ -1,6 +1,7 @@
 package com.qdemy;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,12 +10,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qdemy.clase.Profesor;
+import com.qdemy.clase.Student;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextInputEditText nume;
     private TextInputEditText parola;
-    private Button intra_cont;
-    private TextView creeaza_cont;
+    private Button intraCont;
+    private TextView creeazaCont;
+
+    private Student student;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,36 +34,62 @@ public class MainActivity extends AppCompatActivity {
     {
         nume = findViewById(R.id.nume_textInput_main);
         parola = findViewById(R.id.parola_textInput_main);
-        intra_cont = findViewById(R.id.intra_button_main);
-        creeaza_cont = findViewById(R.id.creeaza_textView_main);
+        intraCont = findViewById(R.id.intra_button_main);
+        creeazaCont = findViewById(R.id.creeaza_textView_main);
 
-        intra_cont.setOnClickListener(new View.OnClickListener() {
+        //CREARE CONT EXEMPLU PROFESOR
+        //conturile profesorilor vor fi predefinite in aplicatia finala
+        final Profesor profesor = new Profesor("DitaAlexandru", "1234", "alexandru.dita@csie.ase.ro");
+
+
+        intraCont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(nume.getText().toString().equals("student"))
-                {
-                    Intent intent = new Intent(getApplicationContext(), StudentActivity.class);
-                    startActivity(intent);
-                    finish();
+
+                    if(nume.getText().toString().equals(profesor.getNume()) &&
+                        parola.getText().toString().equals(profesor.getParola()) )
+                    {
+                        Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else if(nume.getText().toString().equals(student.getNume()) &&
+                            parola.getText().toString().equals(student.getParola()) )
+                    {
+                        Intent intent = new Intent(getApplicationContext(), StudentActivity.class);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE, student);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(), getString(R.string.autentificare_eroare), Toast.LENGTH_SHORT).show();
                 }
-                else if(nume.getText().toString().equals("profesor"))
-                {
-                    Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                else
-                    Toast.makeText(getApplicationContext(),"Nume gresit!", Toast.LENGTH_SHORT).show();
-            }
+
         });
 
-        creeaza_cont.setOnClickListener(new View.OnClickListener() {
+        creeazaCont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ContActivity.class);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent, Constante.REQUEST_CODE_CONT_NOU);
             }
         });
+
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Constante.REQUEST_CODE_CONT_NOU && resultCode == RESULT_OK && data != null)
+        {
+            student = data.getParcelableExtra(Constante.CHEIE_CONT_NOU);
+            Toast.makeText(getApplicationContext(),getString(R.string.inregistrare_succes), Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(getApplicationContext(),getString(R.string.inregistrare_eroare), Toast.LENGTH_SHORT).show();
+
     }
 }

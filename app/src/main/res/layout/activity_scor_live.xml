@@ -8,13 +8,14 @@
 
     <ImageView
         android:id="@+id/stop_image_scorLive"
-        android:layout_width="36dp"
-        android:layout_height="35dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/timer_text_scorLive"
@@ -23,18 +24,19 @@
 
     <ImageView
         android:id="@+id/back_image_scorLive"
-        android:layout_width="36dp"
-        android:layout_height="35dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/titlu_image_profesor"
+        android:contentDescription="@string/inapoi"
         app:layout_constraintHorizontal_bias="0.119"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
 
     <TextView
         android:id="@+id/timer_text_scorLive"
@@ -49,7 +51,8 @@
         android:layout_marginBottom="8dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="99:99"
+        android:text="@string/_99_99"
+        android:textColor="@color/colorAccent"
         android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -81,33 +84,35 @@
             android:layout_height="0dp"
             android:layout_margin="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="4">
 
             <TextView
-                android:id="@+id/asteapta_text_sq2"
+                android:id="@+id/nume_text_scorLive"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_weight="1"
+                android:layout_weight="3"
                 android:gravity="center"
                 android:text="@string/nume"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/acceseaza_button_sq"
                 app:layout_constraintVertical_bias="0.417" />
 
             <TextView
-                android:id="@+id/asteapta_text_sq3"
+                android:id="@+id/punctaj_text_scorLive"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
@@ -116,21 +121,20 @@
                 android:layout_marginBottom="8dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Punctaj"
-                android:textSize="24sp"
+                android:text="@string/punctaj"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/acceseaza_button_sq"
                 app:layout_constraintVertical_bias="0.417" />
         </LinearLayout>
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/studenti_list_scorLive"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="9"
-            android:orientation="vertical"></LinearLayout>
+            android:layout_weight="9"></ListView>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

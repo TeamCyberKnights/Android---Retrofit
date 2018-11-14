@@ -36,7 +36,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="1.5"
             android:gravity="center"
-            android:text="Testul"
+            android:text="@string/nume_test"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -59,7 +59,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="3"
             android:gravity="center"
-            android:text="Descriere"
+            android:text="@string/descriere_test"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,15 +68,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.267" />
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/intrebari_list_testDetalii"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="5.5"
-            android:orientation="vertical"
-            android:weightSum="10">
+            android:layout_weight="5.5">
 
-        </LinearLayout>
+        </ListView>
 
     </LinearLayout>
 
@@ -84,12 +83,13 @@
         android:id="@+id/back_image_testDetalii"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/titlu_image_profesor"
+        android:contentDescription="@string/inapoi"
         app:layout_constraintHorizontal_bias="0.119"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -106,6 +106,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
+        android:contentDescription="@string/editeaza"
         app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -114,7 +115,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.984"
         app:maxImageSize="30dp"
-        app:srcCompat="@drawable/ic_edit_black_24dp" />
+        app:srcCompat="@drawable/ic_edit_black_24dp"
+        android:focusable="true" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/partajeaza_button_testDetalii"
@@ -127,6 +129,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
+        android:contentDescription="@string/partajeaza"
         app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toTopOf="@+id/editeaza_button_testDetalii"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,6 +138,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.988"
         app:maxImageSize="30dp"
-        app:srcCompat="@drawable/ic_share_black_24dp" />
+        app:srcCompat="@drawable/ic_share_black_24dp"
+        android:focusable="true" />
 
 </android.support.constraint.ConstraintLayout>

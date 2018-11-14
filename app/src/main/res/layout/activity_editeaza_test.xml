@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:hint="Nume test"
+                android:hint="@string/nume_test"
                 android:textSize="24sp"
                 android:textStyle="bold" />
         </android.support.design.widget.TextInputLayout>
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:hint="Text test"
+                android:hint="@string/descriere_test"
                 android:textSize="24sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -69,29 +69,30 @@
                 android:id="@+id/durata_text_adaugaTest"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Durata:"
+                android:text="@string/durata"
                 android:textSize="22sp" />
 
             <Spinner
                 android:id="@+id/durate_spinner_editeazaTest"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_weight="3"
                 android:gravity="center" />
 
         </LinearLayout>
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/intrebari_list_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="3"
-            android:orientation="vertical"
-            android:weightSum="6">
+            android:layout_weight="3">
 
-        </LinearLayout>
+        </ListView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,15 +105,17 @@
                 android:id="@+id/textView"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Materia:"
+                android:text="@string/materia1"
                 android:textSize="22sp" />
 
             <Spinner
                 android:id="@+id/materii_spinner_editeazaTest"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="0dp"
                 android:layout_weight="3"
                 android:gravity="center" />
 
@@ -129,7 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.75"
-            android:text="Adaugă întrebarea"
+            android:text="@string/adaug_ntrebarea"
             android:textAllCaps="false"
             android:textSize="18sp" />
 
@@ -138,7 +141,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Actualizează testul"
+            android:text="@string/actualizeaz_testul"
             android:textAllCaps="false"
             android:textSize="22sp" />
 
@@ -148,13 +151,11 @@
         android:id="@+id/back_image_editeazaTest"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/titlu_image_profesor"
-        app:layout_constraintHorizontal_bias="0.119"
+        android:contentDescription="@string/inapoi"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_arrow_back_black_24dp" />

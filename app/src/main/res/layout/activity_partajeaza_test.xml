@@ -36,7 +36,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="Testul"
+            android:text="@string/nume_test"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Partajează testul"
+            android:text="@string/partajeaz_testul"
             android:textAllCaps="false"
             android:textSize="22sp" />
 
@@ -74,7 +74,7 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Persoane cu acces la acest test"
+            android:text="@string/persoane_cu_acces_la_acest_test"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -84,15 +84,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.015" />
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/persoane_list_partajeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="5"
-            android:orientation="vertical"
-            android:weightSum="6">
+            android:layout_weight="5">
 
-        </LinearLayout>
+        </ListView>
 
     </LinearLayout>
 
@@ -100,12 +99,13 @@
         android:id="@+id/back_image_partajeazaTest"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/titlu_image_profesor"
+        android:contentDescription="@string/inapoi"
         app:layout_constraintHorizontal_bias="0.119"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
