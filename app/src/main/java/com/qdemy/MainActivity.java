@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Student;
+import com.qdemy.network.HttpManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private Button intraCont;
     private TextView creeazaCont;
     private String dataCurenta;
+    private static final String urlJSONStudenti = "......"; //URL cu JSON pentru clasa Student
+    private static final String urlJSONProfesori = "......"; // (la fel la restul)
+    private static final String urlJSONTeste = "......";
+    private static final String urlJSONIntrebariGrila = "......";
+    private static final String urlJSONRaspunsuriIntrebariGrila = "......";
+    private static final String urlJSONRezultateTesteProfesor = "......";
+    private static final String urlJSONRezultateTesteStudenti = "......";
 
     private Student student;
 
@@ -30,6 +39,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //region preluare date din URL-uri
+
+        @SuppressLint("StaticFieldLeak") HttpManager manager = new HttpManager() {
+            @Override
+            protected void onPostExecute(String string) {
+
+                //student = StudentParser.fromJson(string);
+
+                //DE FACUT CLASE PARSER PENTRU FIECARE CLASA
+
+            }};
+
+        manager.execute(urlJSONStudenti);
+        manager.execute(urlJSONProfesori);
+        // ......
+
+        //endregion
 
         initializare();
     }
@@ -41,11 +68,15 @@ public class MainActivity extends AppCompatActivity {
         intraCont = findViewById(R.id.intra_button_main);
         creeazaCont = findViewById(R.id.creeaza_textView_main);
 
-        //CREARE CONT EXEMPLU PROFESOR
+
+        //region creare cont exemplu profesor
         //conturile profesorilor vor fi predefinite in aplicatia finala
         final Profesor profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
         //nume: DitaAlexandru
         //parola: 1234
+
+        //endregion
+
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat formatData = new SimpleDateFormat(Constante.DATE_FORMAT);
