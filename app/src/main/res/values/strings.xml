@@ -73,4 +73,27 @@
     <string name="paw">Programarea aplicațiilor Windows</string>
     <string name="dam">Dispozitive și aplicații mobile</string>
     <string name="tw">Tehnologii Web</string>
+    <string name="ex_prof_nume">Dita Alexandru</string>
+    <string name="ex_prof_parola">1234</string>
+    <string name="ex_prof_mail">alexandru.dita@csie.ase.ro</string>
+    <string name="deconectare_message">Dorești să te deconectezi?</string>
+    <string name="deconectare_title">Deconectare</string>
+    <string name="privat">privat</string>
+    <string name="public1">public</string>
+    <string name="ex_prof_utilizator">alex.dita</string>
+    <string name="utilizator">Utilizator</string>
+    <string name="da">Da</string>
+    <string name="nu">Nu</string>
+    <string name="stergere_intrebare_message">Sigur dorești să ștergi această întrebare?</string>
+    <string name="stergere_materie_message">Dorești să elimini această materie din profilul tău?</string>
+    <string name="usor">ușor</string>
+    <string name="mediu">mediu</string>
+    <string name="greu">greu</string>
+    <string name="stergere_test_message">Sigur dorești să ștergi acest test?</string>
+    <string name="student">student</string>
+    <string name="stergere_partajare_message">Dorești să elimini dreptul de acces la acest test lui</string>
+    <string name="profesor">profesor</string>
+    <string name="timp">Timp</string>
+    <string name="corecte">Corecte</string>
+    <string name="Nume_student1">Nume student</string>
 </resources>

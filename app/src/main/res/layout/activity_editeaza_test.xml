@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:gravity="center">
 
             <android.support.design.widget.TextInputEditText
@@ -55,8 +55,41 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:hint="@string/descriere_test"
-                android:textSize="24sp" />
+                android:textSize="18sp" />
         </android.support.design.widget.TextInputLayout>
+
+        <RadioGroup
+            android:id="@+id/tipuri_radioGroup_editeazaTest"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.75"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/privat_radioButton_editeazaTest"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/privat"
+                android:textAllCaps="false"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/public_radioButton_editeazaTest"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_weight="1"
+                android:text="@string/public1"
+                android:textAllCaps="false"
+                android:textSize="20sp" />
+
+        </RadioGroup>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -140,10 +173,10 @@
             android:id="@+id/actualizeaza_button_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.75"
             android:text="@string/actualizeaz_testul"
             android:textAllCaps="false"
-            android:textSize="22sp" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 

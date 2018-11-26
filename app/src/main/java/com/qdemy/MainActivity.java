@@ -13,12 +13,16 @@ import android.widget.Toast;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Student;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextInputEditText nume;
     private TextInputEditText parola;
     private Button intraCont;
     private TextView creeazaCont;
+    private String dataCurenta;
 
     private Student student;
 
@@ -39,8 +43,13 @@ public class MainActivity extends AppCompatActivity {
 
         //CREARE CONT EXEMPLU PROFESOR
         //conturile profesorilor vor fi predefinite in aplicatia finala
-        final Profesor profesor = new Profesor("DitaAlexandru", "1234", "alexandru.dita@csie.ase.ro");
+        final Profesor profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
+        //nume: DitaAlexandru
+        //parola: 1234
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat formatData = new SimpleDateFormat(Constante.DATE_FORMAT);
+        dataCurenta = formatData.format(calendar.getTime());
 
         intraCont.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,14 +60,17 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
                         startActivity(intent);
                         finish();
                     }
                     else if(nume.getText().toString().equals(student.getNume()) &&
                             parola.getText().toString().equals(student.getParola()) )
                     {
+
                         Intent intent = new Intent(getApplicationContext(), StudentActivity.class);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE, student);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
                         startActivity(intent);
                         finish();
                     }
@@ -73,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ContActivity.class);
                 startActivityForResult(intent, Constante.REQUEST_CODE_CONT_NOU);
+                nume.setText("");
+                parola.setText("");
             }
         });
 

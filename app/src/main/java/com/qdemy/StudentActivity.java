@@ -1,6 +1,8 @@
 package com.qdemy;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +20,7 @@ public class StudentActivity extends AppCompatActivity {
     private Button istoric;
 
     private Student student;
+    private String dataCurenta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +38,29 @@ public class StudentActivity extends AppCompatActivity {
         istoric = findViewById(R.id.istoric_button_student);
 
         student = getIntent().getParcelableExtra(Constante.CHEIE_AUTENTIFICARE);
+        dataCurenta = getIntent().getStringExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA);
         Toast.makeText(getApplicationContext(), "Salutare " +student.getNume(), Toast.LENGTH_LONG).show();
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
+
+                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(v.getContext());
+                dlgAlert.setMessage(R.string.deconectare_message);
+                dlgAlert.setTitle(R.string.deconectare_title);
+                dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                dlgAlert.setNegativeButton(R.string.nu, null);
+                dlgAlert.setCancelable(true);
+                AlertDialog dialog = dlgAlert.create();
+                dialog.show();
+
+
             }
         });
 

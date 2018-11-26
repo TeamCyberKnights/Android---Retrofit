@@ -99,55 +99,71 @@
             android:orientation="vertical"
             android:weightSum="6">
 
-            <Button
-                android:id="@+id/A_button_intrebare"
+            <TextView
+                android:id="@+id/A_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp" />
 
-            <Button
-                android:id="@+id/B_button_intrebare"
+            <TextView
+                android:id="@+id/B_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp" />
 
-            <Button
-                android:id="@+id/C_button_intrebare"
+            <TextView
+                android:id="@+id/C_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
-            <Button
-                android:id="@+id/D_button_intrebare"
+            <TextView
+                android:id="@+id/D_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
-            <Button
-                android:id="@+id/E_button_intrebare"
+            <TextView
+                android:id="@+id/E_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
-            <Button
-                android:id="@+id/F_button_intrebare"
+            <TextView
+                android:id="@+id/F_text_raspuns"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
-                android:text="@string/raspuns" />
+                android:gravity="center"
+                android:text="@string/raspuns"
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
