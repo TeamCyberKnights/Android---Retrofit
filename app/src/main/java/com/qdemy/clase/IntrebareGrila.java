@@ -13,7 +13,7 @@ public class IntrebareGrila implements Parcelable {
     private String materie;
     private List<String> variante = new ArrayList<>();
     private List<Boolean> raspunsuri = new ArrayList<>();  // true=corect, false=gresit
-    private float punctaj; // asociat dificultatii: 1-usor, 2-mediu, 3-greu
+    private float punctaj; // asociat dificultatii: 1-usor, 2-mediu, 3-greu  //ENUM
 
     public IntrebareGrila(String nume, String continut, String materie, List<String> variante, List<Boolean> raspunsuri, float punctaj) {
         this.nume = nume;

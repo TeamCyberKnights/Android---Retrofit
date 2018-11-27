@@ -25,13 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button intraCont;
     private TextView creeazaCont;
     private String dataCurenta;
-    private static final String urlJSONStudenti = "......"; //URL cu JSON pentru clasa Student
-    private static final String urlJSONProfesori = "......"; // (la fel la restul)
-    private static final String urlJSONTeste = "......";
-    private static final String urlJSONIntrebariGrila = "......";
-    private static final String urlJSONRaspunsuriIntrebariGrila = "......";
-    private static final String urlJSONRezultateTesteProfesor = "......";
-    private static final String urlJSONRezultateTesteStudenti = "......";
+    private static final String urlJSONProfesori = "......"; //AICI PUI LINK
 
     private Student student;
 
@@ -46,9 +40,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String string) {
 
-                //student = StudentParser.fromJson(string);
+                //profesor = ProfesorParser.fromJson(string);
 
-                //DE FACUT CLASE PARSER PENTRU FIECARE CLASA
+                //DE FACUT CLASA PARSER PENTRU PROFESOR
+
+                //de pus si niste TOAST-uri pt ca nu functioneaza intializarea activitatilor cu obiectele formate
 
             }};
 

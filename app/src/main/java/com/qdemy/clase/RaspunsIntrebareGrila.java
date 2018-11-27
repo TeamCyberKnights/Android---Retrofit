@@ -42,8 +42,15 @@ public class RaspunsIntrebareGrila extends IntrebareGrila {
     }
 
 
+    public void partialCorect()
+    {
+        //raspunsurile  partial corect
+    }
+
+
     public boolean Corect()
     {
+        //de luat in calcul raspunsurile partiale
         if(punctajObtinut==this.getPunctaj()) return true;
         else return false;
     }

@@ -10,7 +10,8 @@ public class RezultatTestStudent implements Parcelable {
 
     private String nume; // preluat de la testul original
     private String data;
-    private float punctajObtinut; //punctajul tuturor intrebarilor * coef obtinut prin impartirea 100/punctaj maxim posibil
+    private float punctajObtinut; //PUNCTAJ RELATIV LA 100  //punctajul tuturor intrebarilor * coef obtinut prin impartirea 100/punctaj maxim posibil
+    //de facut metoda pentru calculat punctajulObtinut (in loc de campul asta) !!!!
     private int minuteTrecute;
     private boolean promovat;
     private List<RaspunsIntrebareGrila> raspunsuri = new ArrayList<>();
