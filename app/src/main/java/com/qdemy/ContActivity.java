@@ -16,6 +16,7 @@ public class ContActivity extends AppCompatActivity {
 
     private TextInputEditText mail;
     private TextInputEditText nume;
+    private TextInputEditText utilizator;
     private TextInputEditText parola;
     private Button salveaza;
     private TextView renunta;
@@ -33,6 +34,7 @@ public class ContActivity extends AppCompatActivity {
     private void initializare()
     {
         nume = findViewById(R.id.nume_textInput_cont);
+        utilizator = findViewById(R.id.utilizator_textInput_cont);
         parola = findViewById(R.id.parola_textInput_cont);
         mail = findViewById(R.id.mail_textInput_cont);
         salveaza = findViewById(R.id.salveaza_button_cont);
@@ -43,17 +45,17 @@ public class ContActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(nume.getText().toString().trim().isEmpty())
-                    Toast.makeText(getApplicationContext(),"Completeaza campul - Nume!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.completeaza_nume), Toast.LENGTH_SHORT).show();
 
                 else if(parola.getText().toString().trim().isEmpty())
-                    Toast.makeText(getApplicationContext(),"Completeaza campul - Parola!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.completeaza_parola), Toast.LENGTH_SHORT).show();
 
                 else if(mail.getText().toString().trim().isEmpty())
-                    Toast.makeText(getApplicationContext(),"Completeaza campul - Mail institutional!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.completeaza_mail), Toast.LENGTH_SHORT).show();
 
                 else
                 {
-                    Student student = new Student(nume.getText().toString(), parola.getText().toString(), mail.getText().toString());
+                    Student student = new Student(nume.getText().toString(), utilizator.getText().toString(), parola.getText().toString(), mail.getText().toString());
 
                     intent.putExtra(Constante.CHEIE_CONT_NOU, student);
                     setResult(RESULT_OK, intent);

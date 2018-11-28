@@ -96,4 +96,8 @@
     <string name="timp">Timp</string>
     <string name="corecte">Corecte</string>
     <string name="Nume_student1">Nume student</string>
+    <string name="completeaza_nume">Completeaza campul - Nume!</string>
+    <string name="completeaza_parola">Completeaza campul - Parola!</string>
+    <string name="completeaza_mail">Completeaza campul - Mail institutional!</string>
+    <string name="completeaza_ambele_campuri">Completează ambele câmpuri!</string>
 </resources>

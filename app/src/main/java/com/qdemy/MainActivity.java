@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
             }};
 
-        manager.execute(urlJSONStudenti);
         manager.execute(urlJSONProfesori);
         // ......
 
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         //region creare cont exemplu profesor
         //conturile profesorilor vor fi predefinite in aplicatia finala
         final Profesor profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
-        //nume: DitaAlexandru
+        //utilizator: alex.dita
         //parola: 1234
 
         //endregion
@@ -82,18 +81,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                    if(nume.getText().toString().equals(profesor.getNume()) &&
-                        parola.getText().toString().equals(profesor.getParola()) )
-                    {
-                        Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
-                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
-                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
-                        startActivity(intent);
-                        finish();
-                    }
-                    else if(nume.getText().toString().equals(student.getNume()) &&
-                            parola.getText().toString().equals(student.getParola()) )
-                    {
+                if (nume.getText().toString().isEmpty() || parola.getText().toString().isEmpty())
+                    Toast.makeText(getApplicationContext(), getString(R.string.completeaza_ambele_campuri), Toast.LENGTH_SHORT).show();
+                else if (nume.getText().toString().equals(profesor.getUtilizator()) &&
+                        parola.getText().toString().equals(profesor.getParola())) {
+                    Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                    intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
+                    intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
+                    startActivity(intent);
+                    finish();
+                }
+                else if (student != null) {
+                    if (nume.getText().toString().equals(student.getUtilizator()) &&
+                            parola.getText().toString().equals(student.getParola())) {
 
                         Intent intent = new Intent(getApplicationContext(), StudentActivity.class);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE, student);
@@ -101,9 +101,10 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     }
-                    else
-                        Toast.makeText(getApplicationContext(), getString(R.string.autentificare_eroare), Toast.LENGTH_SHORT).show();
                 }
+                else
+                    Toast.makeText(getApplicationContext(), getString(R.string.autentificare_eroare), Toast.LENGTH_SHORT).show();
+            }
 
         });
 
