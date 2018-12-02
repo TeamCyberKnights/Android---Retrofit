@@ -100,4 +100,18 @@
     <string name="completeaza_parola">Completeaza campul - Parola!</string>
     <string name="completeaza_mail">Completeaza campul - Mail institutional!</string>
     <string name="completeaza_ambele_campuri">Completează ambele câmpuri!</string>
+    <string name="mail">mail</string>
+    <string name="materii">materii</string>
+    <string name="intrebari">intrebari</string>
+    <string name="teste">teste</string>
+    <string name="continut">continut</string>
+    <string name="materie">materie</string>
+    <string name="punctaj1">punctaj</string>
+    <string name="raspunsuri">raspunsuri</string>
+    <string name="variante">variante</string>
+    <string name="descriere">descriere</string>
+    <string name="autor">autor</string>
+    <string name="minute">minute</string>
+    <string name="estePublic">estePublic</string>
+    <string name="eroare_parsare">Parsarea nu a functionat!</string>
 </resources>

@@ -84,6 +84,17 @@ public class Test implements Parcelable {
 
     //endregion
 
+    @Override
+    public String toString() {
+        return "Test{" +
+                "nume='" + nume + '\'' +
+                ", descriere='" + descriere + '\'' +
+                ", autor='" + autor + '\'' +
+                ", intrebari=" + intrebari +
+                ", minute=" + minute +
+                ", estePublic=" + estePublic +
+                '}';
+    }
 
 
     //Parcel

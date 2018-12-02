@@ -37,7 +37,7 @@ public class TesteActivity extends AppCompatActivity {
         inapoi = findViewById(R.id.back_image_teste);
         adauga = findViewById(R.id.adauga_button_teste);
         testeList = findViewById(R.id.teste_list_teste);
-        //initializare teste
+        //initializare teste in adaptor
         TestAdapter adapter = new TestAdapter(getApplicationContext(),
                 R.layout.item_text_button, teste, getLayoutInflater());
         testeList.setAdapter(adapter);

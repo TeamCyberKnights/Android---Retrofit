@@ -36,12 +36,12 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         adauga = findViewById(R.id.adauga_button_intrebariMaterii);
         intrebariList = findViewById(R.id.intrebari_list_intrebariMaterie);
 
-        //initializare intrebari
+        //initializare intrebari in adaptor
         IntrebareAdapter adapter = new IntrebareAdapter(getApplicationContext(),
                 R.layout.item_text_button, intrebari, getLayoutInflater());
         intrebariList.setAdapter(adapter);
 
-        //INITIALIZARE CAMPURI CU IMATERIA SELECTATA
+        //INITIALIZARE CAMPURI CU MATERIA SELECTATA
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override

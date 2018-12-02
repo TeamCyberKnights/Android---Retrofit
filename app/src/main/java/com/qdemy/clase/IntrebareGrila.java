@@ -13,9 +13,9 @@ public class IntrebareGrila implements Parcelable {
     private String materie;
     private List<String> variante = new ArrayList<>();
     private List<Boolean> raspunsuri = new ArrayList<>();  // true=corect, false=gresit
-    private float punctaj; // asociat dificultatii: 1-usor, 2-mediu, 3-greu  //ENUM
+    private double punctaj; // asociat dificultatii: 1-usor, 2-mediu, 3-greu  //ENUM
 
-    public IntrebareGrila(String nume, String continut, String materie, List<String> variante, List<Boolean> raspunsuri, float punctaj) {
+    public IntrebareGrila(String nume, String continut, String materie, List<String> variante, List<Boolean> raspunsuri, double punctaj) {
         this.nume = nume;
         this.continut = continut;
         this.materie = materie;
@@ -82,16 +82,28 @@ public class IntrebareGrila implements Parcelable {
         this.raspunsuri.set(index,raspuns);
     }
 
-    public float getPunctaj() {
+    public double getPunctaj() {
         return punctaj;
     }
 
-    public void setPunctaj(float punctaj) {
+    public void setPunctaj(double punctaj) {
         this.punctaj = punctaj;
     }
 
 
     //endregion
+
+    @Override
+    public String toString() {
+        return "IntrebareGrila{" +
+                "nume='" + nume + '\'' +
+                ", continut='" + continut + '\'' +
+                ", materie='" + materie + '\'' +
+                ", variante=" + variante +
+                ", raspunsuri=" + raspunsuri +
+                ", punctaj=" + punctaj +
+                '}';
+    }
 
 
     //Parcel
@@ -116,7 +128,7 @@ public class IntrebareGrila implements Parcelable {
         this.materie = parcel.readString();
         parcel.readList(this.variante, getClass().getClassLoader());
         parcel.readList(this.raspunsuri, getClass().getClassLoader());
-        this.punctaj = parcel.readFloat();
+        this.punctaj = parcel.readDouble();
     }
 
 
@@ -133,6 +145,6 @@ public class IntrebareGrila implements Parcelable {
         parcel.writeString(materie);
         parcel.writeList(variante);
         parcel.writeList(raspunsuri);
-        parcel.writeFloat(punctaj);
+        parcel.writeDouble(punctaj);
     }
 }

@@ -39,7 +39,7 @@ public class MateriiActivity extends AppCompatActivity {
         inapoi = findViewById(R.id.back_image_materii);
         materiiList = findViewById(R.id.materii_list_materii);
 
-        //INITIALIZARE MATERII PROFESOR
+        //INITIALIZARE MATERII PROFESOR in adaptor
 
         materiiSpinner = findViewById(R.id.nomenclator_spinner_materii);
         adaugaMaterie = findViewById(R.id.adauga_button_materii);

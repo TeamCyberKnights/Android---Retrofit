@@ -29,6 +29,18 @@ public class Profesor implements Parcelable{
     }
 
     public Profesor(String nume, String utilizator, String parola, String mail, List<String> materii,
+                    List<IntrebareGrila> intrebari, List<Test> teste) {
+        this.nume = nume;
+        this.utilizator = utilizator;
+        this.parola = parola;
+        this.mail = mail;
+        this.materii = materii;
+        this.intrebari = intrebari;
+        this.teste = teste;
+        this.testeSustinute=null;
+    }
+
+    public Profesor(String nume, String utilizator, String parola, String mail, List<String> materii,
                     List<IntrebareGrila> intrebari, List<Test> teste, List<RezultatTestProfesor> testeSustinute) {
         this.nume = nume;
         this.utilizator = utilizator;
@@ -140,6 +152,20 @@ public class Profesor implements Parcelable{
     }
 
     //endregion
+
+    @Override
+    public String toString() {
+        return "Profesor{" +
+                "nume='" + nume + '\'' +
+                ", utilizator='" + utilizator + '\'' +
+                ", parola='" + parola + '\'' +
+                ", mail='" + mail + '\'' +
+                ", materii=" + materii +
+                ", intrebari=" + intrebari +
+                ", teste=" + teste +
+                '}';
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //Parcel

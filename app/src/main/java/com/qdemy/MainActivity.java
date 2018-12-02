@@ -14,6 +14,9 @@ import android.widget.Toast;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Student;
 import com.qdemy.network.HttpManager;
+import com.qdemy.network.ProfesorParser;
+
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,9 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private Button intraCont;
     private TextView creeazaCont;
     private String dataCurenta;
-    private static final String urlJSONProfesori = "......"; //AICI PUI LINK
+    private static final String urlJSONProfesor = "https://api.myjson.com/bins/xuwa2";
 
     private Student student;
+    private Profesor profesor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +44,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String string) {
 
-                //profesor = ProfesorParser.fromJson(string);
-
-                //DE FACUT CLASA PARSER PENTRU PROFESOR
-
-                //de pus si niste TOAST-uri pt ca nu functioneaza intializarea activitatilor cu obiectele formate
+                try {
+                    profesor = ProfesorParser.getProfesorJSON(string);
+                    Toast.makeText(getApplicationContext(), profesor.toString(), Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    Toast.makeText(getApplicationContext(),getString(R.string.eroare_parsare),Toast.LENGTH_LONG).show();
+                }
 
             }};
 
-        manager.execute(urlJSONProfesori);
-        // ......
+        manager.execute(urlJSONProfesor);
 
         //endregion
 
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         //region creare cont exemplu profesor
         //conturile profesorilor vor fi predefinite in aplicatia finala
-        final Profesor profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
+        //profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
         //utilizator: alex.dita
         //parola: 1234
 
@@ -83,13 +87,16 @@ public class MainActivity extends AppCompatActivity {
 
                 if (nume.getText().toString().isEmpty() || parola.getText().toString().isEmpty())
                     Toast.makeText(getApplicationContext(), getString(R.string.completeaza_ambele_campuri), Toast.LENGTH_SHORT).show();
-                else if (nume.getText().toString().equals(profesor.getUtilizator()) &&
+                else if (profesor != null)
+                    {
+                        if (nume.getText().toString().equals(profesor.getUtilizator()) &&
                         parola.getText().toString().equals(profesor.getParola())) {
-                    Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
-                    intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
-                    intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
-                    startActivity(intent);
-                    finish();
+                        Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
+                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
                 else if (student != null) {
                     if (nume.getText().toString().equals(student.getUtilizator()) &&
