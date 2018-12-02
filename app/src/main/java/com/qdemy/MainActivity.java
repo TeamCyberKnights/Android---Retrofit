@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button intraCont;
     private TextView creeazaCont;
     private String dataCurenta;
-    private static final String urlJSONProfesor = "https://api.myjson.com/bins/xuwa2";
+    private static final String urlJSONProfesor = "https://api.myjson.com/bins/17t1sq";
 
     private Student student;
     private Profesor profesor;
@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(String string) {
 
                 try {
-                    profesor = ProfesorParser.getProfesorJSON(string);
-                    Toast.makeText(getApplicationContext(), profesor.toString(), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
+                    profesor = ProfesorParser.getProfesorJSON(getApplicationContext(), string);
+                    //Toast.makeText(getApplicationContext(), profesor.toString(), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
                     Toast.makeText(getApplicationContext(),getString(R.string.eroare_parsare),Toast.LENGTH_LONG).show();
                 }
 

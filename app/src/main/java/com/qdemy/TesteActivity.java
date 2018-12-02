@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Test;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.TestAdapter;
@@ -23,6 +24,7 @@ public class TesteActivity extends AppCompatActivity {
     private FloatingActionButton adauga;
     private ListView testeList;
     private List<Test> teste = new ArrayList<>();
+    private Profesor profesor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,14 @@ public class TesteActivity extends AppCompatActivity {
         inapoi = findViewById(R.id.back_image_teste);
         adauga = findViewById(R.id.adauga_button_teste);
         testeList = findViewById(R.id.teste_list_teste);
-        //initializare teste in adaptor
+
+
+        profesor = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
+        teste = profesor.getTeste();
         TestAdapter adapter = new TestAdapter(getApplicationContext(),
                 R.layout.item_text_button, teste, getLayoutInflater());
         testeList.setAdapter(adapter);
+
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override

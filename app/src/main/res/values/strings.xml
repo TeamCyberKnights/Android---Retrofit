@@ -2,8 +2,10 @@
     <string name="app_name">Qdemy</string>
     <string name="salveaz">Salvează</string>
     <string name="parola">Parola</string>
+    <string name="parola1">parola</string>
     <string name="mail_institu_ional">Mail instituțional</string>
     <string name="nume">Nume</string>
+    <string name="nume1">nume</string>
     <string name="creeaz_cont">Creează cont</string>
     <string name="intr_n_cont">Intră în cont</string>
     <string name="istoricul_testelor">Istoricul testelor</string>
@@ -82,6 +84,7 @@
     <string name="public1">public</string>
     <string name="ex_prof_utilizator">alex.dita</string>
     <string name="utilizator">Utilizator</string>
+    <string name="utilizator1">utilizator</string>
     <string name="da">Da</string>
     <string name="nu">Nu</string>
     <string name="stergere_intrebare_message">Sigur dorești să ștergi această întrebare?</string>

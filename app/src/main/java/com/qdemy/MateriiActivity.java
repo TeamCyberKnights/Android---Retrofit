@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.Profesor;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.MaterieAdapter;
 
@@ -25,6 +26,7 @@ public class MateriiActivity extends AppCompatActivity {
     private Spinner materiiSpinner;
     private Button adaugaMaterie;
     private List<String> materii = new ArrayList<>();
+    private Profesor profesor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +40,6 @@ public class MateriiActivity extends AppCompatActivity {
 
         inapoi = findViewById(R.id.back_image_materii);
         materiiList = findViewById(R.id.materii_list_materii);
-
-        //INITIALIZARE MATERII PROFESOR in adaptor
-
         materiiSpinner = findViewById(R.id.nomenclator_spinner_materii);
         adaugaMaterie = findViewById(R.id.adauga_button_materii);
 
@@ -58,6 +57,10 @@ public class MateriiActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         materiiSpinner.setAdapter(adapter);
 
+
+
+        profesor = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
+        materii = profesor.getMaterii();
 
         MaterieAdapter adapter1 = new MaterieAdapter(getApplicationContext(),
                 R.layout.item_text_button, materii, getLayoutInflater());

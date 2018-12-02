@@ -69,6 +69,7 @@ public class ProfesorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, profesor);
                 startActivity(intent);
             }
         });
@@ -77,6 +78,7 @@ public class ProfesorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), TesteActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, profesor);
                 startActivity(intent);
             }
         });
@@ -85,6 +87,7 @@ public class ProfesorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, profesor);
                 startActivity(intent);
             }
         });
