@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.qdemy.Constante;
 import com.qdemy.IntrebareActivity;
+import com.qdemy.IntrebariMaterieActivity;
 import com.qdemy.MainActivity;
 import com.qdemy.R;
 import com.qdemy.StudentActivity;
@@ -47,9 +48,17 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
 
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
-        final IntrebareGrila intrebare = intrebari.get(position);
+        nume.setText(intrebari.get(position).getNume());
 
-        nume.setText(intrebare.getNume());
+
+        nume.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), IntrebareActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, intrebari.get(position));
+                v.getContext().startActivity(intent);
+            }
+        });
 
         sterge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +70,7 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
                 dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         intrebari.remove(position);
-                        //eliminare din baza de date
+                        notifyDataSetChanged();
                     }
                 });
                 dlgAlert.setNegativeButton(R.string.nu, null);

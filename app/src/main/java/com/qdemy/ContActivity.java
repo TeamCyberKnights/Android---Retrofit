@@ -55,6 +55,7 @@ public class ContActivity extends AppCompatActivity {
 
                 else
                 {
+                    //verificare useri dublicat
                     Student student = new Student(nume.getText().toString(), utilizator.getText().toString(), parola.getText().toString(), mail.getText().toString());
 
                     intent.putExtra(Constante.CHEIE_CONT_NOU, student);

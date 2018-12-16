@@ -1,7 +1,7 @@
 package com.qdemy;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -11,12 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.qdemy.clase.DaoMaster;
+import com.qdemy.clase.DaoSession;
 import com.qdemy.clase.Profesor;
+import com.qdemy.clase.ProfesorDao;
 import com.qdemy.clase.Student;
-import com.qdemy.network.HttpManager;
-import com.qdemy.network.ProfesorParser;
+import com.qdemy.clase.StudentDao;
+import com.qdemy.db.App;
+import com.qdemy.db.DbOpenHelper;
 
-import org.json.JSONException;
+import org.greenrobot.greendao.database.Database;
+import org.greenrobot.greendao.query.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,32 +39,43 @@ public class MainActivity extends AppCompatActivity {
 
     private Student student;
     private Profesor profesor;
+    private SharedPreferences sharedPreferences;
+
+    private Query<Profesor> profesoriQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //region preluare date din URL-uri
-
-        @SuppressLint("StaticFieldLeak") HttpManager manager = new HttpManager() {
-            @Override
-            protected void onPostExecute(String string) {
-
-                try {
-                    profesor = ProfesorParser.getProfesorJSON(getApplicationContext(), string);
-                    //Toast.makeText(getApplicationContext(), profesor.toString(), Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(),getString(R.string.eroare_parsare),Toast.LENGTH_LONG).show();
-                }
-
-            }};
-
-        manager.execute(urlJSONProfesor);
-
-        //endregion
+//        //region preluare date din URL-uri
+//
+//        @SuppressLint("StaticFieldLeak") HttpManager manager = new HttpManager() {
+//            @Override
+//            protected void onPostExecute(String string) {
+//
+//                try {
+//                    profesor = ProfesorParser.getProfesorJSON(getApplicationContext(), string);
+//                    //Toast.makeText(getApplicationContext(), profesor.toString(), Toast.LENGTH_LONG).show();
+//                } catch (Exception e) {
+//                    Toast.makeText(getApplicationContext(),getString(R.string.eroare_parsare),Toast.LENGTH_LONG).show();
+//                }
+//
+//            }};
+//
+//        manager.execute(urlJSONProfesor);
+//
+//        //endregion
 
         initializare();
+
+
+
+        if(profesor != null){
+            nume.setText(profesor.getUtilizator());
+            parola.setText(profesor.getParola());
+        }
+
     }
 
     private void initializare()
@@ -67,13 +85,14 @@ public class MainActivity extends AppCompatActivity {
         intraCont = findViewById(R.id.intra_button_main);
         creeazaCont = findViewById(R.id.creeaza_textView_main);
 
-
-        //region creare cont exemplu profesor
-        //conturile profesorilor vor fi predefinite in aplicatia finala
-        //profesor = new Profesor(getString(R.string.ex_prof_nume), getString(R.string.ex_prof_utilizator), getString(R.string.ex_prof_parola), getString(R.string.ex_prof_mail));
-        //utilizator: alex.dita
-        //parola: 1234
-
+        //profesor = ((App)getApplication()).getDaoSession().getProfesorDao().load(3L);
+        sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
+        try { incarcareProfesorSalvat(); }
+        catch(Exception e1)
+        {
+            try { incarcareStudentSalvat(); }
+            catch(Exception e2) {}
+        }
         //endregion
 
 
@@ -87,13 +106,13 @@ public class MainActivity extends AppCompatActivity {
 
                 if (nume.getText().toString().isEmpty() || parola.getText().toString().isEmpty())
                     Toast.makeText(getApplicationContext(), getString(R.string.completeaza_ambele_campuri), Toast.LENGTH_SHORT).show();
-                else if (profesor != null)
-                    {
-                        if (nume.getText().toString().equals(profesor.getUtilizator()) &&
+                else if (profesor != null){
+                    if (nume.getText().toString().equals(profesor.getUtilizator()) &&
                         parola.getText().toString().equals(profesor.getParola())) {
+
+                        salvareUtilizatorProfesor();
                         Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE, profesor);
-                        intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
                         startActivity(intent);
                         finish();
                     }
@@ -102,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     if (nume.getText().toString().equals(student.getUtilizator()) &&
                             parola.getText().toString().equals(student.getParola())) {
 
+                        salvareUtilizatorStudent();
                         Intent intent = new Intent(getApplicationContext(), StudentActivity.class);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE, student);
                         intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, dataCurenta);
@@ -126,6 +146,46 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void salvareUtilizatorProfesor() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.utilizator), profesor.getUtilizator());
+        editor.putString(getString(R.string.parola), profesor.getParola());
+        editor.commit();
+    }
+
+    private void salvareUtilizatorStudent() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.utilizator), student.getUtilizator());
+        editor.putString(getString(R.string.parola), student.getParola());
+        editor.commit();
+    }
+
+    private void incarcareProfesorSalvat() {
+        String utilizatorText = sharedPreferences.getString(getString(R.string.utilizator), "");
+        String parolaText = sharedPreferences.getString(getString(R.string.parola), "");
+        ProfesorDao profesorDao = new DaoMaster(new DbOpenHelper(this, "Qdemy.db").getWritableDb()).newSession().getProfesorDao();
+        Query<Profesor> query = profesorDao.queryBuilder().where(
+                ProfesorDao.Properties.Utilizator.eq(utilizatorText),
+                ProfesorDao.Properties.Parola.eq(parolaText)).build();
+        profesor = query.list().get(0);
+
+        nume.setText(utilizatorText);
+        parola.setText(parolaText);
+    }
+
+    private void incarcareStudentSalvat() {
+        String utilizatorText = sharedPreferences.getString(getString(R.string.utilizator), "");
+        String parolaText = sharedPreferences.getString(getString(R.string.parola), "");
+        StudentDao studentDao = new DaoMaster(new DbOpenHelper(this, "Qdemy.db").getWritableDb()).newSession().getStudentDao();
+        Query<Student> query = studentDao.queryBuilder().where(
+                StudentDao.Properties.Utilizator.eq(utilizatorText),
+                StudentDao.Properties.Parola.eq(parolaText)).build();
+        student = query.list().get(0);
+
+        nume.setText(utilizatorText);
+        parola.setText(parolaText);
     }
 
 

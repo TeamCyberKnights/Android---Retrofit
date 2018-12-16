@@ -2,6 +2,7 @@ package com.qdemy.clase_adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -12,7 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.qdemy.Constante;
 import com.qdemy.R;
+import com.qdemy.TestDetaliiActivity;
 import com.qdemy.clase.IntrebareGrila;
 import com.qdemy.clase.Test;
 
@@ -24,15 +27,17 @@ public class TestAdapter extends ArrayAdapter<Test> {
     private int resource;
     private List<Test> teste;
     private LayoutInflater inflater;
+    private Boolean removable;
 
     public TestAdapter(@NonNull Context context, int resource,
-                            @NonNull List<Test> objects, LayoutInflater inflater) {
+                            @NonNull List<Test> objects, LayoutInflater inflater, Boolean removable) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
         this.teste = objects;
         this.inflater=inflater;
+        this.removable=removable;
     }
 
     @NonNull
@@ -43,9 +48,17 @@ public class TestAdapter extends ArrayAdapter<Test> {
 
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
-        final Test test = teste.get(position);
+        nume.setText(teste.get(position).getNume());
 
-        nume.setText(test.getNume());
+        nume.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), TestDetaliiActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position));
+                v.getContext().startActivity(intent);
+            }
+        });
+
 
         sterge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +70,7 @@ public class TestAdapter extends ArrayAdapter<Test> {
                 dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         teste.remove(position);
-                        //eliminare din baza de date
+                        notifyDataSetChanged();
                     }
                 });
                 dlgAlert.setNegativeButton(R.string.nu, null);

@@ -34,7 +34,7 @@ public class SelecteazaTestActivity extends AppCompatActivity {
         testeList = findViewById(R.id.teste_list_selecteazaTest);
         //initializare teste
         TestAdapter adapter = new TestAdapter(getApplicationContext(),
-                R.layout.item_text_button, teste, getLayoutInflater());
+                R.layout.item_text_button, teste, getLayoutInflater(), false);
         testeList.setAdapter(adapter);
 
         inapoi.setOnClickListener(new View.OnClickListener() {

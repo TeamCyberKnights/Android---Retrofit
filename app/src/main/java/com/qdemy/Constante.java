@@ -8,4 +8,6 @@ public interface Constante {
     String CHEIE_AUTENTIFICARE_EXTRA = "extra";
     String CHEIE_TRANSFER = "extra";
     String DATE_FORMAT = "dd.MM.yyyy";
+
+    String FISIER_PREFERINTA_UTILIZATOR = "fisierDateUtilizator";
 }

@@ -23,23 +23,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.design.widget.TextInputLayout
+        <TextView
             android:id="@+id/nume_text_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="0dp"
             android:layout_weight="1"
-            android:gravity="center">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/nume_textInput_editeazaTest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:hint="@string/nume_test"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </android.support.design.widget.TextInputLayout>
+            android:gravity="center"
+            android:hint="@string/nume_test"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/descriere_text_editeazaTest"
@@ -54,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:hint="@string/descriere_test"
+                android:text="@string/descriere_test"
                 android:textSize="18sp" />
         </android.support.design.widget.TextInputLayout>
 

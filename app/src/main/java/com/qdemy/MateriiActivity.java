@@ -38,34 +38,35 @@ public class MateriiActivity extends AppCompatActivity {
 
     private void initializare() {
 
+        //region Initializare componente vizuale
         inapoi = findViewById(R.id.back_image_materii);
         materiiList = findViewById(R.id.materii_list_materii);
         materiiSpinner = findViewById(R.id.nomenclator_spinner_materii);
         adaugaMaterie = findViewById(R.id.adauga_button_materii);
 
-        String[] nomenclator_materii = new String[] {
-                getString(R.string.poo),
-                getString(R.string.sdd),
-                getString(R.string.java),
-                getString(R.string.paw),
-                getString(R.string.dam),
-                getString(R.string.tw)
-        };
+        profesor = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
+        materii = profesor.getNumeMaterii();
+        final MaterieAdapter adapter = new MaterieAdapter(getApplicationContext(),
+                R.layout.item_text_button, materii, getLayoutInflater());
+        materiiList.setAdapter(adapter);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        List<String> nomenclator_materii = new ArrayList<>();
+        nomenclator_materii.add(getString(R.string.poo));
+        nomenclator_materii.add(getString(R.string.sdd));
+        nomenclator_materii.add(getString(R.string.java));
+        nomenclator_materii.add(getString(R.string.paw));
+        nomenclator_materii.add(getString(R.string.dam));
+        nomenclator_materii.add(getString(R.string.tw));
+
+        for(int i=0;i<nomenclator_materii.size();i++)
+            for(int j=0;j<materii.size();j++)
+                if(nomenclator_materii.get(i).equals(materii.get(j)))
+                    nomenclator_materii.remove(i);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, nomenclator_materii);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        materiiSpinner.setAdapter(adapter);
-
-
-
-        profesor = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
-        materii = profesor.getMaterii();
-
-        MaterieAdapter adapter1 = new MaterieAdapter(getApplicationContext(),
-                R.layout.item_text_button, materii, getLayoutInflater());
-        materiiList.setAdapter(adapter1);
-
+        materiiSpinner.setAdapter(adapter1);
+        //endregion
 
 
         inapoi.setOnClickListener(new View.OnClickListener() {
@@ -78,18 +79,10 @@ public class MateriiActivity extends AppCompatActivity {
         adaugaMaterie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //adauga materie in layout
+                materii.add(materiiSpinner.getSelectedItem().toString());
+                adapter.notifyDataSetChanged();
             }
         });
 
-
-        materiiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), IntrebariMaterieActivity.class);
-                intent.putExtra(Constante.CHEIE_AUTENTIFICARE, materii.get(position));
-                startActivity(intent);
-            }
-        });
     }
 }

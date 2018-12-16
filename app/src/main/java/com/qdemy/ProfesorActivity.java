@@ -42,7 +42,6 @@ public class ProfesorActivity extends AppCompatActivity {
         start = findViewById(R.id.start_image_profesor);
 
         profesor = getIntent().getParcelableExtra(Constante.CHEIE_AUTENTIFICARE);
-        dataCurenta = getIntent().getStringExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA);
         Toast.makeText(getApplicationContext(), "Salutare " +profesor.getNume(), Toast.LENGTH_LONG).show();
 
         inapoi.setOnClickListener(new View.OnClickListener() {

@@ -44,7 +44,7 @@ public class TesteActivity extends AppCompatActivity {
         profesor = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
         teste = profesor.getTeste();
         TestAdapter adapter = new TestAdapter(getApplicationContext(),
-                R.layout.item_text_button, teste, getLayoutInflater());
+                R.layout.item_text_button, teste, getLayoutInflater(), true);
         testeList.setAdapter(adapter);
 
 
@@ -63,13 +63,5 @@ public class TesteActivity extends AppCompatActivity {
             }
         });
 
-        testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), TestDetaliiActivity.class);
-                intent.putExtra(Constante.CHEIE_AUTENTIFICARE, teste.get(position));
-                startActivity(intent);
-            }
-        });
     }
 }
