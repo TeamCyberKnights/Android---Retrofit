@@ -20,6 +20,7 @@ public class RezultatTestProfesor implements Parcelable {
     @ToMany(referencedJoinProperty = "rezultatTestProfesorId")
     private List<RezultatTestStudent> rezultate;
 
+    //O LEGI DE TEST NU DE PROF!!!!!!!!!!
     @NotNull private long profesorId;
 
     //region Constructori
