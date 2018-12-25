@@ -72,7 +72,7 @@
         app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/adauga_button_intrebariMaterii"
+        android:id="@+id/adauga_button_intrebariMaterie"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"

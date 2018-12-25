@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +18,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.VariantaRaspuns;
+import com.qdemy.clase.VariantaRaspunsDao;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +33,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
     private ImageView inapoi;
     private TextView materia;
-    private TextView nume;
-    private TextInputEditText continut;
+    private TextInputEditText text;
     private TextInputEditText variantaA;
     private TextInputEditText variantaB;
     private TextInputEditText variantaC;
@@ -47,7 +52,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
     private Profesor profesor;
     private IntrebareGrila intrebare;
-    private List<VariantaRaspuns> variante = new ArrayList<>();
+    private List<VariantaRaspuns> varianteRaspuns = new ArrayList<>();
     private List<Boolean> raspunsuri = new ArrayList<>();
     private SharedPreferences sharedPreferences;
 
@@ -64,8 +69,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
         //region Initializare componente vizuale
         inapoi = findViewById(R.id.back_image_editeazaIntrebare);
         materia = findViewById(R.id.materia_text_editeazaIntrebare);
-        nume = findViewById(R.id.nume_text_editeazaIntrebare);
-        continut = findViewById(R.id.descriere_textInput_editeazaIntrebare);
+        text = findViewById(R.id.descriere_textInput_editeazaIntrebare);
         actualizeaza = findViewById(R.id.editeaza_button_editeazaIntrebare);
         variantaA = findViewById(R.id.A_textInput_editeazaIntrebare);
         variantaB = findViewById(R.id.B_textInput_editeazaIntrebare);
@@ -91,16 +95,15 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dificultatiSpinner.setAdapter(adapter);
 
-        sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
-        incarcareUtilizatorSalvat();
+        profesor = ((App) getApplication()).getProfesor();
+
         //endregion
 
         //region Initilizare intrebare
-        intrebare = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
+        intrebare =  ((App) getApplication()).getIntrebareGrila(getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1));
         materia.setText(intrebare.getMaterie());
-        nume.setText(intrebare.getNume());
-        continut.setText(intrebare.getContinut());
-        dificultatiSpinner.setSelection((int)intrebare.getPunctaj()-1);
+        text.setText(intrebare.getText());
+        dificultatiSpinner.setSelection((int)intrebare.getDificultate()-1);
 
         int nr_variante = intrebare.getVariante().size();
         getVariantaRaspuns(variantaA, raspunsA, 0);
@@ -111,13 +114,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
         if(nr_variante==6) getVariantaRaspuns(variantaF, raspunsF, 5);
         //endregion
 
-
-        inapoi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        //region Variante raspuns
 
         variantaB.addTextChangedListener(new TextWatcher() {
             @Override
@@ -220,40 +217,72 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
             }
         });
 
+        //endregion
+
+
+        inapoi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
 
 
         actualizeaza.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                //region Validare variante raspuns
+
                 if(!(variantaA.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaA.getText().toString(), raspunsA.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaA.getText().toString(), raspunsA.isChecked()));
                 else {
                     Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_2_variante), Toast.LENGTH_LONG).show();
                     return;
                 }
                 if(!(variantaB.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaB.getText().toString(), raspunsB.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaB.getText().toString(), raspunsB.isChecked()));
                 else {
                     Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_2_variante), Toast.LENGTH_LONG).show();
                     return;
                 }
                 if(!(variantaC.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaC.getText().toString(), raspunsC.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaC.getText().toString(), raspunsC.isChecked()));
                 if(!(variantaD.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaD.getText().toString(), raspunsD.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaD.getText().toString(), raspunsD.isChecked()));
                 if(!(variantaE.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaE.getText().toString(), raspunsE.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaE.getText().toString(), raspunsE.isChecked()));
                 if(!(variantaF.getText().toString().trim().isEmpty()))
-                    variante.add(new VariantaRaspuns(variantaF.getText().toString(), raspunsF.isChecked()));
+                    varianteRaspuns.add(new VariantaRaspuns(variantaF.getText().toString(), raspunsF.isChecked()));
+
+
+                boolean raspunsuriCorecte = false;
+                if(raspunsA.isChecked() || raspunsB.isChecked() ||raspunsC.isChecked() ||
+                        raspunsD.isChecked() ||raspunsE.isChecked() ||raspunsF.isChecked())
+                    raspunsuriCorecte=true;
+                if (raspunsuriCorecte==false)
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_1_corect), Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (text.getText().toString().trim().isEmpty())
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_inexistenta), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (!(text.getText().toString().contains("?")))
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_invalida), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                //endregion
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                intrebare.setContinut(continut.getText().toString());
-                intrebare.setPunctaj(dificultatiSpinner.getSelectedItemPosition()+1);
-                intrebare.setVariante(variante);
-                profesor.setIntrebari(intrebare, intrebare.getNume());
-                salvareUtilizator();
+                actualizeazaIntrebare();
                 finish();
             }
         });
@@ -268,17 +297,47 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
         raspuns.setVisibility(View.VISIBLE);
     }
 
-    private void incarcareUtilizatorSalvat() {
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString(getString(R.string.utilizator), "");
-        profesor = gson.fromJson(json, Profesor.class);
-    }
+    private void actualizeazaIntrebare() {
 
-    private void salvareUtilizator() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(profesor);
-        editor.putString(getString(R.string.utilizator), json);
-        editor.commit();
+        Query<VariantaRaspuns> queryVarianteRaspuns = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
+                VariantaRaspunsDao.Properties.IntrebareId.eq(intrebare.getId())).build();
+
+        List<VariantaRaspuns> varianteRaspunsActualizate = new ArrayList<>();
+        //preluare variante care NU se modifica
+        for ( VariantaRaspuns varianta : queryVarianteRaspuns.list()) {
+            for (int i = 0; i < varianteRaspuns.size(); i++)
+                if (varianta.getText().equals(varianteRaspuns.get(i).getText()) &&
+                        varianta.getCorect() == varianteRaspuns.get(i).getCorect())
+                { varianteRaspunsActualizate.add(varianteRaspuns.get(i)); break;}
+        }
+        //preluare variante care se modifica + adaugare in bd
+        for ( VariantaRaspuns varianta : varianteRaspuns) {
+            boolean exista = false;
+            for (int i = 0; i < varianteRaspunsActualizate.size(); i++)
+                if (varianta.getText().equals(varianteRaspunsActualizate.get(i).getText()) &&
+                    varianta.getCorect() == varianteRaspunsActualizate.get(i).getCorect())
+                    exista=true;
+            if(exista==false) {
+                varianteRaspunsActualizate.add(varianta);
+                ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().insert(
+                        new VariantaRaspuns(varianta.getText(), varianta.getCorect(), intrebare.getId()));
+            }
+        }
+
+        //actualizare intrebare
+        Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                IntrebareGrilaDao.Properties.Id.eq(intrebare.getId())).build();
+
+        IntrebareGrila intrebareDeActualizat = queryIntrebare.list().get(0);
+        intrebareDeActualizat.setText(text.getText().toString());
+        intrebareDeActualizat.setDificultate(dificultatiSpinner.getSelectedItemPosition()+1);
+        intrebareDeActualizat.setVariante(varianteRaspunsActualizate);
+        ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().update(intrebare);
+
+        //actualizare profesor
+        profesor.setIntrebare(intrebareDeActualizat);
+        ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
+
+        finish();
     }
 }

@@ -44,8 +44,8 @@ public class IstoricStudentAdapter extends ArrayAdapter<RezultatTestStudent> {
 
         final RezultatTestStudent test = teste.get(position);
 
-        nume.setText(test.getNume());
-        punctaj.setText(Float.toString(test.getPunctajObtinut()));
+        //nume.setText(test.getNume());
+        //punctaj.setText(Float.toString(test.getPunctajObtinut()));
         promovat.setBackgroundResource(test.isPromovat() ? R.drawable.ic_promovat : R.drawable.ic_picat );
 
 

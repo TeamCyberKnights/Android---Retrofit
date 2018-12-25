@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.qdemy.Constante;
+import com.qdemy.EditeazaIntrebareActivity;
 import com.qdemy.IntrebareActivity;
 import com.qdemy.IntrebariMaterieActivity;
 import com.qdemy.MainActivity;
@@ -29,15 +30,18 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
     private int resource;
     private List<IntrebareGrila> intrebari;
     private LayoutInflater inflater;
+    private IntrebariMaterieActivity activity;
 
     public IntrebareAdapter(@NonNull Context context, int resource,
-                            @NonNull List<IntrebareGrila> objects, LayoutInflater inflater) {
+                            @NonNull List<IntrebareGrila> objects, LayoutInflater inflater,
+                            IntrebariMaterieActivity activity) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
         this.intrebari = objects;
         this.inflater=inflater;
+        this.activity=activity;
     }
 
     @NonNull
@@ -48,14 +52,14 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
 
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
-        nume.setText(intrebari.get(position).getNume());
+        nume.setText(intrebari.get(position).getText());
 
 
         nume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), IntrebareActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, intrebari.get(position));
+                Intent intent = new Intent(v.getContext(), EditeazaIntrebareActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, intrebari.get(position).getId());
                 v.getContext().startActivity(intent);
             }
         });
@@ -69,6 +73,7 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
                 //dlgAlert.setTitle("Ștergere întrebare");
                 dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        activity.stergeIntrebare(intrebari.get(position).getText());
                         intrebari.remove(position);
                         notifyDataSetChanged();
                     }

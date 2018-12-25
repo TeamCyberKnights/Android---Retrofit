@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.qdemy.clase.Student;
+import com.qdemy.db.App;
 
 public class StudentActivity extends AppCompatActivity {
 
@@ -20,7 +21,6 @@ public class StudentActivity extends AppCompatActivity {
     private Button istoric;
 
     private Student student;
-    private String dataCurenta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +37,8 @@ public class StudentActivity extends AppCompatActivity {
         start = findViewById(R.id.start_image_student);
         istoric = findViewById(R.id.istoric_button_student);
 
-        student = getIntent().getParcelableExtra(Constante.CHEIE_AUTENTIFICARE);
-        dataCurenta = getIntent().getStringExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA);
-        Toast.makeText(getApplicationContext(), "Salutare " +student.getNume(), Toast.LENGTH_LONG).show();
+        student = ((App) getApplication()).getStudent();
+        Toast.makeText(getApplicationContext(), getString(R.string.salutare) + " " +student.getNume() + " " +student.getPrenume(), Toast.LENGTH_LONG).show();
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +76,6 @@ public class StudentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), StartQuizActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
     }

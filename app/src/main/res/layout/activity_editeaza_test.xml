@@ -6,6 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".EditeazaTestActivity">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/partajeaza_button_editeazaTest"
+        android:layout_width="49dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:contentDescription="@string/partajeaza"
+        android:focusable="true"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.964"
+        app:maxImageSize="30dp"
+        app:srcCompat="@drawable/ic_share_black_24dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -27,7 +50,7 @@
             android:id="@+id/nume_text_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:hint="@string/nume_test"
             android:textSize="24sp"
@@ -115,57 +138,15 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="3">
+            android:layout_weight="4.5">
 
         </ListView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.75"
-            android:orientation="horizontal"
-            android:weightSum="4">
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/materia1"
-                android:textSize="22sp" />
-
-            <Spinner
-                android:id="@+id/materii_spinner_editeazaTest"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="0dp"
-                android:layout_weight="3"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <Spinner
-            android:id="@+id/intrebari_spinner_editeazaTest"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.75" />
-
-        <Button
-            android:id="@+id/adaugaIntrebare_button_editeazaTest"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.75"
-            android:text="@string/adaug_ntrebarea"
-            android:textAllCaps="false"
-            android:textSize="18sp" />
 
         <Button
             android:id="@+id/actualizeaza_button_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.75"
+            android:layout_weight="1"
             android:text="@string/actualizeaz_testul"
             android:textAllCaps="false"
             android:textSize="20sp" />

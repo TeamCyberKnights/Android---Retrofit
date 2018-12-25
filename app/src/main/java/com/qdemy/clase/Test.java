@@ -7,41 +7,70 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.JoinEntity;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.ToOne;
 
 @Entity
-public class Test implements Parcelable {
+public class Test {
 
     @Id (autoincrement = true) private Long id;
     @Index(unique = true) private String nume;
     @NotNull private String descriere;
-    @NotNull private String autor; //numele din clasa Profesor //!!!!!!!
-    @NotNull private int minute;
+    @NotNull private int timp_disponibil; //minute
     @NotNull private Boolean estePublic;
+    @NotNull private String materie;
 
     @ToMany(referencedJoinProperty = "testId")
+    private List<TestPartajat> testePartajate;
+
+    @ToMany
+    @JoinEntity( entity = EvidentaIntrebariTeste.class, sourceProperty = "testId", targetProperty = "intrebareId")
     private List<IntrebareGrila> intrebari;
 
-
     @NotNull private long profesorId;
+
+
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+    /** Used for active entity operations. */
+    @Generated(hash = 1043090224)
+    private transient TestDao myDao;
+    
 
     //region Constructori
 
     public Test() {}
 
-    public Test(String nume, String descriere, String autor, List<IntrebareGrila> intrebari, int minute, Boolean estePublic) {
+    public Test(String nume, String descriere, int timp_disponibil, Boolean estePublic, String materie, long profesorId) {
         this.nume = nume;
         this.descriere = descriere;
-        this.autor = autor;
-        this.intrebari = intrebari;
-        this.minute = minute;
+        this.timp_disponibil = timp_disponibil;
         this.estePublic = estePublic;
+        this.materie=materie;
+        this.profesorId=profesorId;
     }
+
+    @Generated(hash = 1384776144)
+    public Test(Long id, String nume, @NotNull String descriere, int timp_disponibil, @NotNull Boolean estePublic,
+            @NotNull String materie, long profesorId) {
+        this.id = id;
+        this.nume = nume;
+        this.descriere = descriere;
+        this.timp_disponibil = timp_disponibil;
+        this.estePublic = estePublic;
+        this.materie = materie;
+        this.profesorId = profesorId;
+    }
+
+    
 
     //endregion
 
@@ -63,35 +92,6 @@ public class Test implements Parcelable {
         this.descriere = descriere;
     }
 
-    public String getAutor() {
-        return autor;
-    }
-
-    public void setAutor(String autor) {
-        this.autor = autor;
-    }
-
-    /**
-     * To-many relationship, resolved on first access (and after reset).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Generated(hash = 869514377)
-    public List<IntrebareGrila> getIntrebari() {
-        if (intrebari == null) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            IntrebareGrilaDao targetDao = daoSession.getIntrebareGrilaDao();
-            List<IntrebareGrila> intrebariNew = targetDao._queryTest_Intrebari(id);
-            synchronized (this) {
-                if (intrebari == null) {
-                    intrebari = intrebariNew;
-                }
-            }
-        }
-        return intrebari;
-    }
 
     public IntrebareGrila getIntrebari(int index) {
         return intrebari.get(index);
@@ -105,12 +105,12 @@ public class Test implements Parcelable {
         this.intrebari.set(index, intrebare);
     }
 
-    public int getMinute() {
-        return minute;
+    public int getTimpDisponibil() {
+        return timp_disponibil;
     }
 
-    public void setMinute(int minute) {
-        this.minute = minute;
+    public void setTimpDisponibil(int minute) {
+        this.timp_disponibil = minute;
     }
 
     public Boolean getEstePublic() {
@@ -137,66 +137,70 @@ public class Test implements Parcelable {
         this.id = id;
     }
 
-    //endregion
+    public int getTimp_disponibil() {
+        return this.timp_disponibil;
+    }
 
-    //region Parcel
+    public void setTimp_disponibil(int timp_disponibil) {
+        this.timp_disponibil = timp_disponibil;
+    }
 
-    public static final Creator<Test> CREATOR =
-            new Creator<Test>() {
-                @Override
-                public Test createFromParcel(Parcel parcel) {
-                    return new Test(parcel);
+    public String getMaterie() {
+        return materie;
+    }
+
+    public void setMaterie(String materie) {
+        this.materie = materie;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 970963607)
+    public List<TestPartajat> getTestePartajate() {
+        if (testePartajate == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            TestPartajatDao targetDao = daoSession.getTestPartajatDao();
+            List<TestPartajat> testePartajateNew = targetDao._queryTest_TestePartajate(id);
+            synchronized (this) {
+                if (testePartajate == null) {
+                    testePartajate = testePartajateNew;
                 }
+            }
+        }
+        return testePartajate;
+    }
 
-                @Override
-                public Test[] newArray(int i) {
-                    return new Test[i];
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 724840730)
+    public synchronized void resetTestePartajate() {
+        testePartajate = null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 869514377)
+    public List<IntrebareGrila> getIntrebari() {
+        if (intrebari == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            IntrebareGrilaDao targetDao = daoSession.getIntrebareGrilaDao();
+            List<IntrebareGrila> intrebariNew = targetDao._queryTest_Intrebari(id);
+            synchronized (this) {
+                if (intrebari == null) {
+                    intrebari = intrebariNew;
                 }
-            };
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-    /** Used for active entity operations. */
-    @Generated(hash = 1043090224)
-    private transient TestDao myDao;
-
-
-    public Test(Parcel parcel) {
-        this.nume = parcel.readString();
-        this.descriere = parcel.readString();
-        this.autor = parcel.readString();
-        parcel.readList(this.intrebari, getClass().getClassLoader());
-        this.minute = parcel.readInt();
-        this.estePublic  = (parcel.readInt() == 0) ? false : true;
-    }
-
-    @Generated(hash = 1583639366)
-    public Test(Long id, String nume, @NotNull String descriere, @NotNull String autor, int minute, @NotNull Boolean estePublic,
-            long profesorId) {
-        this.id = id;
-        this.nume = nume;
-        this.descriere = descriere;
-        this.autor = autor;
-        this.minute = minute;
-        this.estePublic = estePublic;
-        this.profesorId = profesorId;
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeString(nume);
-        parcel.writeString(descriere);
-        parcel.writeString(autor);
-        parcel.writeList(intrebari);
-        parcel.writeInt(minute);
-        parcel.writeInt(estePublic ? 1 : 0);
+            }
+        }
+        return intrebari;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */

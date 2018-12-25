@@ -10,11 +10,13 @@ import org.greenrobot.greendao.annotation.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.ToOne;
 
 @Entity
-public class RaspunsIntrebareGrila extends IntrebareGrila {
+public class RaspunsIntrebareGrila  {
 
     @Id (autoincrement = true) private Long id;
+    @NotNull private long intrebareId;
     @NotNull private float punctajObtinut; //punctajul intrebarii impartit la nr de raspunsuri corecte (daca este =0 => raspuns gresit)
     @NotNull private int secunde; //timpul in care a raspuns
 
@@ -24,23 +26,16 @@ public class RaspunsIntrebareGrila extends IntrebareGrila {
 
     public RaspunsIntrebareGrila() {}
 
-    public RaspunsIntrebareGrila(String nume, String continut, String materie, List<VariantaRaspuns> variante, List<Boolean> raspunsuri, float punctaj,
-                                 float punctajObtinut, int secunde) {
-        super(nume, continut, materie, variante, punctaj);
+    public RaspunsIntrebareGrila(long intrebareId, float punctaj, float punctajObtinut, int secunde) {
+        this.intrebareId = intrebareId;
         this.punctajObtinut=punctajObtinut;
         this.secunde=secunde;
     }
 
-    public RaspunsIntrebareGrila(IntrebareGrila intrebare, float punctajObtinut, int secunde) {
-        super(intrebare.getNume(), intrebare.getContinut(), intrebare.getMaterie(),
-              intrebare.getVariante(), intrebare.getPunctaj());
-        this.punctajObtinut=punctajObtinut;
-        this.secunde=secunde;
-    }
-
-    @Generated(hash = 965281344)
-    public RaspunsIntrebareGrila(Long id, float punctajObtinut, int secunde, long rezultatTestStudentId) {
+    @Generated(hash = 416581354)
+    public RaspunsIntrebareGrila(Long id, long intrebareId, float punctajObtinut, int secunde, long rezultatTestStudentId) {
         this.id = id;
+        this.intrebareId = intrebareId;
         this.punctajObtinut = punctajObtinut;
         this.secunde = secunde;
         this.rezultatTestStudentId = rezultatTestStudentId;
@@ -49,6 +44,14 @@ public class RaspunsIntrebareGrila extends IntrebareGrila {
     //endregion
 
     //region GET, SET
+
+    public long getIntrebareId() {
+        return intrebareId;
+    }
+
+    public void setIntrebareId(long intrebareId) {
+        this.intrebareId = intrebareId;
+    }
 
     public float getPunctajObtinut() {
         return punctajObtinut;
@@ -66,12 +69,10 @@ public class RaspunsIntrebareGrila extends IntrebareGrila {
         this.secunde = secunde;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -85,21 +86,6 @@ public class RaspunsIntrebareGrila extends IntrebareGrila {
     }
 
     //endregion
-
-
-    public void partialCorect()
-    {
-        //raspunsurile  partial corect
-    }
-
-
-    public boolean Corect()
-    {
-        //de luat in calcul raspunsurile partiale
-        if(punctajObtinut==this.getPunctaj()) return true;
-        else return false;
-    }
-
 
 
 }

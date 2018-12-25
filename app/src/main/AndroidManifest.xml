@@ -25,7 +25,6 @@
         <activity android:name=".GrilaQuizActivity" />
         <activity android:name=".RezultatStudentActivity" />
         <activity android:name=".ProfesorActivity" />
-        <activity android:name=".SelecteazaTestActivity" />
         <activity android:name=".StartingQuizProfesorActivity" />
         <activity android:name=".ScorLiveActivity" />
         <activity android:name=".RezumatTestActivity" />

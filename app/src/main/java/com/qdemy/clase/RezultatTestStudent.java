@@ -14,12 +14,12 @@ import java.util.List;
 import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class RezultatTestStudent implements Parcelable {
+public class RezultatTestStudent {
 
     @Id (autoincrement = true) private Long id;
-    @NotNull private String nume; // preluat de la testul original //!!!!
+    @NotNull private long testId;
     @NotNull private String data;
-    private float punctajObtinut; //PUNCTAJ RELATIV LA 100  //punctajul tuturor intrebarilor * coef obtinut prin impartirea 100/punctaj maxim posibil
+    //private float punctajObtinut; //PUNCTAJ RELATIV LA 100  //punctajul tuturor intrebarilor * coef obtinut prin impartirea 100/punctaj maxim posibil
     //de facut metoda pentru calculat punctajulObtinut (in loc de campul asta) !!!!
     @NotNull private int minuteTrecute;
     @NotNull private boolean promovat;
@@ -28,33 +28,43 @@ public class RezultatTestStudent implements Parcelable {
     private List<RaspunsIntrebareGrila> raspunsuri;
 
 
-    @NotNull private long rezultatTestProfesorId;
+    @NotNull private long testSustinutId;
     @NotNull private long studentId;
 
     //region Constructori
 
     public RezultatTestStudent() {}
 
-    public RezultatTestStudent(String nume, String data, float punctajObtinut, int minuteTrecute, boolean promovat,
+    public RezultatTestStudent(long testId, String data, int minuteTrecute, boolean promovat,
                                List<RaspunsIntrebareGrila> raspunsuri) {
-        this.nume = nume;
+        this.testId = testId;
         this.data = data;
-        this.punctajObtinut = punctajObtinut;
         this.minuteTrecute = minuteTrecute;
         this.promovat=promovat;
         this.raspunsuri = raspunsuri;
+    }
+
+    @Generated(hash = 1291890339)
+    public RezultatTestStudent(Long id, long testId, @NotNull String data, int minuteTrecute, boolean promovat, long testSustinutId, long studentId) {
+        this.id = id;
+        this.testId = testId;
+        this.data = data;
+        this.minuteTrecute = minuteTrecute;
+        this.promovat = promovat;
+        this.testSustinutId = testSustinutId;
+        this.studentId = studentId;
     }
 
     //endregion
 
     //region GET, SET
 
-    public String getNume() {
-        return nume;
+    public long getTestId() {
+        return testId;
     }
 
-    public void setNume(String nume) {
-        this.nume = nume;
+    public void setTestId(long testId) {
+        this.testId = testId;
     }
 
     public String getData() {
@@ -63,14 +73,6 @@ public class RezultatTestStudent implements Parcelable {
 
     public void setData(String data) {
         this.data = data;
-    }
-
-    public float getPunctajObtinut() {
-        return punctajObtinut;
-    }
-
-    public void setPunctajObtinut(float punctajObtinut) {
-        this.punctajObtinut = punctajObtinut;
     }
 
     public int getMinuteTrecute() {
@@ -107,13 +109,6 @@ public class RezultatTestStudent implements Parcelable {
         return raspunsuri.get(index);
     }
 
-    public RaspunsIntrebareGrila getRaspunsuri(String nume_intrebare) {
-        for(int i=0;i<raspunsuri.size();i++)
-            if(raspunsuri.get(i).getNume().equals(nume_intrebare))  return raspunsuri.get(i);
-
-        return null;
-    }
-
     public void setRaspunsuri(List<RaspunsIntrebareGrila> raspunsuri) {
         this.raspunsuri = raspunsuri;
     }
@@ -128,14 +123,6 @@ public class RezultatTestStudent implements Parcelable {
 
     public void setPromovat(boolean promovat) {
         this.promovat = promovat;
-    }
-
-    public long getRezultatTestProfesorId() {
-        return rezultatTestProfesorId;
-    }
-
-    public void setRezultatTestProfesorId(long rezultatTestProfesorId) {
-        this.rezultatTestProfesorId = rezultatTestProfesorId;
     }
 
     public Long getId() {
@@ -154,23 +141,25 @@ public class RezultatTestStudent implements Parcelable {
         this.studentId = studentId;
     }
 
+    public long getTestSustinutId() {
+        return testSustinutId;
+    }
+
+    public void setTestSustinutId(long testSustinutId) {
+        this.testSustinutId = testSustinutId;
+    }
+
+    public boolean getPromovat() {
+        return this.promovat;
+    }
+
+
+    //METODA CALCULARE PUNCTAJ RAPORTAT LA 100
+
     //endregion
 
 
-    //region Parcel
 
-    public static final Creator<RezultatTestStudent> CREATOR =
-            new Creator<RezultatTestStudent>() {
-                @Override
-                public RezultatTestStudent createFromParcel(Parcel parcel) {
-                    return new RezultatTestStudent(parcel);
-                }
-
-                @Override
-                public RezultatTestStudent[] newArray(int i) {
-                    return new RezultatTestStudent[i];
-                }
-            };
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
@@ -179,47 +168,7 @@ public class RezultatTestStudent implements Parcelable {
     private transient RezultatTestStudentDao myDao;
 
 
-    public RezultatTestStudent(Parcel parcel) {
-        this.nume = parcel.readString();
-        this.data = parcel.readString();
-        this.punctajObtinut = parcel.readFloat();
-        this.minuteTrecute = parcel.readInt();
-        this.promovat= (parcel.readInt() == 0) ? false : true;
-        parcel.readList(this.raspunsuri, getClass().getClassLoader());
-    }
 
-    @Generated(hash = 2140403352)
-    public RezultatTestStudent(Long id, @NotNull String nume, @NotNull String data, float punctajObtinut, int minuteTrecute, boolean promovat,
-            long rezultatTestProfesorId, long studentId) {
-        this.id = id;
-        this.nume = nume;
-        this.data = data;
-        this.punctajObtinut = punctajObtinut;
-        this.minuteTrecute = minuteTrecute;
-        this.promovat = promovat;
-        this.rezultatTestProfesorId = rezultatTestProfesorId;
-        this.studentId = studentId;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeString(nume);
-        parcel.writeString(data);
-        parcel.writeFloat(punctajObtinut);
-        parcel.writeInt(minuteTrecute);
-        parcel.writeInt(promovat ? 1 : 0);
-        parcel.writeList(raspunsuri);
-    }
-
-    public boolean getPromovat() {
-        return this.promovat;
-    }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 527297346)

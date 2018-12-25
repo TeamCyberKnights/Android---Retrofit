@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.qdemy.PartajeazaTestActivity;
 import com.qdemy.R;
 import com.qdemy.clase.Profesor;
 
@@ -23,15 +24,18 @@ public class PartajareTestAdapter extends ArrayAdapter<Profesor> {
     private int resource;
     private List<Profesor> profesori;
     private LayoutInflater inflater;
+    private PartajeazaTestActivity activity;
 
     public PartajareTestAdapter(@NonNull Context context, int resource,
-                                @NonNull List<Profesor> objects, LayoutInflater inflater) {
+                                @NonNull List<Profesor> objects, LayoutInflater inflater,
+                                PartajeazaTestActivity activity) {
         super(context, resource, objects);
 
         this.context = context;
         this.resource = resource;
         this.profesori = objects;
         this.inflater = inflater;
+        this.activity=activity;
     }
 
     @NonNull
@@ -43,7 +47,7 @@ public class PartajareTestAdapter extends ArrayAdapter<Profesor> {
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
 
-        nume.setText(profesori.get(position).getNume());
+        nume.setText(profesori.get(position).getNume() + " " + profesori.get(position).getPrenume());
         sterge.setBackgroundResource(R.drawable.ic_close_black_24dp);
 
         sterge.setOnClickListener(new View.OnClickListener() {
@@ -51,12 +55,12 @@ public class PartajareTestAdapter extends ArrayAdapter<Profesor> {
             public void onClick(View v) {
 
                 AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
-                dlgAlert.setMessage(context.getString(R.string.stergere_partajare_message) + profesori.get(position).getNume() + " ?");
-                //dlgAlert.setTitle("Ștergere profesor");
+                dlgAlert.setMessage(context.getString(R.string.stergere_partajare_message) + " " +
+                                    profesori.get(position).getNume() + " " + profesori.get(position).getPrenume() +" ?");
                 dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        //editare drepturi acces profesor
-                        profesori.remove(position);
+                        activity.stergeTest(profesori.get(position));
+                        //profesori.remove(position);
                     }
                 });
                 dlgAlert.setNegativeButton(R.string.nu, null);

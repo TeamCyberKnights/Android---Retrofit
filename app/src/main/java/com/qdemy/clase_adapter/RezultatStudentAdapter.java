@@ -44,11 +44,11 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
 
         final RaspunsIntrebareGrila intrebare = intrebari.get(position);
 
-        nume.setText(intrebare.getNume());
+        //nume.setText(intrebare.getNume());
         //in lucru
-        corect.setBackgroundResource(intrebare.getPunctajObtinut()==0 ? R.drawable.ic_picat :
-                                     intrebare.getPunctajObtinut()==intrebare.getPunctaj() ? R.drawable.ic_promovat :
-                                     R.drawable.ic_mediu );
+//        corect.setBackgroundResource(intrebare.getPunctajObtinut()==0 ? R.drawable.ic_picat :
+//                                     intrebare.getPunctajObtinut()==intrebare.getPunctaj() ? R.drawable.ic_promovat :
+//                                     R.drawable.ic_mediu );
 
 
         return rand;

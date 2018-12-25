@@ -7,8 +7,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.Student;
+import com.qdemy.clase.TestSustinut;
 import com.qdemy.clase_adapter.RezultatTestAdapter;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class ScorLiveActivity extends AppCompatActivity {
     private TextView timer;
     private List<Student> studenti;
     private ListView studentiList;
-    private RezultatTestProfesor test;
+    private TestSustinut test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

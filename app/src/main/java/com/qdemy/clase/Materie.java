@@ -11,7 +11,7 @@ public class Materie {
     @Id(autoincrement = true) private Long id;
     @NotNull private String nume;
 
-    @NotNull private long profesorId;
+
 
     //region Constructori
 
@@ -21,11 +21,10 @@ public class Materie {
         this.nume = nume;
     }
 
-    @Generated(hash = 659149784)
-    public Materie(Long id, @NotNull String nume, long profesorId) {
+    @Generated(hash = 1738787040)
+    public Materie(Long id, @NotNull String nume) {
         this.id = id;
         this.nume = nume;
-        this.profesorId = profesorId;
     }
 
     //endregion
@@ -46,14 +45,6 @@ public class Materie {
 
     public void setNume(String nume) {
         this.nume = nume;
-    }
-
-    public long getProfesorId() {
-        return profesorId;
-    }
-
-    public void setProfesorId(long profesorId) {
-        this.profesorId = profesorId;
     }
 
 

@@ -8,6 +8,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.JoinEntity;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
@@ -16,30 +17,36 @@ import java.util.List;
 import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class Profesor implements Parcelable{
+public class Profesor {
 
     @Id (autoincrement = true) private Long id;
-    @Index(unique = true) private String nume;
-    @NotNull private String utilizator;
+    @Index(unique = true) private String utilizator;
+    @NotNull private String nume;
+    @NotNull private String prenume;
     @NotNull private String parola;
     @NotNull private String mail;
 
-    @ToMany(referencedJoinProperty = "profesorId")
+    @ToMany
+    @JoinEntity( entity = EvidentaMateriiProfesori.class, sourceProperty = "profesorId", targetProperty = "materieId")
     private List<Materie> materii;
+
     @ToMany(referencedJoinProperty = "profesorId")
     private List<IntrebareGrila> intrebari;
     @ToMany(referencedJoinProperty = "profesorId")
     private List<Test> teste;
     @ToMany(referencedJoinProperty = "profesorId")
-    private List<RezultatTestProfesor> testeSustinute;
+    private List<TestPartajat> testePartajate;
+    @ToMany(referencedJoinProperty = "profesorId")
+    private List<TestSustinut> testeSustinute;
 
     //region Constructori
 
     public Profesor() {
     }
 
-    public Profesor(String nume, String utilizator, String parola, String mail) {
+    public Profesor(String utilizator, String nume, String prenume, String parola, String mail) {
         this.nume = nume;
+        this.prenume = prenume;
         this.utilizator = utilizator;
         this.parola = parola;
         this.mail = mail;
@@ -49,28 +56,15 @@ public class Profesor implements Parcelable{
         testeSustinute=null;
     }
 
-    public Profesor(String nume, String utilizator, String parola, String mail, List<Materie> materii,
-                    List<IntrebareGrila> intrebari, List<Test> teste) {
-        this.nume = nume;
+    @Generated(hash = 2145845688)
+    public Profesor(Long id, String utilizator, @NotNull String nume, @NotNull String prenume, @NotNull String parola,
+            @NotNull String mail) {
+        this.id = id;
         this.utilizator = utilizator;
+        this.nume = nume;
+        this.prenume = prenume;
         this.parola = parola;
         this.mail = mail;
-        this.materii = materii;
-        this.intrebari = intrebari;
-        this.teste = teste;
-        this.testeSustinute=null;
-    }
-
-    public Profesor(String nume, String utilizator, String parola, String mail, List<Materie> materii,
-                    List<IntrebareGrila> intrebari, List<Test> teste, List<RezultatTestProfesor> testeSustinute) {
-        this.nume = nume;
-        this.utilizator = utilizator;
-        this.parola = parola;
-        this.mail = mail;
-        this.materii = materii;
-        this.intrebari = intrebari;
-        this.teste = teste;
-        this.testeSustinute=testeSustinute;
     }
 
     //endregion
@@ -133,6 +127,8 @@ public class Profesor implements Parcelable{
 
     public List<String> getNumeMaterii() {
 
+        if(this.materii==null) return null;
+
         List<String> numeMaterii = new ArrayList<String>();
         for(Materie m : this.materii)
             numeMaterii.add(m.getNume());
@@ -146,6 +142,15 @@ public class Profesor implements Parcelable{
 
     public void setMaterii(List<Materie> materii) {
         this.materii = materii;
+    }
+
+    public void setNumeMaterii(List<String> numeMaterii) {
+
+        List<Materie> listaMaterii = new ArrayList<>();
+        for ( String m: numeMaterii ) {
+            listaMaterii.add(new Materie(m));
+        }
+        this.materii = listaMaterii;
     }
 
     public void setMaterii(Materie materie, int index) {
@@ -178,26 +183,16 @@ public class Profesor implements Parcelable{
         return intrebari.get(index);
     }
 
-    public IntrebareGrila getIntrebari(String numeIntrebare) {
-        for(int i=0;i<intrebari.size();i++)
-            if(intrebari.get(i).getNume().equals(numeIntrebare))
-                return intrebari.get(i);
-        return null;
-    }
-
     public void setIntrebari(List<IntrebareGrila> intrebari) {
         this.intrebari = intrebari;
     }
 
-    public void setIntrebari(IntrebareGrila intrebare, int index) {
-        this.intrebari.set(index,intrebare);
-    }
-
-    public void setIntrebari(IntrebareGrila intrebare, String numeIntrebare) {
-        for(int i=0;i<intrebari.size();i++)
-            if(intrebari.get(i).getNume().equals(numeIntrebare))
+    public void setIntrebare(IntrebareGrila intrebare) {
+        for(int i=0;i<this.intrebari.size();i++)
+            if(this.intrebari.get(i).getId()== intrebare.getId())
                 this.intrebari.set(i,intrebare);
     }
+
 
     /**
      * To-many relationship, resolved on first access (and after reset).
@@ -239,37 +234,17 @@ public class Profesor implements Parcelable{
                 this.teste.set(i, test);
     }
 
-    /**
-     * To-many relationship, resolved on first access (and after reset).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Generated(hash = 1236894588)
-    public List<RezultatTestProfesor> getTesteSustinute() {
-        if (testeSustinute == null) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            RezultatTestProfesorDao targetDao = daoSession.getRezultatTestProfesorDao();
-            List<RezultatTestProfesor> testeSustinuteNew = targetDao._queryProfesor_TesteSustinute(id);
-            synchronized (this) {
-                if (testeSustinute == null) {
-                    testeSustinute = testeSustinuteNew;
-                }
-            }
-        }
-        return testeSustinute;
+    public void setTest (Test test) {
+        for(int i=0;i<this.teste.size();i++)
+            if(this.teste.get(i).getId()== test.getId())
+                this.teste.set(i,test);
     }
 
-    public RezultatTestProfesor getTesteSustinute(int index) {
-        return testeSustinute.get(index);
-    }
-
-    public void setTesteSustinute(List<RezultatTestProfesor> testeSustinute) {
+    public void setTesteSustinute(List<TestSustinut> testeSustinute) {
         this.testeSustinute = testeSustinute;
     }
 
-    public void setTesteSustinute(RezultatTestProfesor testSustinut, int index) {
+    public void setTesteSustinute(TestSustinut testSustinut, int index) {
         this.testeSustinute.set(index, testSustinut);
     }
 
@@ -281,23 +256,52 @@ public class Profesor implements Parcelable{
         this.id = id;
     }
 
+    public String getPrenume() {
+        return prenume;
+    }
+
+    public void setPrenume(String prenume) {
+        this.prenume = prenume;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1812081283)
+    public List<TestPartajat> getTestePartajate() {
+        if (testePartajate == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            TestPartajatDao targetDao = daoSession.getTestPartajatDao();
+            List<TestPartajat> testePartajateNew = targetDao._queryProfesor_TestePartajate(id);
+            synchronized (this) {
+                if (testePartajate == null) {
+                    testePartajate = testePartajateNew;
+                }
+            }
+        }
+        return testePartajate;
+    }
+
+    public TestPartajat getTesteSustinute(int index) {
+        return testePartajate.get(index);
+    }
+
+    public void setTestePartajate(List<TestPartajat> testePartajate) {
+        this.testePartajate = testePartajate;
+    }
+
+    public void setTestePartajate(TestPartajat testPartajat, int index) {
+        this.testePartajate.set(index, testPartajat);
+    }
+
     //endregion
 
 
-    // region Parcel
 
-    public static final Parcelable.Creator<Profesor> CREATOR =
-            new Parcelable.Creator<Profesor>() {
-                @Override
-                public Profesor createFromParcel(Parcel parcel) {
-                    return new Profesor(parcel);
-                }
-
-                @Override
-                public Profesor[] newArray(int i) {
-                    return new Profesor[i];
-                }
-            };
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
@@ -305,45 +309,7 @@ public class Profesor implements Parcelable{
     @Generated(hash = 1921261089)
     private transient ProfesorDao myDao;
 
-    private Profesor(Parcel parcel) {
 
-        this.nume = parcel.readString();
-        this.utilizator = parcel.readString();
-        this.parola = parcel.readString();
-        this.mail = parcel.readString();
-        parcel.readList(this.materii, getClass().getClassLoader());
-        parcel.readList(this.intrebari, getClass().getClassLoader());
-        parcel.readList(this.teste, getClass().getClassLoader());
-        parcel.readList(this.testeSustinute, getClass().getClassLoader());
-    }
-
-    @Generated(hash = 1193608516)
-    public Profesor(Long id, String nume, @NotNull String utilizator, @NotNull String parola,
-            @NotNull String mail) {
-        this.id = id;
-        this.nume = nume;
-        this.utilizator = utilizator;
-        this.parola = parola;
-        this.mail = mail;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeString(nume);
-        parcel.writeString(utilizator);
-        parcel.writeString(parola);
-        parcel.writeString(mail);
-        parcel.writeList(materii);
-        parcel.writeList(intrebari);
-        parcel.writeList(teste);
-        parcel.writeList(testeSustinute);
-    }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 1461820496)
@@ -403,6 +369,34 @@ public class Profesor implements Parcelable{
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 724840730)
+    public synchronized void resetTestePartajate() {
+        testePartajate = null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1997600704)
+    public List<TestSustinut> getTesteSustinute() {
+        if (testeSustinute == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            TestSustinutDao targetDao = daoSession.getTestSustinutDao();
+            List<TestSustinut> testeSustinuteNew = targetDao._queryProfesor_TesteSustinute(id);
+            synchronized (this) {
+                if (testeSustinute == null) {
+                    testeSustinute = testeSustinuteNew;
+                }
+            }
+        }
+        return testeSustinute;
     }
 
     /** called by internal mechanisms, do not call yourself. */

@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.RezultatTestStudent;
 import com.qdemy.clase_adapter.IstoricProfesorAdapter;
 import com.qdemy.clase_adapter.IstoricStudentAdapter;
@@ -54,7 +53,7 @@ public class IstoricStudentActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
-                intent.putExtra(Constante.CHEIE_AUTENTIFICARE, teste.get(position));
+                //intent.putExtra(Constante.CHEIE_AUTENTIFICARE, teste.get(position));
                 intent.putExtra(Constante.CHEIE_AUTENTIFICARE_EXTRA, origine);
                 startActivity(intent);
             }

@@ -25,25 +25,24 @@ import com.qdemy.clase.IntrebareGrila;
 
 import java.util.List;
 
-public class IntrebareTestAdapter extends ArrayAdapter<IntrebareGrila> {
+public class AdaugaTestAdapter extends ArrayAdapter<IntrebareGrila> {
 
     private Context context;
     private int resource;
     //private List<IntrebareGrila> intrebari;
     private LayoutInflater inflater;
-    private boolean adaugaTest;
-    private Activity activity;
+    private AdaugaTestActivity activity;
 
-    public IntrebareTestAdapter(@NonNull Context context, int resource,
-                            @NonNull List<IntrebareGrila> objects, LayoutInflater inflater,
-                                boolean adaugaTest) {
+    public AdaugaTestAdapter(@NonNull Context context, int resource,
+                               @NonNull List<IntrebareGrila> objects, LayoutInflater inflater,
+                             AdaugaTestActivity activity) {
+
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
-        //this.intrebari = objects;
         this.inflater=inflater;
-        this.adaugaTest = adaugaTest;
+        this.activity = activity;
     }
 
     @NonNull
@@ -57,51 +56,25 @@ public class IntrebareTestAdapter extends ArrayAdapter<IntrebareGrila> {
         selectat.setBackgroundResource(R.drawable.ic_promovat);
 
 
-        final IntrebareGrila intrebare;
-        if(adaugaTest) intrebare = ((AdaugaTestActivity) getContext()).intrebari.get(position);
-        else intrebare = ((EditeazaTestActivity) getContext()).intrebari.get(position);
+        final IntrebareGrila intrebare = activity.intrebari.get(position);
         nume.setText(intrebare.getText());
 
-        if(adaugaTest){
-        if(((AdaugaTestActivity) getContext()).selectari.get(position)==false) {
-            selectat.setVisibility(View.INVISIBLE);
-        }
-        else rand.setBackgroundColor(Color.LTGRAY);}
-        else{
-            if(((EditeazaTestActivity) getContext()).selectari.get(position)==false) {
-                selectat.setVisibility(View.INVISIBLE);
-            }
-            else rand.setBackgroundColor(Color.LTGRAY);
-        }
+        if(activity.selectari.get(position)==false) selectat.setVisibility(View.INVISIBLE);
+        else rand.setBackgroundColor(Color.LTGRAY);
 
 
         nume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(adaugaTest) {
-                    if (((AdaugaTestActivity) getContext()).selectari.get(position) == false) {
-                        ((AdaugaTestActivity) getContext()).selectari.set(position, true);
-                        ((AdaugaTestActivity) getContext()).intrebariSelectate.add(((AdaugaTestActivity) getContext()).intrebari.get(position));
-                    } else {
-                        ((AdaugaTestActivity) getContext()).selectari.set(position, false);
-                        if (((AdaugaTestActivity) getContext()).intrebariSelectate.contains(((AdaugaTestActivity) getContext()).intrebari.get(position)))
-                            ((AdaugaTestActivity) getContext()).intrebariSelectate.remove(((AdaugaTestActivity) getContext()).intrebari.get(position));
-                    }
+                if (activity.selectari.get(position) == false) {
+                    activity.selectari.set(position, true);
+                    activity.intrebariSelectate.add(activity.intrebari.get(position));
+                } else {
+                    activity.selectari.set(position, false);
+                    if (activity.intrebariSelectate.contains(activity.intrebari.get(position)))
+                        activity.intrebariSelectate.remove(activity.intrebari.get(position));
                 }
-                else
-                {
-                    if (((EditeazaTestActivity) getContext()).selectari.get(position) == false) {
-                        ((EditeazaTestActivity) getContext()).selectari.set(position, true);
-                        ((EditeazaTestActivity) getContext()).intrebariSelectate.add(((EditeazaTestActivity) getContext()).intrebari.get(position));
-                    } else {
-                        ((EditeazaTestActivity) getContext()).selectari.set(position, false);
-                        if (((EditeazaTestActivity) getContext()).intrebariSelectate.contains(((EditeazaTestActivity) getContext()).intrebari.get(position)))
-                            ((EditeazaTestActivity) getContext()).intrebariSelectate.remove(((EditeazaTestActivity) getContext()).intrebari.get(position));
-                    }
-                }
-
                 notifyDataSetChanged();
-
             }
         });
 

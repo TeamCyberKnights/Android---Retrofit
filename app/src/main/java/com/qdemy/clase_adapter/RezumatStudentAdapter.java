@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.qdemy.R;
 import com.qdemy.clase.RaspunsIntrebareGrila;
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.RezultatTestStudent;
 
 import java.util.List;
@@ -45,7 +44,7 @@ public class RezumatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
         final RaspunsIntrebareGrila intrebare = intrebari.get(position);
 
-        nume.setText(intrebare.getNume());
+        //nume.setText(intrebare.getText());
         timp.setText(intrebare.getSecunde());
         punctaj.setText(Float.toString(intrebare.getPunctajObtinut()));
 

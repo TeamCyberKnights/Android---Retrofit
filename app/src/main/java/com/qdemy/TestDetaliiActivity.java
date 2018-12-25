@@ -15,7 +15,6 @@ import com.google.gson.Gson;
 import com.qdemy.clase.IntrebareGrila;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Test;
-import com.qdemy.clase_adapter.IntrebareTestAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,12 +63,12 @@ public class TestDetaliiActivity extends AppCompatActivity {
 
         nume.setText(test.getNume());
         descriere.setText(test.getDescriere());
-        minute.setText(getString(R.string.minute2, test.getMinute()));
+        minute.setText(getString(R.string.minute2, test.getTimpDisponibil()));
         estePublic.setText(test.getEstePublic()?getString(R.string.test_public):getString(R.string.test_privat));
         intrebari = test.getIntrebari();
-        IntrebareTestAdapter adapter = new IntrebareTestAdapter(getApplicationContext(),
-                R.layout.item_text_button, intrebari, getLayoutInflater(), false);
-        intrebariList.setAdapter(adapter);
+        //AdaugaTestAdapter adapter = new AdaugaTestAdapter(getApplicationContext(),
+        //        R.layout.item_text_button, intrebari, getLayoutInflater(), false);
+        //intrebariList.setAdapter(adapter);
         //endregion
 
         inapoi.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +82,7 @@ public class TestDetaliiActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), EditeazaTestActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, test);
+                //intent.putExtra(Constante.CHEIE_TRANSFER, test);
                 startActivity(intent);
                 finish();
             }
@@ -93,7 +92,7 @@ public class TestDetaliiActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PartajeazaTestActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, test);
+                //intent.putExtra(Constante.CHEIE_TRANSFER, test);
                 startActivity(intent);
             }
         });
@@ -102,7 +101,7 @@ public class TestDetaliiActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), IntrebareActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, intrebari.get(position));
+                //intent.putExtra(Constante.CHEIE_TRANSFER, intrebari.get(position));
                 startActivity(intent);
             }
         });

@@ -14,49 +14,37 @@ import java.util.List;
 import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class RezultatTestProfesor implements Parcelable {
+public class TestSustinut {
 
     @Id (autoincrement = true) private Long id;
-    @ToMany(referencedJoinProperty = "rezultatTestProfesorId")
+    @ToMany(referencedJoinProperty = "testSustinutId")
     private List<RezultatTestStudent> rezultate;
 
-    //O LEGI DE TEST NU DE PROF!!!!!!!!!!
     @NotNull private long profesorId;
+
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+    /** Used for active entity operations. */
+    @Generated(hash = 242359434)
+    private transient TestSustinutDao myDao;
 
     //region Constructori
 
-    public RezultatTestProfesor() {}
+    public TestSustinut() {}
 
-    public RezultatTestProfesor(List<RezultatTestStudent> rezultate) {
-        this.rezultate = rezultate;
+
+    @Generated(hash = 666652173)
+    public TestSustinut(Long id, long profesorId) {
+        this.id = id;
+        this.profesorId = profesorId;
     }
+
 
     //endregion
 
     //region GET, SET
-
-    /**
-     * To-many relationship, resolved on first access (and after reset).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Generated(hash = 651739910)
-    public List<RezultatTestStudent> getRezultate() {
-        if (rezultate == null) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            RezultatTestStudentDao targetDao = daoSession.getRezultatTestStudentDao();
-            List<RezultatTestStudent> rezultateNew = targetDao
-                    ._queryRezultatTestProfesor_Rezultate(id);
-            synchronized (this) {
-                if (rezultate == null) {
-                    rezultate = rezultateNew;
-                }
-            }
-        }
-        return rezultate;
-    }
 
     public void setRezultate(List<RezultatTestStudent> rezultate) {
         this.rezultate = rezultate;
@@ -78,19 +66,48 @@ public class RezultatTestProfesor implements Parcelable {
         this.id = id;
     }
 
-    public float getMedia()
-    {
-        float media=0;
-        for(int i=0;i<rezultate.size();i++)
-            media+=rezultate.get(i).getPunctajObtinut();
-
-        return media/rezultate.size();
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1325749065)
+    public List<RezultatTestStudent> getRezultate() {
+        if (rezultate == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            RezultatTestStudentDao targetDao = daoSession.getRezultatTestStudentDao();
+            List<RezultatTestStudent> rezultateNew = targetDao._queryTestSustinut_Rezultate(id);
+            synchronized (this) {
+                if (rezultate == null) {
+                    rezultate = rezultateNew;
+                }
+            }
+        }
+        return rezultate;
     }
 
-    public String getNume()
+
+    
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public float getMedia()
+    {
+//        float media=0;
+//        for(int i=0;i<rezultate.size();i++)
+//            media+=rezultate.get(i).getPunctajObtinut();
+//
+//        return media/rezultate.size();
+        return 0;
+    }
+
+    public long getTestId()
     {
         //preluat din prima inregistare din lista
-        return rezultate.get(0).getNume();
+        return rezultate.get(0).getTestId();
     }
 
     public String getData()
@@ -108,69 +125,26 @@ public class RezultatTestProfesor implements Parcelable {
         return promovati;
     }
 
-    public int getRaspunsuriCorecte(String nume_intrebare)
-    {
-        int raspunsuriCorecte=0;
-        for(int i=0;i<rezultate.size();i++)
-            if(rezultate.get(i).getRaspunsuri(nume_intrebare).Corect()) raspunsuriCorecte++;
-        return raspunsuriCorecte;
-    }
+//    public int getRaspunsuriCorecte(String nume_intrebare)
+//    {
+//        int raspunsuriCorecte=0;
+//        for(int i=0;i<rezultate.size();i++)
+//            if(rezultate.get(i).getRaspunsuri(nume_intrebare).Corect()) raspunsuriCorecte++;
+//        return raspunsuriCorecte;
+//    }
 
     public int getNumarStudenti()
     {
         return rezultate.size();
     }
 
-    //endregion
-
-    //region Parcel
-
-    public static final Creator<RezultatTestProfesor> CREATOR =
-            new Creator<RezultatTestProfesor>() {
-                @Override
-                public RezultatTestProfesor createFromParcel(Parcel parcel) {
-                    return new RezultatTestProfesor(parcel);
-                }
-
-                @Override
-                public RezultatTestProfesor[] newArray(int i) {
-                    return new RezultatTestProfesor[i];
-                }
-            };
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-    /** Used for active entity operations. */
-    @Generated(hash = 705348718)
-    private transient RezultatTestProfesorDao myDao;
-
-
-    public RezultatTestProfesor(Parcel parcel) {
-        parcel.readList(this.rezultate, getClass().getClassLoader());
-    }
-
-    @Generated(hash = 1370978341)
-    public RezultatTestProfesor(Long id, long profesorId) {
-        this.id = id;
-        this.profesorId = profesorId;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeList(rezultate);
-    }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 1446559007)
     public synchronized void resetRezultate() {
         rezultate = null;
     }
+
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
@@ -184,6 +158,7 @@ public class RezultatTestProfesor implements Parcelable {
         myDao.delete(this);
     }
 
+
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
@@ -195,6 +170,7 @@ public class RezultatTestProfesor implements Parcelable {
         }
         myDao.refresh(this);
     }
+
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
@@ -208,12 +184,14 @@ public class RezultatTestProfesor implements Parcelable {
         myDao.update(this);
     }
 
+
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 644028761)
+    @Generated(hash = 1116706449)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getRezultatTestProfesorDao() : null;
+        myDao = daoSession != null ? daoSession.getTestSustinutDao() : null;
     }
 
     //endregion
+
 }

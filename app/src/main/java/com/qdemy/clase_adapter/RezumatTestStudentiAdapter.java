@@ -10,8 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.qdemy.R;
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.Student;
+import com.qdemy.clase.TestSustinut;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ public class RezumatTestStudentiAdapter extends ArrayAdapter<Student> {
     private int resource;
     private List<Student> studenti;
     private LayoutInflater inflater;
-    private RezultatTestProfesor test;
+    private TestSustinut test;
 
     public RezumatTestStudentiAdapter(@NonNull Context context, int resource,
                                       @NonNull List<Student> objects, LayoutInflater inflater,
-                                      RezultatTestProfesor test) {
+                                      TestSustinut test) {
         super(context, resource, objects);
 
         this.context=context;
@@ -46,8 +46,8 @@ public class RezumatTestStudentiAdapter extends ArrayAdapter<Student> {
 
         final Student student = studenti.get(position);
 
-        nume.setText(student.getNume());
-        punctaj.setText(Float.toString(student.getTesteSustinute(test.getNume(),test.getData()).getPunctajObtinut()));
+        nume.setText(student.getNume() + " " + student.getPrenume());
+        //punctaj.setText(Float.toString(student.getTesteSustinute(test.getNume(),test.getData()).getPunctajObtinut()));
 
 
 

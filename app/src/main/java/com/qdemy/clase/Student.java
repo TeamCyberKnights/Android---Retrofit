@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.JoinEntity;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
@@ -16,35 +17,43 @@ import java.util.List;
 import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class Student implements Parcelable {
+public class Student {
 
     @Id (autoincrement = true) private Long id;
-    @Index(unique = true) private String nume;
-    @NotNull private String utilizator;
+    @Index(unique = true) private String utilizator;
+    @NotNull private String nume;
+    @NotNull private String prenume;
     @NotNull private String parola;
     @NotNull private String mail;
 
     @ToMany(referencedJoinProperty = "studentId")
     private List<RezultatTestStudent> testeSustinute;
 
+    @ToMany
+    @JoinEntity( entity = EvidentaStudentiEchipe.class, sourceProperty = "studentId", targetProperty = "echipaId")
+    private List<Echipa> echipe;
+
     //region Constructori
 
     public Student () {}
 
-    public Student(String nume, String utilizator, String parola, String mail) {
+    public Student( String utilizator, String nume, String prenume, String parola, String mail) {
         this.nume = nume;
+        this.prenume = prenume;
         this.utilizator = utilizator;
         this.parola = parola;
         this.mail = mail;
-        this.testeSustinute = null;
     }
 
-    public Student(String nume, String utilizator, String parola, String mail, List<RezultatTestStudent> testeSustinute) {
-        this.nume = nume;
+    @Generated(hash = 52540429)
+    public Student(Long id, String utilizator, @NotNull String nume, @NotNull String prenume,
+            @NotNull String parola, @NotNull String mail) {
+        this.id = id;
         this.utilizator = utilizator;
+        this.nume = nume;
+        this.prenume = prenume;
         this.parola = parola;
         this.mail = mail;
-        this.testeSustinute = testeSustinute;
     }
 
     //endregion
@@ -112,7 +121,8 @@ public class Student implements Parcelable {
     public RezultatTestStudent getTesteSustinute(String nume, String data) {
 
         for (int i=0;i<testeSustinute.size();i++)
-            if(testeSustinute.get(i).getNume().equals(nume) &&
+            if(
+                    //testeSustinute.get(i).getNume().equals(nume) &&
                testeSustinute.get(i).getData().equals(data)) return testeSustinute.get(i);
 
         return null;
@@ -134,23 +144,24 @@ public class Student implements Parcelable {
         this.id = id;
     }
 
+    public String getPrenume() {
+        return prenume;
+    }
+
+    public void setPrenume(String prenume) {
+        this.prenume = prenume;
+    }
+
+    
+
+    public void setEchipe(List<Echipa> echipe) {
+        this.echipe = echipe;
+    }
+
     //endregion
 
 
-    //region Parcel
 
-    public static final Creator<Student> CREATOR =
-            new Creator<Student>() {
-                @Override
-                public Student createFromParcel(Parcel parcel) {
-                    return new Student(parcel);
-                }
-
-                @Override
-                public Student[] newArray(int i) {
-                    return new Student[i];
-                }
-            };
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
@@ -158,38 +169,6 @@ public class Student implements Parcelable {
     @Generated(hash = 1943931642)
     private transient StudentDao myDao;
 
-    private Student(Parcel parcel) {
-
-        this.nume = parcel.readString();
-        this.utilizator = parcel.readString();
-        this.parola = parcel.readString();
-        this.mail = parcel.readString();
-        parcel.readList(this.testeSustinute, getClass().getClassLoader());
-    }
-
-    @Generated(hash = 562938018)
-    public Student(Long id, String nume, @NotNull String utilizator, @NotNull String parola, @NotNull String mail) {
-        this.id = id;
-        this.nume = nume;
-        this.utilizator = utilizator;
-        this.parola = parola;
-        this.mail = mail;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeString(nume);
-        parcel.writeString(utilizator);
-        parcel.writeString(parola);
-        parcel.writeString(mail);
-        parcel.writeList(testeSustinute);
-    }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 64673083)
@@ -231,6 +210,34 @@ public class Student implements Parcelable {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1897197852)
+    public List<Echipa> getEchipe() {
+        if (echipe == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            EchipaDao targetDao = daoSession.getEchipaDao();
+            List<Echipa> echipeNew = targetDao._queryStudent_Echipe(id);
+            synchronized (this) {
+                if (echipe == null) {
+                    echipe = echipeNew;
+                }
+            }
+        }
+        return echipe;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1647092795)
+    public synchronized void resetEchipe() {
+        echipe = null;
     }
 
     /** called by internal mechanisms, do not call yourself. */

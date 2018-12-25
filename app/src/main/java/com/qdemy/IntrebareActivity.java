@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qdemy.clase.IntrebareGrila;
-
+//DE SCOOOOOS!!!!!!!!!!
 public class IntrebareActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -56,16 +56,16 @@ public class IntrebareActivity extends AppCompatActivity {
         //region Initializare intrebare
         intrebare = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
         materia.setText(intrebare.getMaterie());
-        numeIntrebare.setText(intrebare.getNume());
-        continutIntrebare.setText(intrebare.getContinut());
+        //numeIntrebare.setText(intrebare.getNume());
+        //continutIntrebare.setText(intrebare.getContinut());
 
-        int nr_variante = intrebare.getVariante().size();
+        //int nr_variante = intrebare.getVariante().size();
         getVariantaRaspuns(variantaA,0);
         getVariantaRaspuns(variantaB,1);
-        if(nr_variante>=3) getVariantaRaspuns(variantaC, 2);
-        if(nr_variante>=4) getVariantaRaspuns(variantaD, 3);
-        if(nr_variante>=5) getVariantaRaspuns(variantaE, 4);
-        if(nr_variante==6) getVariantaRaspuns(variantaF, 5);
+        //if(nr_variante>=3) getVariantaRaspuns(variantaC, 2);
+        //if(nr_variante>=4) getVariantaRaspuns(variantaD, 3);
+        //if(nr_variante>=5) getVariantaRaspuns(variantaE, 4);
+        //if(nr_variante==6) getVariantaRaspuns(variantaF, 5);
         //endregion
 
 
@@ -80,7 +80,7 @@ public class IntrebareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), EditeazaIntrebareActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, intrebare);
+                //intent.putExtra(Constante.CHEIE_TRANSFER, intrebare);
                 startActivity(intent);
                 finish();
             }

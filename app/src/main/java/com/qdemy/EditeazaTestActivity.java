@@ -1,12 +1,11 @@
 package com.qdemy;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,18 +14,25 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.qdemy.clase.EvidentaIntrebariTeste;
+import com.qdemy.clase.EvidentaIntrebariTesteDao;
 import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Test;
-import com.qdemy.clase_adapter.IntrebareAdapter;
-import com.qdemy.clase_adapter.IntrebareTestAdapter;
+import com.qdemy.clase.TestDao;
+import com.qdemy.clase_adapter.AdaugaTestAdapter;
+import com.qdemy.clase_adapter.EditeazaTestAdapter;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class EditeazaTestActivity extends AppCompatActivity {
 
@@ -34,19 +40,20 @@ public class EditeazaTestActivity extends AppCompatActivity {
     private TextView nume;
     private TextInputEditText descriere;
     private Spinner durateSpinner;
-    private Spinner materii;
-    private Spinner intrebariSpinner;
-    private Button adaugaIntrebare;
     private Button actualizeazaTest;
     private ListView intrebariList;
     private RadioGroup tipuri;
     private RadioButton estePublic;
     private RadioButton estePrivat;
-    private List<IntrebareGrila> intrebari = new ArrayList<>();
+    private FloatingActionButton partajeaza;
+    public List<IntrebareGrila> intrebari = new ArrayList<>();
+    public List<Boolean> selectari = new ArrayList<>();
+    public List<IntrebareGrila> intrebariSelectate = new ArrayList<>();
+    private Map<String, Integer> durate = new TreeMap<String, Integer>();
 
     private Profesor profesor;
     private Test test;
-    private SharedPreferences sharedPreferences;
+    private String materie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +70,13 @@ public class EditeazaTestActivity extends AppCompatActivity {
         nume = findViewById(R.id.nume_text_editeazaTest);
         descriere = findViewById(R.id.descriere_textInput_editeazaTest);
         durateSpinner = findViewById(R.id.durate_spinner_editeazaTest);
-        materii = findViewById(R.id.materii_spinner_editeazaTest);
-        intrebariSpinner = findViewById(R.id.intrebari_spinner_editeazaTest);
-        adaugaIntrebare = findViewById(R.id.adaugaIntrebare_button_editeazaTest);
         actualizeazaTest = findViewById(R.id.actualizeaza_button_editeazaTest);
         intrebariList = findViewById(R.id.intrebari_list_editeazaTest);
         tipuri = findViewById(R.id.tipuri_radioGroup_editeazaTest);
         estePrivat = findViewById(R.id.privat_radioButton_editeazaTest);
         estePublic = findViewById(R.id.public_radioButton_editeazaTest);
+        partajeaza = findViewById(R.id.partajeaza_button_editeazaTest);
 
-        final Map<String, Integer> durate = new HashMap<String, Integer>();
         durate.put("10 minute",10);
         durate.put("15 minute",15);
         durate.put("30 minute",30);
@@ -88,34 +92,41 @@ public class EditeazaTestActivity extends AppCompatActivity {
         //endregion
 
         //region Initializare test
-        sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
-        incarcareUtilizatorSalvat();
-        test = getIntent().getParcelableExtra(Constante.CHEIE_TRANSFER);
+        profesor = ((App) getApplication()).getProfesor();
+        test =  ((App) getApplication()).getTest(getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1));
+
+        materie = test.getMaterie();
         nume.setText(test.getNume());
         descriere.setText(test.getDescriere());
         for (String s : durate.keySet()) {
-            if (durate.get(s).equals(test.getMinute())) {
+            if (durate.get(s).equals(test.getTimpDisponibil())) {
                 durateSpinner.setSelection(adapterDurate.getPosition(s));
                 break;
             }
         }
         tipuri.check(test.getEstePublic()?estePublic.getId():estePrivat.getId());
 
-        final List<String> intrebariSpinnerList = new ArrayList<>();
-        final ArrayAdapter<String> adapterIntrebari = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, intrebariSpinnerList );
-        adapterIntrebari.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        intrebariSpinner.setAdapter(adapterIntrebari);
 
-        ArrayAdapter<String> adapterMaterii = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, profesor.getNumeMaterii());
-        adapterMaterii.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        materii.setAdapter(adapterMaterii);
 
-        intrebari = test.getIntrebari();
-        final IntrebareTestAdapter adapterIntrebariSelectate = new IntrebareTestAdapter(getApplicationContext(),
-                R.layout.item_text_button, intrebari, getLayoutInflater(), true);
-        intrebariList.setAdapter(adapterIntrebariSelectate);
+        Query<IntrebareGrila> queryIntrebari = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                IntrebareGrilaDao.Properties.Materie.eq(materie),
+                IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
+        intrebari = queryIntrebari.list();
+        intrebariSelectate = test.getIntrebari();
+
+        for(int i=0;i<intrebari.size();i++) {
+            boolean selectat = false;
+            for (int j = 0; j < intrebariSelectate.size(); j++)
+                if (intrebari.get(i).equals(intrebariSelectate.get(j))) {selectat = true; break;}
+
+            selectari.add(selectat);
+        }
+
+        final EditeazaTestAdapter adapter = new EditeazaTestAdapter(getApplicationContext(),
+                R.layout.item_text_button, intrebari, getLayoutInflater(), EditeazaTestActivity.this);
+        intrebariList.setAdapter(adapter);
+
+
         //endregion
 
 
@@ -126,67 +137,94 @@ public class EditeazaTestActivity extends AppCompatActivity {
             }
         });
 
-        adaugaIntrebare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                intrebari.add(profesor.getIntrebari(intrebariSpinner.getSelectedItem().toString()));
-                adapterIntrebariSelectate.notifyDataSetChanged();
-                adapterIntrebari.remove(intrebariSpinner.getSelectedItem().toString());
-            }
-        });
 
         actualizeazaTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                test.setDescriere(descriere.getText().toString());
-                test.setIntrebari(intrebari); //!!!!!stergerea
-                test.setMinute(durate.get(durateSpinner.getSelectedItem()));
-                test.setEstePublic(tipuri.getCheckedRadioButtonId()==estePublic.getId()?true:false);
-                test.setIntrebari(intrebari);
-                profesor.setTeste(test, test.getNume());
-                salvareUtilizator();
-                finish();
+
+                if (intrebariSelectate==null)
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_1_intrebare), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (nume.getText().toString().trim().isEmpty())
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_nume_inexistent), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (descriere.getText().toString().trim().isEmpty())
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_descriere_inexistenta), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                actualizeazaTest();
             }
         });
 
-        materii.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                intrebariSpinnerList.clear();
-                for(int i=0;i<profesor.getIntrebari().size();i++)
-                    if(profesor.getIntrebari(i).getMaterie().equals(materii.getSelectedItem())&&
-                       !(intrebari.contains(profesor.getIntrebari(i))))
-                        intrebariSpinnerList.add(profesor.getIntrebari(i).getNume());
-                adapterIntrebari.notifyDataSetChanged();
-            }
 
+        partajeaza.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        intrebariList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), IntrebareActivity.class);
-                intent.putExtra(Constante.CHEIE_AUTENTIFICARE, intrebari.get(position));
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PartajeazaTestActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, test.getId());
                 startActivity(intent);
             }
         });
+
     }
 
-    private void incarcareUtilizatorSalvat() {
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString(getString(R.string.utilizator), "");
-        profesor = gson.fromJson(json, Profesor.class);
+    private void actualizeazaTest() {
+
+        //selectare test
+        Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                TestDao.Properties.Nume.eq(nume.getText().toString()),
+                TestDao.Properties.Materie.eq(materie),
+                TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
+
+        //actualizare test
+        Test test = queryTest.list().get(0);
+        test.setIntrebari(intrebariSelectate);
+        test.setDescriere(descriere.getText().toString());
+        test.setTimpDisponibil(durate.get(durateSpinner.getSelectedItem()));
+        test.setEstePublic(tipuri.getCheckedRadioButtonId()==estePublic.getId()?true:false);
+        ((App) getApplication()).getDaoSession().getTestDao().update(test);
+
+
+        //actualizare evidenta intrebari test
+        //actualizare intrebari
+        for ( IntrebareGrila intrebare : intrebariSelectate) {
+            Query<EvidentaIntrebariTeste> queryEvidentaIntrebare = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
+                    EvidentaIntrebariTesteDao.Properties.IntrebareId.eq(intrebare.getId()),
+                    EvidentaIntrebariTesteDao.Properties.TestId.eq(test.getId())).build();
+
+            if(queryEvidentaIntrebare.list().size()<1)
+                ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().insert(
+                        new EvidentaIntrebariTeste(intrebare.getId(), test.getId()));
+        }
+
+        //stergere intrebari neselectate (selectate anterior)
+        Query<EvidentaIntrebariTeste> queryEvidentaIntrebari = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
+                EvidentaIntrebariTesteDao.Properties.TestId.eq(test.getId())).build();
+        for ( EvidentaIntrebariTeste evidentaIntrebare : queryEvidentaIntrebari.list()) {
+            boolean gasit = false;
+            for (int i = 0; i < intrebariSelectate.size(); i++)
+                if(intrebariSelectate.get(i).getId().equals(evidentaIntrebare.getIntrebareId()))
+                {gasit=true; break;}
+
+            if(gasit==false)
+                ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().deleteByKey(evidentaIntrebare.getId());
+        }
+
+
+        //actualizare profesor
+        profesor.setTest(test);
+        ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
+
+        finish();
     }
 
-    private void salvareUtilizator() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(profesor);
-        editor.putString(getString(R.string.utilizator), json);
-        editor.commit();
-    }
+
 }

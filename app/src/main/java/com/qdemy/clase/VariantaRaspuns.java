@@ -25,6 +25,12 @@ public class VariantaRaspuns {
         this.corect = corect;
     }
 
+    public VariantaRaspuns(String text, Boolean corect, long intrebareId) {
+        this.text = text;
+        this.corect = corect;
+        this.intrebareId=intrebareId;
+    }
+
     @Generated(hash = 1343979047)
     public VariantaRaspuns(Long id, @NotNull String text, @NotNull Boolean corect,
             long intrebareId) {

@@ -14,10 +14,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.qdemy.Constante;
+import com.qdemy.EditeazaTestActivity;
 import com.qdemy.R;
 import com.qdemy.TestDetaliiActivity;
+import com.qdemy.TesteActivity;
 import com.qdemy.clase.IntrebareGrila;
 import com.qdemy.clase.Test;
+import com.qdemy.clase.TestDao;
+import com.qdemy.clase.TestPartajat;
+import com.qdemy.clase.TestPartajatDao;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
@@ -28,16 +36,22 @@ public class TestAdapter extends ArrayAdapter<Test> {
     private List<Test> teste;
     private LayoutInflater inflater;
     private Boolean removable;
+    private TesteActivity activity;
+    private long profesorId;
+    private boolean estePartajat = true;
 
     public TestAdapter(@NonNull Context context, int resource,
-                            @NonNull List<Test> objects, LayoutInflater inflater, Boolean removable) {
+                       @NonNull List<Test> objects, LayoutInflater inflater, Boolean removable,
+                       TesteActivity activity, long profesorId) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
         this.teste = objects;
-        this.inflater=inflater;
-        this.removable=removable;
+        this.inflater = inflater;
+        this.removable = removable;
+        this.activity = activity;
+        this.profesorId = profesorId;
     }
 
     @NonNull
@@ -46,16 +60,27 @@ public class TestAdapter extends ArrayAdapter<Test> {
 
         View rand = inflater.inflate(resource, parent, false);
 
-        TextView nume = rand.findViewById(R.id.text_itb);
-        Button sterge = rand.findViewById(R.id.button_itb);
+        TextView nume = rand.findViewById(R.id.text_itbb);
+        Button partajat = rand.findViewById(R.id.button1_itbb);
+        Button sterge = rand.findViewById(R.id.button2_itbb);
         nume.setText(teste.get(position).getNume());
+
+        //verificare test partajat
+        Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
+                TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
+        if(queryTestPartajat.list().size()<1) { partajat.setVisibility(View.INVISIBLE); estePartajat=false;}
+        else sterge.setVisibility(View.INVISIBLE);
+
 
         nume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), TestDetaliiActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position));
-                v.getContext().startActivity(intent);
+                if(!estePartajat) {
+                    Intent intent = new Intent(v.getContext(), EditeazaTestActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position).getId());
+                    v.getContext().startActivity(intent);
+                }
             }
         });
 
@@ -69,6 +94,7 @@ public class TestAdapter extends ArrayAdapter<Test> {
                 //dlgAlert.setTitle("Ștergere test");
                 dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        activity.stergeTest(teste.get(position).getNume());
                         teste.remove(position);
                         notifyDataSetChanged();
                     }

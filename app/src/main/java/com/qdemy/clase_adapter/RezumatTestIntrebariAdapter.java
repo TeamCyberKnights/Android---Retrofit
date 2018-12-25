@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.qdemy.R;
 import com.qdemy.clase.IntrebareGrila;
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.Student;
+import com.qdemy.clase.TestSustinut;
 
 import java.util.List;
 
@@ -22,11 +22,11 @@ public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
     private int resource;
     private List<IntrebareGrila> intrebari;
     private LayoutInflater inflater;
-    private RezultatTestProfesor test;
+    private TestSustinut test;
 
     public RezumatTestIntrebariAdapter(@NonNull Context context, int resource,
                                        @NonNull List<IntrebareGrila> objects, LayoutInflater inflater,
-                                       RezultatTestProfesor test) {
+                                       TestSustinut test) {
         super(context, resource, objects);
 
         this.context=context;
@@ -47,8 +47,8 @@ public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
 
         final IntrebareGrila intrebare = intrebari.get(position);
 
-        nume.setText(intrebare.getNume());
-        corecte.setText(test.getRaspunsuriCorecte(intrebare.getNume()));
+        nume.setText(intrebare.getText());
+        //corecte.setText(test.getRaspunsuriCorecte(intrebare.getNume()));
 
 
 

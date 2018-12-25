@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import com.qdemy.clase.IntrebareGrila;
 import com.qdemy.clase.RaspunsIntrebareGrila;
-import com.qdemy.clase.RezultatTestProfesor;
 import com.qdemy.clase.Student;
+import com.qdemy.clase.TestSustinut;
 import com.qdemy.clase_adapter.RezumatStudentAdapter;
 import com.qdemy.clase_adapter.RezumatTestIntrebariAdapter;
 import com.qdemy.clase_adapter.RezumatTestStudentiAdapter;
@@ -34,7 +34,7 @@ public class RezumatTestActivity extends AppCompatActivity {
     private List<Student> studenti;
     private List<IntrebareGrila> intrebari;
     private ListView informatiiList;
-    private RezultatTestProfesor test;
+    private TestSustinut test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

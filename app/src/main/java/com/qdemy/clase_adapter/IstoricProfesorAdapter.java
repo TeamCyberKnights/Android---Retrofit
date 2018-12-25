@@ -13,19 +13,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.qdemy.R;
-import com.qdemy.clase.RezultatTestProfesor;
+import com.qdemy.clase.TestSustinut;
 
 import java.util.List;
 
-public class IstoricProfesorAdapter extends ArrayAdapter<RezultatTestProfesor> {
+public class IstoricProfesorAdapter extends ArrayAdapter<TestSustinut> {
 
     private Context context;
     private int resource;
-    private List<RezultatTestProfesor> teste;
+    private List<TestSustinut> teste;
     private LayoutInflater inflater;
 
     public IstoricProfesorAdapter(@NonNull Context context, int resource,
-                            @NonNull List<RezultatTestProfesor> objects, LayoutInflater inflater) {
+                            @NonNull List<TestSustinut> objects, LayoutInflater inflater) {
         super(context, resource, objects);
 
         this.context=context;
@@ -44,9 +44,9 @@ public class IstoricProfesorAdapter extends ArrayAdapter<RezultatTestProfesor> {
         TextView data = rand.findViewById(R.id.text2_ittt);
         TextView media = rand.findViewById(R.id.text3_ittt);
 
-        final RezultatTestProfesor test = teste.get(position);
+        final TestSustinut test = teste.get(position);
 
-        nume.setText(test.getNume());
+        //nume.setText(test.getNume());
         data.setText(test.getData());
         media.setText(Float.toString(test.getMedia()));
 

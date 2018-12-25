@@ -15,51 +15,59 @@ import java.util.List;
 import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class IntrebareGrila implements Parcelable {
+public class IntrebareGrila {
 
     @Id (autoincrement = true) private Long id;
-    @Index(unique = true) private String nume;
-    @NotNull private String continut;
+    //DE SCOS ACTIVITATEA CU VEZI INTREBARE
+    @NotNull private String text;
     @NotNull private String materie;
-    @NotNull private double punctaj; // asociat dificultatii: 1-usor, 2-mediu, 3-greu
+    @NotNull private double dificultate; // asociat dificultatii: 1-usor, 2-mediu, 3-greu
 
     @ToMany(referencedJoinProperty = "intrebareId")
     private List<VariantaRaspuns> variante;
 
-
     @NotNull private long profesorId;
-    @NotNull private long testId;
+
+
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+    /** Used for active entity operations. */
+    @Generated(hash = 1431844353)
+    private transient IntrebareGrilaDao myDao;
 
     //region Constructori
 
     public IntrebareGrila() {}
 
-    public IntrebareGrila(String nume, String continut, String materie, List<VariantaRaspuns> variante, double punctaj) {
-        this.nume = nume;
-        this.continut = continut;
+    public IntrebareGrila(String text, String materie, double dificultate, long profesorId) {
+        this.text = text;
         this.materie = materie;
-        this.variante = variante;
-        this.punctaj = punctaj;
+        this.dificultate = dificultate;
+        this.profesorId = profesorId;
+    }
+
+    @Generated(hash = 1455994296)
+    public IntrebareGrila(Long id, @NotNull String text, @NotNull String materie, double dificultate,
+            long profesorId) {
+        this.id = id;
+        this.text = text;
+        this.materie = materie;
+        this.dificultate = dificultate;
+        this.profesorId = profesorId;
     }
 
     //endregion
 
     //region GET, SET
 
-    public String getNume() {
-        return nume;
+    public String getText() {
+        return text;
     }
 
-    public void setNume(String nume) {
-        this.nume = nume;
-    }
-
-    public String getContinut() {
-        return continut;
-    }
-
-    public void setContinut(String continut) {
-        this.continut = continut;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getMaterie() {
@@ -68,6 +76,43 @@ public class IntrebareGrila implements Parcelable {
 
     public void setMaterie(String materie) {
         this.materie = materie;
+    }
+
+
+    public VariantaRaspuns getVariante(int index) {
+        return variante.get(index);
+    }
+
+    public void setVariante(List<VariantaRaspuns> variante) {
+        this.variante = variante;
+    }
+
+    public void setVariante(VariantaRaspuns varianta, int index) {
+        this.variante.set(index, varianta);
+    }
+
+    public double getDificultate() {
+        return dificultate;
+    }
+
+    public void setDificultate(double punctaj) {
+        this.dificultate = punctaj;
+    }
+
+    public long getProfesorId() {
+        return profesorId;
+    }
+
+    public void setProfesorId(long profesorId) {
+        this.profesorId = profesorId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     /**
@@ -90,121 +135,6 @@ public class IntrebareGrila implements Parcelable {
             }
         }
         return variante;
-    }
-
-    public VariantaRaspuns getVariante(int index) {
-        return variante.get(index);
-    }
-
-    public void setVariante(List<VariantaRaspuns> variante) {
-        this.variante = variante;
-    }
-
-    public void setVariante(VariantaRaspuns varianta, int index) {
-        this.variante.set(index, varianta);
-    }
-
-    public double getPunctaj() {
-        return punctaj;
-    }
-
-    public void setPunctaj(double punctaj) {
-        this.punctaj = punctaj;
-    }
-
-    public long getProfesorId() {
-        return profesorId;
-    }
-
-    public void setProfesorId(long profesorId) {
-        this.profesorId = profesorId;
-    }
-
-    public long getTestId() {
-        return testId;
-    }
-
-    public void setTestId(long testId) {
-        this.testId = testId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    //endregion
-
-    //region Parcel
-
-    public static final Creator<IntrebareGrila> CREATOR =
-            new Creator<IntrebareGrila>() {
-                @Override
-                public IntrebareGrila createFromParcel(Parcel parcel) {
-                    return new IntrebareGrila(parcel);
-                }
-
-                @Override
-                public IntrebareGrila[] newArray(int i) {
-                    return new IntrebareGrila[i];
-                }
-            };
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-    /** Used for active entity operations. */
-    @Generated(hash = 1431844353)
-    private transient IntrebareGrilaDao myDao;
-
-
-    public IntrebareGrila(Parcel parcel) {
-        this.nume = parcel.readString();
-        this.continut = parcel.readString();
-        this.materie = parcel.readString();
-        parcel.readList(this.variante, getClass().getClassLoader());
-        this.punctaj = parcel.readDouble();
-    }
-
-    @Generated(hash = 932140341)
-    public IntrebareGrila(Long id, String nume, @NotNull String continut, @NotNull String materie, double punctaj,
-            long profesorId, long testId) {
-        this.id = id;
-        this.nume = nume;
-        this.continut = continut;
-        this.materie = materie;
-        this.punctaj = punctaj;
-        this.profesorId = profesorId;
-        this.testId = testId;
-    }
-
-//    @Generated(hash = 932140341)
-//    public IntrebareGrila(Long id, String nume, @NotNull String continut, @NotNull String materie, double punctaj,
-//            long profesorId, long testId) {
-//        this.id = id;
-//        this.nume = nume;
-//        this.continut = continut;
-//        this.materie = materie;
-//        this.punctaj = punctaj;
-//        this.profesorId = profesorId;
-//        this.testId = testId;
-//    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-
-        parcel.writeString(nume);
-        parcel.writeString(continut);
-        parcel.writeString(materie);
-        parcel.writeList(variante);
-        parcel.writeDouble(punctaj);
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
@@ -257,4 +187,5 @@ public class IntrebareGrila implements Parcelable {
     }
 
     //endregion
+
 }
