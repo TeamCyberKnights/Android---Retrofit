@@ -155,9 +155,12 @@ public class ProfesorActivity extends AppCompatActivity {
                 builder.setPositiveButton(getString(R.string.start), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(getApplicationContext(), StartingQuizProfesorActivity.class);
-                        intent.putExtra(Constante.CHEIE_TRANSFER, spinner.getSelectedItem().toString());
-                        startActivityForResult(intent, Constante.REQUEST_CODE_START_TEST);
+                        try {
+                            Intent intent = new Intent(getApplicationContext(), StartingQuizProfesorActivity.class);
+                            intent.putExtra(Constante.CHEIE_TRANSFER, spinner.getSelectedItem().toString());
+                            startActivityForResult(intent, Constante.REQUEST_CODE_START_TEST);
+                        }
+                        catch(Exception e) {}
                     }
                 });
 
