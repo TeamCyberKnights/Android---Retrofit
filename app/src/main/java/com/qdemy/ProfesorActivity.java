@@ -149,7 +149,7 @@ public class ProfesorActivity extends AppCompatActivity {
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(v.getContext(),
                         android.R.layout.simple_spinner_item, testeProfesor);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                adapter.setDropDownViewResource(R.layout.item_spinner);
                 spinner.setAdapter(adapter);
 
                 builder.setPositiveButton(getString(R.string.start), new DialogInterface.OnClickListener() {
@@ -163,7 +163,9 @@ public class ProfesorActivity extends AppCompatActivity {
 
 
                 builder.setView(view);
-                builder.show();
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.getWindow().setBackgroundDrawableResource(R.color.portocaliu);
             }
         });
     }
