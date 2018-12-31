@@ -111,7 +111,7 @@ public class MateriiActivity extends AppCompatActivity {
         actualizeazaNomenclator();
         final ArrayAdapter<String> adapterNomenclator = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, nomenclator_materii);
-        adapterNomenclator.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterNomenclator.setDropDownViewResource(R.layout.item_spinner);
         materiiSpinner.setAdapter(adapterNomenclator);
         //endregion
 

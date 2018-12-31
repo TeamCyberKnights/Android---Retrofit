@@ -160,7 +160,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/materia"
-            android:textSize="30sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
