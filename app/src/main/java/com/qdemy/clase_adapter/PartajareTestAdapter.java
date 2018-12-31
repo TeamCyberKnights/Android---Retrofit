@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,28 +48,32 @@ public class PartajareTestAdapter extends ArrayAdapter<Profesor> {
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
 
-        nume.setText(profesori.get(position).getNume() + " " + profesori.get(position).getPrenume());
-        sterge.setBackgroundResource(R.drawable.ic_close_black_24dp);
+        try {
+            nume.setText(profesori.get(position).getNume() + " " + profesori.get(position).getPrenume());
+            nume.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.bleu_marin));
+            sterge.setBackgroundResource(R.drawable.ic_close_black_24dp);
 
-        sterge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            sterge.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
-                dlgAlert.setMessage(context.getString(R.string.stergere_partajare_message) + " " +
-                                    profesori.get(position).getNume() + " " + profesori.get(position).getPrenume() +" ?");
-                dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        activity.stergeTest(profesori.get(position));
-                        //profesori.remove(position);
-                    }
-                });
-                dlgAlert.setNegativeButton(R.string.nu, null);
-                AlertDialog dialog = dlgAlert.create();
-                dialog.show();
+                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
+                    dlgAlert.setMessage(context.getString(R.string.stergere_partajare_message) + " " +
+                            profesori.get(position).getNume() + " " + profesori.get(position).getPrenume() + " ?");
+                    dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            activity.stergeTest(profesori.get(position));
+                            //profesori.remove(position);
+                        }
+                    });
+                    dlgAlert.setNegativeButton(R.string.nu, null);
+                    AlertDialog dialog = dlgAlert.create();
+                    dialog.show();
 
-            }
-        });
+                }
+            });
+        }
+        catch (Exception e) {}
 
 
         return rand;

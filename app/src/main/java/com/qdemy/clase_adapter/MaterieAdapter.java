@@ -62,27 +62,28 @@ public class MaterieAdapter extends ArrayAdapter<String> {
         TextView nume = rand.findViewById(R.id.text_itb);
         Button sterge = rand.findViewById(R.id.button_itb);
         sterge.setBackgroundResource(R.drawable.ic_close_black_24dp);
-        if(materii!=null) nume.setText(materii.get(position));
 
+        try {
+            if (materii != null) nume.setText(materii.get(position));
 
-        nume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent;
-                if(continut.equals(v.getContext().getResources().getString(R.string.testele_mele)))
-                    intent = new Intent(v.getContext(), TesteActivity.class);
-                else
-                    intent = new Intent(v.getContext(), IntrebariMaterieActivity.class);
+            nume.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent;
+                    if (continut.equals(v.getContext().getResources().getString(R.string.testele_mele)))
+                        intent = new Intent(v.getContext(), TesteActivity.class);
+                    else
+                        intent = new Intent(v.getContext(), IntrebariMaterieActivity.class);
 
-                intent.putExtra(Constante.CHEIE_TRANSFER, materii.get(position));
-                v.getContext().startActivity(intent);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, materii.get(position));
+                    v.getContext().startActivity(intent);
 
-            }
-        });
+                }
+            });
 
-        sterge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
+            sterge.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
                     AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
                     dlgAlert.setMessage(R.string.stergere_materie_message);
                     //dlgAlert.setTitle("Ștergere materie");
@@ -99,7 +100,9 @@ public class MaterieAdapter extends ArrayAdapter<String> {
                     dialog.show();
                 }
 
-        });
+            });
+        }
+        catch (Exception e) {}
 
         return rand;
     }

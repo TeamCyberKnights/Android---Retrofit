@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.qdemy">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".db.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -28,21 +28,18 @@
         <activity android:name=".StartingQuizProfesorActivity" />
         <activity android:name=".ScorLiveActivity" />
         <activity android:name=".RezumatTestActivity" />
-        <activity android:name=".RezultatTestActivity" />
         <activity android:name=".RezumatStudentActivity" />
         <activity android:name=".MateriiActivity" />
         <activity android:name=".IntrebariMaterieActivity" />
-        <activity android:name=".IntrebareActivity" />
         <activity android:name=".AdaugaIntrebareActivity" />
         <activity android:name=".EditeazaIntrebareActivity" />
         <activity android:name=".TesteActivity" />
-        <activity android:name=".TestDetaliiActivity" />
         <activity android:name=".EditeazaTestActivity" />
         <activity android:name=".PartajeazaTestActivity" />
         <activity android:name=".AdaugaTestActivity" />
         <activity android:name=".IstoricStudentActivity" />
-        <activity android:name=".IstoricProfesorActivity"></activity>
-
+        <activity android:name=".IstoricProfesorActivity" />
+        <activity android:name=".TestePubliceActivity"></activity>
     </application>
 
 </manifest>

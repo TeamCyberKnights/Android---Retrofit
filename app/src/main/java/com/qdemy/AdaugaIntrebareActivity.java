@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,8 @@ import org.greenrobot.greendao.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class AdaugaIntrebareActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -49,6 +52,11 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
 
     private Profesor profesor;
     public List<VariantaRaspuns> varianteRaspuns = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +98,7 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, dificultati);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         dificultatiSpinner.setAdapter(adapter);
 
         //endregion

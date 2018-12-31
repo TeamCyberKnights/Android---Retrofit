@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fundal4"
     tools:context=".RezultatStudentActivity">
 
     <TextView
         android:id="@+id/scor_text_rezultatStudent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="139dp"
         android:layout_margin="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
@@ -18,7 +19,6 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:layout_weight="5"
-        android:background="@color/colorAccent"
         android:gravity="center"
         android:text="@string/_100"
         android:textColor="@android:color/background_light"
@@ -70,6 +70,7 @@
         android:layout_marginBottom="8dp"
         android:text="@string/salveaz"
         android:textAllCaps="false"
+        android:textColor="@color/bleu_marin"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

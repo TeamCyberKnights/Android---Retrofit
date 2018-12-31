@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,8 @@ import org.greenrobot.greendao.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class PartajeazaTestActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -38,6 +41,11 @@ public class PartajeazaTestActivity extends AppCompatActivity {
 
     private Test test;
     private Profesor profesorAutor;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +75,7 @@ public class PartajeazaTestActivity extends AppCompatActivity {
         }
         adapterProfesori = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, numeProfesori);
-        adapterProfesori.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterProfesori.setDropDownViewResource(R.layout.item_spinner);
         profesoriSpinner.setAdapter(adapterProfesori);
 
 

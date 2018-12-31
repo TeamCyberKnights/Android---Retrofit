@@ -1,13 +1,20 @@
 package com.qdemy;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,15 +40,27 @@ import org.greenrobot.greendao.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class TesteActivity extends AppCompatActivity {
 
     private ImageView inapoi;
+    private ImageView acasa;
+    private ImageView istoric;
+    private ImageView intrebari;
     private FloatingActionButton adauga;
     private ListView testeList;
     private String materie;
     private TextView materieTitlu;
+    private SearchView cautaTest;
+    private TestAdapter adapter;
     private List<Test> teste = new ArrayList<>();
     private Profesor profesor;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +72,20 @@ public class TesteActivity extends AppCompatActivity {
 
     private void initializare() {
 
+        //region Intializare componenete vizuale
         inapoi = findViewById(R.id.back_image_teste);
+        acasa = findViewById(R.id.acasa_image_teste);
+        istoric = findViewById(R.id.istoric_image_teste);
+        intrebari = findViewById(R.id.intrebari_image_teste);
         adauga = findViewById(R.id.adauga_button_teste);
         testeList = findViewById(R.id.teste_list_teste);
+        cautaTest = findViewById(R.id.search_teste);
+        int id = cautaTest.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) cautaTest.findViewById(id);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(getResources().getColor(R.color.gri));
         materieTitlu = findViewById(R.id.titlu_text_teste);
-
+        //endregion
 
         //region Initializare intrebari
         profesor = ((App) getApplication()).getProfesor();
@@ -79,19 +107,12 @@ public class TesteActivity extends AppCompatActivity {
         }
 
 
-        TestAdapter adapter = new TestAdapter(getApplicationContext(), R.layout.item_text_button_button,
+        adapter = new TestAdapter(getApplicationContext(), R.layout.item_text_button_button,
                 teste, getLayoutInflater(), true, TesteActivity.this, profesor.getId());
         testeList.setAdapter(adapter);
         //endregion
 
 
-
-        inapoi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         adauga.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +123,79 @@ public class TesteActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        cautaTest.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)){
+                    adapter.filter("");
+                    testeList.clearTextFilter();
+                }
+                else {
+                    adapter.filter(newText);
+                }
+                return true;
+            }
+        });
+
+        //region Meniu
+
+        inapoi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(v.getContext());
+                dlgAlert.setMessage(R.string.deconectare_message);
+                dlgAlert.setTitle(R.string.deconectare_title);
+                dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                dlgAlert.setNegativeButton(R.string.nu, null);
+                dlgAlert.setCancelable(true);
+                AlertDialog dialog = dlgAlert.create();
+                dialog.show();
+                dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
+            }
+        });
+
+        acasa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        istoric.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+
+        intrebari.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        //endregion
 
     }
 

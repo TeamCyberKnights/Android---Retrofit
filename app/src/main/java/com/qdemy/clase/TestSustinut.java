@@ -34,6 +34,9 @@ public class TestSustinut {
 
     public TestSustinut() {}
 
+    public TestSustinut(long profesorId) {
+        this.profesorId = profesorId;
+    }
 
     @Generated(hash = 666652173)
     public TestSustinut(Long id, long profesorId) {

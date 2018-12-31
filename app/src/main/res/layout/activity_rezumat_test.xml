@@ -4,23 +4,108 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fundal4"
     tools:context=".RezumatTestActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        android:weightSum="5.5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titlu_image_profesor6">
+
+        <ImageView
+            android:id="@+id/acasa_image_rezumatTest"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/inapoi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/acasax" />
+
+        <ImageView
+            android:id="@+id/istoric_image_rezumatTest"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="372dp"
+            android:layout_weight="1.5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titlu_image_profesor"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@drawable/istoric" />
+
+        <ImageView
+            android:id="@+id/intrebari_image_rezumatTest"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/intrebarix" />
+
+        <ImageView
+            android:id="@+id/teste_image_rezumatTest"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="136dp"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/intrebari_button_profesor"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/testex" />
+
+        <ImageView
+            android:id="@+id/back_image_rezumatTest"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/inapoi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/deconectare" />
+    </LinearLayout>
+
     <ImageView
-        android:id="@+id/back_image_rezumatTest"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
+        android:id="@+id/titlu_image_profesor6"
+        android:layout_width="156dp"
+        android:layout_height="72dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:contentDescription="@string/inapoi"
-        app:layout_constraintHorizontal_bias="0.119"
+        android:contentDescription="@string/logo"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+        app:srcCompat="@drawable/logo_white" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,36 +122,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
-        <TextView
-            android:id="@+id/test_text_rezumatTest"
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barcahrt_rezumatTest"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="1.5"
-            android:gravity="center"
-            android:text="@string/nume_test"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.405"
-            app:layout_constraintStart_toEndOf="@+id/back_image_rezumatTest"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.015" />
+            android:layout_height="0sp"
+            android:layout_weight="4"></com.github.mikephil.charting.charts.BarChart>
 
         <RadioGroup
             android:id="@+id/optiuni_radioGroup_rezumatTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.75"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -80,7 +148,9 @@
                 android:checked="true"
                 android:text="@string/studen_i"
                 android:textAllCaps="false"
-                android:textSize="24sp" />
+                android:textColor="@color/bleu"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/intrebari_radioButton_rezumatTest"
@@ -91,17 +161,19 @@
                 android:layout_weight="1"
                 android:text="@string/ntreb_ri"
                 android:textAllCaps="false"
-                android:textSize="24sp" />
+                android:textColor="@color/bleu"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
         </RadioGroup>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:layout_weight="1"
+            android:layout_margin="5dp"
+            android:layout_weight="0.75"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="3">
 
             <TextView
                 android:id="@+id/nume_text_rezumatTest"
@@ -114,10 +186,10 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_weight="3"
+                android:layout_weight="2"
                 android:gravity="center"
                 android:text="@string/nume"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +210,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/punctaj"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -150,8 +222,8 @@
             android:id="@+id/informatii_list_rezumatTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:layout_weight="5.5"></ListView>
+            android:layout_margin="5dp"
+            android:layout_weight="3.75"></ListView>
 
         <TextView
             android:id="@+id/promovati_text_rezumatTest"
@@ -164,7 +236,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:layout_weight="1"
+            android:layout_weight="0.75"
             android:gravity="center"
             android:text="@string/promovati"
             android:textSize="24sp"
@@ -175,6 +247,7 @@
             app:layout_constraintStart_toEndOf="@+id/back_image_rezumatTest"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.015" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

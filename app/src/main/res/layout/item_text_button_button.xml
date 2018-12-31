@@ -21,7 +21,8 @@
             android:id="@+id/text_itbb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="6" />
+            android:layout_weight="6"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/button1_itbb"
@@ -29,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:layout_weight="1"
-            android:background="@drawable/ic_people_24dp"
+            android:background="@drawable/ic_people_black_24dp"
             android:gravity="center_horizontal"
             android:padding="0dp" />
 
@@ -39,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:layout_weight="1"
-            android:background="@drawable/ic_delete_forever_black2_24dp"
+            android:background="@drawable/ic_close_black_24dp"
             android:gravity="center_horizontal"
             android:padding="0dp" />
     </LinearLayout>

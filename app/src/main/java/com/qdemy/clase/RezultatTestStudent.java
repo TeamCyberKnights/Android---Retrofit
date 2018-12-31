@@ -35,13 +35,14 @@ public class RezultatTestStudent {
 
     public RezultatTestStudent() {}
 
-    public RezultatTestStudent(long testId, String data, int minuteTrecute, boolean promovat,
-                               List<RaspunsIntrebareGrila> raspunsuri) {
+    public RezultatTestStudent(long testId, String data, int minuteTrecute, List<RaspunsIntrebareGrila> raspunsuri,
+                               boolean promovat, long studentId) {
         this.testId = testId;
         this.data = data;
         this.minuteTrecute = minuteTrecute;
         this.promovat=promovat;
         this.raspunsuri = raspunsuri;
+        this.studentId = studentId;
     }
 
     @Generated(hash = 1291890339)

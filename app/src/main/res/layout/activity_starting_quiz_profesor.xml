@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fundal4"
     tools:context=".StartingQuizProfesorActivity">
 
     <LinearLayout
@@ -30,7 +31,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_weight="25"
-            android:background="@android:color/holo_blue_dark"
             android:gravity="center"
             android:text="@string/asdfgh"
             android:textColor="@android:color/background_light"
@@ -67,6 +67,7 @@
             android:baselineAligned="false"
             android:gravity="center_horizontal|center"
             android:orientation="horizontal"
+            android:visibility="gone"
             android:weightSum="2">
 
             <RadioButton
@@ -78,7 +79,10 @@
                 android:layout_weight="1"
                 android:checked="true"
                 android:gravity="center"
-                android:text="@string/individual" />
+                android:text="@string/individual"
+                android:textColor="@color/bleu"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/o2_radio_startingQuiz"
@@ -88,7 +92,10 @@
                 android:layout_marginRight="25dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/echipe" />
+                android:text="@string/echipe"
+                android:textColor="@color/bleu"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </RadioGroup>
 
         <ListView
@@ -96,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="45"></ListView>
+            android:layout_weight="50"></ListView>
 
         <TextView
             android:id="@+id/renunta_text_startingQuiz"
@@ -125,7 +132,7 @@
             android:layout_weight="10"
             android:background="@color/colorAccent"
             android:text="@string/start"
-            android:textColor="@android:color/background_light"
+            android:textColor="@color/bleu_marin"
             android:textSize="24sp"
             android:textStyle="bold" />
 

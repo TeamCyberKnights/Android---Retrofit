@@ -1,8 +1,10 @@
 package com.qdemy.clase_adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.qdemy.R;
+import com.qdemy.RezumatStudentActivity;
+import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.RaspunsIntrebareGrila;
 import com.qdemy.clase.RezultatTestStudent;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
@@ -19,17 +27,20 @@ public class RezumatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
     private Context context;
     private int resource;
-    private List<RaspunsIntrebareGrila> intrebari;
+    private List<RaspunsIntrebareGrila> raspunsuri;
     private LayoutInflater inflater;
+    private RezumatStudentActivity activity;
 
     public RezumatStudentAdapter(@NonNull Context context, int resource,
-                                 @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater) {
+                                 @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater,
+                                 RezumatStudentActivity activity) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
-        this.intrebari = objects;
+        this.raspunsuri = objects;
         this.inflater=inflater;
+        this.activity = activity;
     }
 
     @NonNull
@@ -38,15 +49,21 @@ public class RezumatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
         View rand = inflater.inflate(resource, parent, false);
 
-        TextView nume = rand.findViewById(R.id.text1_ittt);
-        TextView timp = rand.findViewById(R.id.text2_ittt);
-        TextView punctaj = rand.findViewById(R.id.text3_ittt);
+        TextView nume = rand.findViewById(R.id.text1_itt);
+        TextView punctaj = rand.findViewById(R.id.text2_itt);
 
-        final RaspunsIntrebareGrila intrebare = intrebari.get(position);
+        try {
+            final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
+            Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
 
-        //nume.setText(intrebare.getText());
-        timp.setText(intrebare.getSecunde());
-        punctaj.setText(Float.toString(intrebare.getPunctajObtinut()));
+            nume.setText(queryIntrebare.list().get(0).getText());
+            punctaj.setText(String.valueOf(raspuns.getPunctajObtinut()));
+            punctaj.setTextColor(raspuns.getPunctajObtinut() == 0 ? ContextCompat.getColor(rand.getContext(), R.color.rosu) :
+                    raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? ContextCompat.getColor(rand.getContext(), R.color.verde) :
+                            ContextCompat.getColor(rand.getContext(), R.color.galben));
+        }
+        catch (Exception e) {}
 
         return rand;
     }

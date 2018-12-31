@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class AdaugaTestActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -48,6 +51,11 @@ public class AdaugaTestActivity extends AppCompatActivity {
 
     private Profesor profesor;
     private String materie;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +87,8 @@ public class AdaugaTestActivity extends AppCompatActivity {
         List<String> list = new ArrayList<String>(durate.keySet());
         ArrayAdapter<String> adapterDurate = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);
-        adapterDurate.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterDurate.setDropDownViewResource(R.layout.item_spinner);
         durateSpinner.setAdapter(adapterDurate);
-
 
 
         profesor = ((App) getApplication()).getProfesor();
@@ -141,9 +148,7 @@ public class AdaugaTestActivity extends AppCompatActivity {
 
         //adaugare test
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                TestDao.Properties.Nume.eq(nume.getText().toString()),
-                TestDao.Properties.Materie.eq(materie),
-                TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
+                TestDao.Properties.Nume.eq(nume.getText().toString())).build();
 
         if(queryTest.list().size()>0)
         {

@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.design.widget.TextInputEditText;
@@ -29,6 +30,8 @@ import org.greenrobot.greendao.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class EditeazaIntrebareActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -55,6 +58,11 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
     private List<VariantaRaspuns> varianteRaspuns = new ArrayList<>();
     private List<Boolean> raspunsuri = new ArrayList<>();
     private SharedPreferences sharedPreferences;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +100,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, dificultati);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         dificultatiSpinner.setAdapter(adapter);
 
         profesor = ((App) getApplication()).getProfesor();
@@ -303,12 +311,16 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
                 VariantaRaspunsDao.Properties.IntrebareId.eq(intrebare.getId())).build();
 
         List<VariantaRaspuns> varianteRaspunsActualizate = new ArrayList<>();
-        //preluare variante care NU se modifica
+        //preluare variante care NU se modifica + stergere variante care nu exista
         for ( VariantaRaspuns varianta : queryVarianteRaspuns.list()) {
+            boolean exista = false;
             for (int i = 0; i < varianteRaspuns.size(); i++)
                 if (varianta.getText().equals(varianteRaspuns.get(i).getText()) &&
                         varianta.getCorect() == varianteRaspuns.get(i).getCorect())
-                { varianteRaspunsActualizate.add(varianteRaspuns.get(i)); break;}
+                { varianteRaspunsActualizate.add(varianteRaspuns.get(i));
+                  exista = true; break;}
+            if(exista==false)
+                ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().deleteByKey(varianta.getId());
         }
         //preluare variante care se modifica + adaugare in bd
         for ( VariantaRaspuns varianta : varianteRaspuns) {
@@ -323,6 +335,8 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
                         new VariantaRaspuns(varianta.getText(), varianta.getCorect(), intrebare.getId()));
             }
         }
+
+        /////////////////// stergere variante
 
         //actualizare intrebare
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(

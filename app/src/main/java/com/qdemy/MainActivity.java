@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
@@ -24,6 +25,7 @@ import org.greenrobot.greendao.query.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,9 +43,15 @@ public class MainActivity extends AppCompatActivity {
     private Query<Profesor> profesoriQuery;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 //        //region preluare date din URL-uri
 //
@@ -63,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
 //        manager.execute(urlJSONProfesor);
 //
 //        //endregion
+
+        //Calligrapher calligrapher = new Calligrapher(this);
+        //calligrapher.setFont(this, "font/ubuntu_regular.ttf", true);
 
         initializare();
 

@@ -16,17 +16,15 @@ import android.widget.TextView;
 import com.qdemy.Constante;
 import com.qdemy.EditeazaTestActivity;
 import com.qdemy.R;
-import com.qdemy.TestDetaliiActivity;
 import com.qdemy.TesteActivity;
-import com.qdemy.clase.IntrebareGrila;
 import com.qdemy.clase.Test;
-import com.qdemy.clase.TestDao;
 import com.qdemy.clase.TestPartajat;
 import com.qdemy.clase.TestPartajatDao;
 import com.qdemy.db.App;
 
 import org.greenrobot.greendao.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestAdapter extends ArrayAdapter<Test> {
@@ -34,6 +32,7 @@ public class TestAdapter extends ArrayAdapter<Test> {
     private Context context;
     private int resource;
     private List<Test> teste;
+    private ArrayList<Test> testeOriginal;
     private LayoutInflater inflater;
     private Boolean removable;
     private TesteActivity activity;
@@ -48,11 +47,33 @@ public class TestAdapter extends ArrayAdapter<Test> {
         this.context=context;
         this.resource=resource;
         this.teste = objects;
+        this.testeOriginal = new ArrayList<Test>();
+        this.testeOriginal.addAll(teste);
+
         this.inflater = inflater;
         this.removable = removable;
         this.activity = activity;
         this.profesorId = profesorId;
     }
+
+
+    //filter
+    public void filter(String charText){
+        charText = charText.toLowerCase();
+        teste.clear();
+        if (charText.equals("")){
+            teste.addAll(testeOriginal);
+        }
+        else {
+            for (Test test : testeOriginal){
+                if (test.getNume().toLowerCase().contains(charText)){
+                    teste.add(test);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
@@ -63,48 +84,54 @@ public class TestAdapter extends ArrayAdapter<Test> {
         TextView nume = rand.findViewById(R.id.text_itbb);
         Button partajat = rand.findViewById(R.id.button1_itbb);
         Button sterge = rand.findViewById(R.id.button2_itbb);
-        nume.setText(teste.get(position).getNume());
 
-        //verificare test partajat
-        Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
-                TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
-                TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
-        if(queryTestPartajat.list().size()<1) { partajat.setVisibility(View.INVISIBLE); estePartajat=false;}
-        else sterge.setVisibility(View.INVISIBLE);
+        try {
+            nume.setText(teste.get(position).getNume());
 
-
-        nume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!estePartajat) {
-                    Intent intent = new Intent(v.getContext(), EditeazaTestActivity.class);
-                    intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position).getId());
-                    v.getContext().startActivity(intent);
-                }
-            }
-        });
+            //verificare test partajat
+            Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                    TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
+                    TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
+            if (queryTestPartajat.list().size() < 1) {
+                partajat.setVisibility(View.INVISIBLE);
+                estePartajat = false;
+            } else sterge.setVisibility(View.INVISIBLE);
 
 
-        sterge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(v.getContext());
-                dlgAlert.setMessage(R.string.stergere_test_message);
-                //dlgAlert.setTitle("Ștergere test");
-                dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        activity.stergeTest(teste.get(position).getNume());
-                        teste.remove(position);
-                        notifyDataSetChanged();
+            nume.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!estePartajat) {
+                        Intent intent = new Intent(v.getContext(), EditeazaTestActivity.class);
+                        intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position).getId());
+                        v.getContext().startActivity(intent);
                     }
-                });
-                dlgAlert.setNegativeButton(R.string.nu, null);
-                AlertDialog dialog = dlgAlert.create();
-                dialog.show();
+                }
+            });
 
-            }
-        });
+
+            sterge.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
+                    dlgAlert.setMessage(R.string.stergere_test_message);
+                    //dlgAlert.setTitle("Ștergere test");
+                    dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            activity.stergeTest(teste.get(position).getNume());
+                            teste.remove(position);
+                            notifyDataSetChanged();
+                        }
+                    });
+                    dlgAlert.setNegativeButton(R.string.nu, null);
+                    AlertDialog dialog = dlgAlert.create();
+                    dialog.show();
+
+                }
+            });
+        }
+        catch (Exception e) {}
 
 
 

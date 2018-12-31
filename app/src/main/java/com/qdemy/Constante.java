@@ -8,7 +8,9 @@ public interface Constante {
     String CHEIE_AUTENTIFICARE = "autentificare";
     String CHEIE_AUTENTIFICARE_EXTRA = "extra";
     String CHEIE_TRANSFER = "extra";
-    String CHEIE_TRANSFER_2 = "extra2";
+    String CHEIE_TRANSFER2 = "extra2";
+    String CHEIE_TRANSFER_INTREBARI = "extraIntrebari";
+    String CHEIE_TRANSFER_INDEX = "extraIndex";
     String DATE_FORMAT = "dd.MM.yyyy";
     String MAIL_FORMAT = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 

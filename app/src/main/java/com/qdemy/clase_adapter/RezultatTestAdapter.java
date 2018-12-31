@@ -10,31 +10,37 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.qdemy.R;
+import com.qdemy.ScorLiveActivity;
+import com.qdemy.clase.RezultatTestStudent;
+import com.qdemy.clase.StudentDao;
 import com.qdemy.clase.TestSustinut;
 import com.qdemy.clase.Student;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
-public class RezultatTestAdapter extends ArrayAdapter<Student> {
+public class RezultatTestAdapter extends ArrayAdapter<RezultatTestStudent> {
 
     private Context context;
     private int resource;
-    private List<Student> studenti;
+    private List<RezultatTestStudent> rezultate;
     private LayoutInflater inflater;
     private String numeTest;
     private String data;
-    private TestSustinut test;
+    private ScorLiveActivity activity;
 
     public RezultatTestAdapter(@NonNull Context context, int resource,
-                               @NonNull List<Student> objects, LayoutInflater inflater,
-                               TestSustinut test) {
+                               @NonNull List<RezultatTestStudent> objects, LayoutInflater inflater,
+                               ScorLiveActivity activity) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
-        this.studenti = objects;
+        this.rezultate = objects;
         this.inflater=inflater;
-        this.test=test;
+        this.activity=activity;
     }
 
     @NonNull
@@ -46,11 +52,15 @@ public class RezultatTestAdapter extends ArrayAdapter<Student> {
         TextView nume = rand.findViewById(R.id.text1_itt);
         TextView punctaj = rand.findViewById(R.id.text2_itt);
 
-        final Student student = studenti.get(position);
+        try {
+            Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
+                    StudentDao.Properties.Id.eq(rezultate.get(position).getStudentId())).build();
+            final Student student = queryStudent.list().get(0);
 
-        nume.setText(student.getNume());
-        //punctaj.setText(Float.toString(student.getTesteSustinute(test.getNume(), test.getData()).getPunctajObtinut()));
-
+            nume.setText(student.getNume());
+            punctaj.setText(String.valueOf(((App) activity.getApplication()).getPunctajTest(rezultate.get(position).getRaspunsuri())));
+        }
+        catch (Exception e) {}
 
 
         return rand;

@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorAccent">#ff3d00</color>
+    <color name="bej">#ffc966</color>
+    <color name="gri">#d7dae3</color>
+    <color name="bleu">#6882a3</color>
+    <color name="rosu">#B22B27</color>
+    <color name="verde">#4A9143</color>
+    <color name="portocaliu">#e34700</color>
+    <color name="albastru">#01596f</color>
+    <color name="bleu_marin">#0e354a</color>
+    <color name="galben">#fac100</color>
+    <color name="foreground_material_light">#0e354a</color>
+    <color name="colorAccent">#FFC966</color>
+    <color name="alb">#ffffff</color>
+
 </resources>

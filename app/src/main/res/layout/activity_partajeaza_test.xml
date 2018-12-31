@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gri"
     tools:context=".PartajeazaTestActivity">
 
     <LinearLayout
@@ -37,6 +38,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:text="@string/nume_test"
+            android:textColor="@color/bleu_marin"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -59,6 +61,7 @@
             android:layout_weight="1"
             android:text="@string/partajeaz_testul"
             android:textAllCaps="false"
+            android:textColor="@color/bleu_marin"
             android:textSize="22sp" />
 
         <TextView
@@ -75,6 +78,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/persoane_cu_acces_la_acest_test"
+            android:textColor="@color/bleu_marin"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -103,12 +107,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:contentDescription="@string/inapoi"
-        app:layout_constraintHorizontal_bias="0.119"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+        app:srcCompat="@drawable/inapoi" />
 
 </android.support.constraint.ConstraintLayout>

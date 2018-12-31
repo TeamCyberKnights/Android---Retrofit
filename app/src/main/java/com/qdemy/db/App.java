@@ -12,12 +12,19 @@ import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.Materie;
 import com.qdemy.clase.Profesor;
 import com.qdemy.clase.ProfesorDao;
+import com.qdemy.clase.RaspunsIntrebareGrila;
+import com.qdemy.clase.RezultatTestStudent;
+import com.qdemy.clase.RezultatTestStudentDao;
 import com.qdemy.clase.Student;
 import com.qdemy.clase.StudentDao;
 import com.qdemy.clase.Test;
 import com.qdemy.clase.TestDao;
 
 import org.greenrobot.greendao.query.Query;
+
+import java.util.List;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class App extends Application {
 
@@ -26,6 +33,15 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //font
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/ubuntu.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
+
+
+
         DbOpenHelper helper = new DbOpenHelper(this, "Qdemy.db", null);
         mDaoSession = new DaoMaster(helper.getWritableDatabase()).newSession();
         //mDaoSession.getIntrebareGrilaDao().deleteAll();
@@ -92,6 +108,40 @@ public class App extends Application {
     {
         Query<Test> query = getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Id.eq(idTest)).build();
+        return query.list().get(0);
+    }
+
+    public RezultatTestStudent getRezultatTest(long idRezultatTest)
+    {
+        Query<RezultatTestStudent> query = getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
+                RezultatTestStudentDao.Properties.Id.eq(idRezultatTest)).build();
+        return query.list().get(0);
+    }
+
+
+    public float getPunctajTest(List<RaspunsIntrebareGrila> raspunsuri)
+    {
+        float punctaj = 0;
+        float punctajMaxim = 0;
+        for (RaspunsIntrebareGrila raspuns: raspunsuri ) {
+            punctaj += raspuns.getPunctajObtinut();
+
+            Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+            punctajMaxim+=query.list().get(0).getDificultate();
+        }
+        float coef = 100/punctajMaxim;
+        return punctaj*coef;
+    }
+
+    public Test getTestLive()
+    {
+        SharedPreferences sharedPreferences;
+        sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
+        long testId = sharedPreferences.getLong(getString(R.string.testLive), -1);
+
+        Query<Test> query = getDaoSession().getTestDao().queryBuilder().where(
+                TestDao.Properties.Id.eq(testId)).build();
         return query.list().get(0);
     }
 

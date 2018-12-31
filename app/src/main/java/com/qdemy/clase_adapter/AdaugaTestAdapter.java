@@ -1,25 +1,18 @@
 package com.qdemy.clase_adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.qdemy.AdaugaTestActivity;
-import com.qdemy.Constante;
-import com.qdemy.EditeazaTestActivity;
-import com.qdemy.IntrebareActivity;
 import com.qdemy.R;
 import com.qdemy.clase.IntrebareGrila;
 
@@ -55,29 +48,31 @@ public class AdaugaTestAdapter extends ArrayAdapter<IntrebareGrila> {
         final Button selectat = rand.findViewById(R.id.button_itb);
         selectat.setBackgroundResource(R.drawable.ic_promovat);
 
+        try {
+            final IntrebareGrila intrebare = activity.intrebari.get(position);
+            nume.setText(intrebare.getText());
+            nume.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.bleu_marin));
 
-        final IntrebareGrila intrebare = activity.intrebari.get(position);
-        nume.setText(intrebare.getText());
-
-        if(activity.selectari.get(position)==false) selectat.setVisibility(View.INVISIBLE);
-        else rand.setBackgroundColor(Color.LTGRAY);
+            if (activity.selectari.get(position) == false) selectat.setVisibility(View.INVISIBLE);
+            else rand.setBackgroundColor(Color.WHITE);
 
 
-        nume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (activity.selectari.get(position) == false) {
-                    activity.selectari.set(position, true);
-                    activity.intrebariSelectate.add(activity.intrebari.get(position));
-                } else {
-                    activity.selectari.set(position, false);
-                    if (activity.intrebariSelectate.contains(activity.intrebari.get(position)))
-                        activity.intrebariSelectate.remove(activity.intrebari.get(position));
+            nume.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (activity.selectari.get(position) == false) {
+                        activity.selectari.set(position, true);
+                        activity.intrebariSelectate.add(activity.intrebari.get(position));
+                    } else {
+                        activity.selectari.set(position, false);
+                        if (activity.intrebariSelectate.contains(activity.intrebari.get(position)))
+                            activity.intrebariSelectate.remove(activity.intrebari.get(position));
+                    }
+                    notifyDataSetChanged();
                 }
-                notifyDataSetChanged();
-            }
-        });
-
+            });
+        }
+        catch (Exception e) {}
 
         return rand;
     }

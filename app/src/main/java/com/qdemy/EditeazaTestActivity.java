@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class EditeazaTestActivity extends AppCompatActivity {
 
     private ImageView inapoi;
@@ -54,6 +57,11 @@ public class EditeazaTestActivity extends AppCompatActivity {
     private Profesor profesor;
     private Test test;
     private String materie;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +95,7 @@ public class EditeazaTestActivity extends AppCompatActivity {
         List<String> list = new ArrayList<String>(durate.keySet());
         ArrayAdapter<String> adapterDurate = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);
-        adapterDurate.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterDurate.setDropDownViewResource(R.layout.item_spinner);
         durateSpinner.setAdapter(adapterDurate);
         //endregion
 

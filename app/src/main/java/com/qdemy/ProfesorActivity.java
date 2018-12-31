@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.Nullable;
@@ -11,7 +12,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qdemy.clase.Profesor;
@@ -20,17 +23,25 @@ import com.qdemy.db.App;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class ProfesorActivity extends AppCompatActivity {
 
-    private Button intrebari;
-    private Button istoric;
-    private Button teste;
-    private Button desfasurare;
+    private ImageView intrebari;
+    private ImageView istoric;
+    private ImageView teste;
+    private TextView desfasurare;
     private ImageView inapoi;
     private ImageView start;
+    private ProgressBar progresBar;
 
     private Profesor profesor;
     private List<String> testeProfesor = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +60,15 @@ public class ProfesorActivity extends AppCompatActivity {
         desfasurare = findViewById(R.id.desfasurare_button_profesor);
         inapoi = findViewById(R.id.back_image_profesor);
         start = findViewById(R.id.start_image_profesor);
+        progresBar = findViewById(R.id.progressBar_profesor);
         //endregion
 
         profesor = ((App) getApplication()).getProfesor();
-        Toast.makeText(getApplicationContext(), getString(R.string.salutare) + " " + profesor.getNume() + " " + profesor.getPrenume(), Toast.LENGTH_LONG).show();
         for(int i=0;i<profesor.getTeste().size();i++)
            testeProfesor.add(profesor.getTeste(i).getNume());
 
 
+        //region Meniu
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +87,7 @@ public class ProfesorActivity extends AppCompatActivity {
                 dlgAlert.setCancelable(true);
                 AlertDialog dialog = dlgAlert.create();
                 dialog.show();
+                dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
             }
         });
 
@@ -82,8 +95,8 @@ public class ProfesorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
-                //intent.putExtra(Constante.CHEIE_TRANSFER, profesor);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -93,6 +106,7 @@ public class ProfesorActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
                 intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -102,16 +116,28 @@ public class ProfesorActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
                 intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
                 startActivity(intent);
+                finish();
             }
         });
+
+        //endregion
+
 
         desfasurare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getApplicationContext(), ScorLiveActivity.class);
-                //startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), ScorLiveActivity.class);
+                startActivity(intent);
             }
         });
+        progresBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ScorLiveActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,10 +172,16 @@ public class ProfesorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK)
-           desfasurare.setVisibility(View.VISIBLE);
-        else
-            desfasurare.setVisibility(View.INVISIBLE);
+        if (resultCode == RESULT_OK){
+            desfasurare.setVisibility(View.VISIBLE);
+            start.setVisibility(View.INVISIBLE);
+            progresBar.setVisibility(View.VISIBLE);
+        }
 
+        else {
+            desfasurare.setVisibility(View.INVISIBLE);
+            start.setVisibility(View.VISIBLE);
+            progresBar.setVisibility(View.INVISIBLE);
+        }
     }
 }

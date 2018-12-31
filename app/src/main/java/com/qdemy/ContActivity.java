@@ -1,5 +1,6 @@
 package com.qdemy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.design.widget.TextInputEditText;
@@ -20,6 +21,8 @@ import com.qdemy.db.DbOpenHelper;
 
 import org.greenrobot.greendao.query.Query;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class ContActivity extends AppCompatActivity {
 
     private TextInputEditText mail;
@@ -30,6 +33,11 @@ public class ContActivity extends AppCompatActivity {
     private Button salveaza;
     private TextView renunta;
     Intent intent;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

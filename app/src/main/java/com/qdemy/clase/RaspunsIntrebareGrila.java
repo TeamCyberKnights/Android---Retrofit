@@ -26,7 +26,12 @@ public class RaspunsIntrebareGrila  {
 
     public RaspunsIntrebareGrila() {}
 
-    public RaspunsIntrebareGrila(long intrebareId, float punctaj, float punctajObtinut, int secunde) {
+    public RaspunsIntrebareGrila(long intrebareId, float punctajObtinut) {
+        this.intrebareId = intrebareId;
+        this.punctajObtinut=punctajObtinut;
+    }
+
+    public RaspunsIntrebareGrila(long intrebareId, float punctajObtinut, int secunde) {
         this.intrebareId = intrebareId;
         this.punctajObtinut=punctajObtinut;
         this.secunde=secunde;

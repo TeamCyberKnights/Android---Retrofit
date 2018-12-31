@@ -11,8 +11,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.qdemy.R;
+import com.qdemy.RezultatStudentActivity;
+import com.qdemy.clase.IntrebareGrila;
+import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.RaspunsIntrebareGrila;
 import com.qdemy.clase.RezultatTestStudent;
+import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
@@ -20,17 +26,20 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
 
     private Context context;
     private int resource;
-    private List<RaspunsIntrebareGrila> intrebari;
+    private List<RaspunsIntrebareGrila> raspunsuri;
     private LayoutInflater inflater;
+    private RezultatStudentActivity activity;
 
     public RezultatStudentAdapter(@NonNull Context context, int resource,
-                                 @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater) {
+                                  @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater,
+                                  RezultatStudentActivity activity) {
         super(context, resource, objects);
 
         this.context=context;
         this.resource=resource;
-        this.intrebari = objects;
+        this.raspunsuri = objects;
         this.inflater=inflater;
+        this.activity=activity;
     }
 
     @NonNull
@@ -42,14 +51,16 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
         TextView nume = rand.findViewById(R.id.text_itb);
         Button corect = rand.findViewById(R.id.button_itb);
 
-        final RaspunsIntrebareGrila intrebare = intrebari.get(position);
-
-        //nume.setText(intrebare.getNume());
-        //in lucru
-//        corect.setBackgroundResource(intrebare.getPunctajObtinut()==0 ? R.drawable.ic_picat :
-//                                     intrebare.getPunctajObtinut()==intrebare.getPunctaj() ? R.drawable.ic_promovat :
-//                                     R.drawable.ic_mediu );
-
+        try {
+            final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
+            Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+            nume.setText(queryIntrebare.list().get(0).getText());
+            corect.setBackgroundResource(raspuns.getPunctajObtinut() == 0 ? R.drawable.ic_picat :
+                    raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? R.drawable.ic_promovat :
+                            R.drawable.ic_mediu);
+        }
+        catch (Exception e) {}
 
         return rand;
     }

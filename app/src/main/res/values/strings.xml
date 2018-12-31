@@ -107,7 +107,7 @@
     <string name="variante_de_r_spuns">Variante de răspuns:</string>
     <string name="error_message_min_1_corect">Este obligatoriu minim un răspuns corect!</string>
     <string name="error_message_intrebare_existenta">Această întrebare este deja salvată!</string>
-    <string name="error_message_test_existent">Acest test este deja salvat!</string>
+    <string name="error_message_test_existent">Un test cu același nume este deja înregistrat!</string>
     <string name="error_message_intrebare_inexistenta">Întrebare inexistentă!</string>
     <string name="error_message_intrebare_invalida">Întrebare invalidă!</string>
     <string name="error_message_min_1_intrebare">Este obligatorie minim o întrebare selectată!</string>
@@ -117,4 +117,23 @@
     <string name="test_txt">test.txt</string>
     <string name="error_message_citire_cod_test">Codul testului nu a putut fi citit!</string>
     <string name="selecteaza_testul">Selectează testul</string>
+    <string name="error_message_cod_invalid">Codul este invalid!</string>
+    <string name="error_message_test_deja_sustinut">Ai susținut deja acest test!</string>
+    <string name="selectare_maxima_variante_raspuns">Poți selecta maxim %1$d variante de răspuns!</string>
+    <string name="corecte2">corecte</string>
+    <string name="partiale">parțiale</string>
+    <string name="gresite">greșite</string>
+    <string name="testLive">testLive</string>
+    <string name="error_message_app_mail">Nu există nicio aplicație de email instalată!</string>
+    <string name="trimite_mail">Trimite mail</string>
+    <string name="trimite_mail2">Trimite mail...</string>
+    <string name="alege_profesorul">Alege profesorul:</string>
+    <string name="cauta_intrebarea">Caută întrebarea</string>
+    <string name="cauta_testul">Caută testul</string>
+    <string name="teste_publice">Teste publice</string>
+    <string name="autor_test_public">Autor: %1$s %2$s</string>
+    <string name="nota">Ai obținut nota</string>
+    <string name="terminare_test">Ai terminat testul!</string>
+    <string name="rezolva_alt_test">Rezolvă alt test!</string>
+    <string name="error_message_niciun_test_sustinut">Nu există niciun test susținut!</string>
 </resources>

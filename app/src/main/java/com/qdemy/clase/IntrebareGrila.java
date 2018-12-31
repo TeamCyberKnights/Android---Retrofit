@@ -18,7 +18,6 @@ import org.greenrobot.greendao.DaoException;
 public class IntrebareGrila {
 
     @Id (autoincrement = true) private Long id;
-    //DE SCOS ACTIVITATEA CU VEZI INTREBARE
     @NotNull private String text;
     @NotNull private String materie;
     @NotNull private double dificultate; // asociat dificultatii: 1-usor, 2-mediu, 3-greu
