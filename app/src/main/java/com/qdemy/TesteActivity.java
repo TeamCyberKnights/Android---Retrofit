@@ -96,14 +96,16 @@ public class TesteActivity extends AppCompatActivity {
         materieTitlu.setText(materie);
 
         //incarcare teste proprii si partajate
+        //COSMIN - TO DO SELECT TESTELE PROFESORULUI + TESTELE PARTAJATE
         for(int i=0;i<profesor.getTeste().size();i++)
             if(profesor.getTeste(i).getMaterie().equals(materie))
                 teste.add(profesor.getTeste(i));
+
         Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
                 TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
         for(int i=0;i<queryTestePartajate.list().size();i++) {
             Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                    TestDao.Properties.Id.eq(queryTestePartajate.list().get(i).getId())).build();
+                    TestDao.Properties.Id.eq(queryTestePartajate.list().get(i).getTestId())).build();
             if (queryTest.list().get(0).getMaterie().equals(materie))
                 teste.add(queryTest.list().get(0));
         }
@@ -215,6 +217,7 @@ public class TesteActivity extends AppCompatActivity {
     public void stergeTest(String numeTest)
     {
         //selectare test
+        //COSMIN - TO DO SELECT TEST CURENT
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(numeTest),
                 TestDao.Properties.Materie.eq(materie),
@@ -222,6 +225,7 @@ public class TesteActivity extends AppCompatActivity {
 
 
         //stergere evidente intrebari test
+        //COSMIN - TO DO DELETE TEST DIN EVIDENTA TESTE
         Query<EvidentaIntrebariTeste> queryEvidenta = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao()
                 .queryBuilder().where(EvidentaIntrebariTesteDao.Properties.TestId.eq(queryTest.list().get(0).getId())).build();
 
@@ -230,6 +234,7 @@ public class TesteActivity extends AppCompatActivity {
 
 
         //stergere test partajat
+        //COSMIN - TO DO DELETE TEST DIN TESTE PARTAJATE
         Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao()
                 .queryBuilder().where(TestPartajatDao.Properties.TestId.eq(queryTest.list().get(0).getId())).build();
 
@@ -238,14 +243,28 @@ public class TesteActivity extends AppCompatActivity {
 
 
         //actualizare profesor
+        //COSMIN - TO DO UPDATE PROFESOR CU LISTA FARA TESTUL DEJA STERS
         List<Test> testeActualizate = profesor.getTeste();
         testeActualizate.remove(queryTest.list().get(0));
         profesor.setTeste(testeActualizate);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
 
 
+        //COSMIN - TO DO UPDATE TEST CURENT CU ID-UL PROFESORULUI CU -1 (SA NU APARA NICIUNUI PROFESOR)
         //NU se sterge testul ci doar se elimina id-ul profesorului
         queryTest.list().get(0).setProfesorId(-1);
         ((App) getApplication()).getDaoSession().getTestDao().update(queryTest.list().get(0));
+    }
+
+    public void stergeTestPartajat(Long id)
+    {
+        //stergere test partajat
+        //COSMIN - TO DO SELECT + DELETE TEST PARTAJAT CURENT
+        Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                TestPartajatDao.Properties.TestId.eq(id),
+                TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
+
+        ((App) getApplication()).getDaoSession().getTestPartajatDao().deleteByKey(queryTestePartajate.list().get(0).getId());
+
     }
 }

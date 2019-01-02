@@ -53,6 +53,7 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
 
         try {
             final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
+            //COSMIN - TO DO SELECT INTREBARE CURENTA
             Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                     IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
             nume.setText(queryIntrebare.list().get(0).getText());

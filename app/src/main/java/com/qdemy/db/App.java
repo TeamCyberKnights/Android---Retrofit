@@ -75,6 +75,8 @@ public class App extends Application {
 
     public Profesor getProfesor()
     {
+        //COSMIN - TO DO SELECT PROFESOR
+
         SharedPreferences sharedPreferences;
         sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
         String utilizator = sharedPreferences.getString(getString(R.string.utilizator), "");
@@ -87,6 +89,8 @@ public class App extends Application {
 
     public Student getStudent()
     {
+        //COSMIN - TO DO SELECT STUDENT
+
         SharedPreferences sharedPreferences;
         sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
         String utilizator = sharedPreferences.getString(getString(R.string.utilizator), "");
@@ -99,6 +103,8 @@ public class App extends Application {
 
     public IntrebareGrila getIntrebareGrila(long idIntrebare)
     {
+        //COSMIN - TO DO SELECT INTREBARE CU ID-UL PRIMIT
+
         Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Id.eq(idIntrebare)).build();
         return query.list().get(0);
@@ -106,6 +112,8 @@ public class App extends Application {
 
     public Test getTest(long idTest)
     {
+        //COSMIN - TO DO SELECT TEST CU ID-UL PRIMIT
+
         Query<Test> query = getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Id.eq(idTest)).build();
         return query.list().get(0);
@@ -113,6 +121,8 @@ public class App extends Application {
 
     public RezultatTestStudent getRezultatTest(long idRezultatTest)
     {
+        //COSMIN - TO DO SELECT REZULTAT TEST CU ID-UL PRIMIT
+
         Query<RezultatTestStudent> query = getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                 RezultatTestStudentDao.Properties.Id.eq(idRezultatTest)).build();
         return query.list().get(0);
@@ -126,6 +136,8 @@ public class App extends Application {
         for (RaspunsIntrebareGrila raspuns: raspunsuri ) {
             punctaj += raspuns.getPunctajObtinut();
 
+            //COSMIN - TO DO SELECT INTREBARI CU ID-UL RASPUNSULUI CURENT
+
             Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                     IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
             punctajMaxim+=query.list().get(0).getDificultate();
@@ -136,6 +148,9 @@ public class App extends Application {
 
     public Test getTestLive()
     {
+        // O SA DISPARA
+        //COSMIN - TO DO ID-UL TESTULUI CURENT TREBUIE PRELUAT DE PE SERVER
+
         SharedPreferences sharedPreferences;
         sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
         long testId = sharedPreferences.getLong(getString(R.string.testLive), -1);

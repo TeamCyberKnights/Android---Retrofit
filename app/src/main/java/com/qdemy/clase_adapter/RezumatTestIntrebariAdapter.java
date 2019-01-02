@@ -61,9 +61,11 @@ public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
             IntrebareGrila intrebare = intrebari.get(position);
             nume.setText(intrebare.getText());
 
+            //COSMIN - TO DO SELECT REZULTAT TEST STUDENT CURENT
             Query<RezultatTestStudent> queryRezultate = ((App) activity.getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                     RezultatTestStudentDao.Properties.Id.eq(testSustinutId)).build();
             for (RezultatTestStudent rezultat : queryRezultate.list()) {
+                //COSMIN - TO DO SELECT RASPUNS INTREBARE GRILA CURENTA
                 Query<RaspunsIntrebareGrila> queryRaspuns = ((App) activity.getApplication()).getDaoSession().getRaspunsIntrebareGrilaDao().queryBuilder().where(
                         RaspunsIntrebareGrilaDao.Properties.IntrebareId.eq(intrebare.getId()),
                         RaspunsIntrebareGrilaDao.Properties.RezultatTestStudentId.eq(rezultat.getId())).build();

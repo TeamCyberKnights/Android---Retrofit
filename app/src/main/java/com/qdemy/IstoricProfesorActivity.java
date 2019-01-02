@@ -83,6 +83,7 @@ public class IstoricProfesorActivity extends AppCompatActivity {
 
         //region Initializare rezultate
         profesor = ((App) getApplication()).getProfesor();
+        //COSMIN - TO DO SELECT TESTE SUSTINUTE ALE PROFESORULUI CURENT
         final Query<TestSustinut> queryTesteSustinute = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
                 TestSustinutDao.Properties.ProfesorId.eq(profesor.getId())).build();
 

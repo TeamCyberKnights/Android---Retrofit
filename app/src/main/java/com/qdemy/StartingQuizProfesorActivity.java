@@ -65,6 +65,7 @@ public class StartingQuizProfesorActivity extends AppCompatActivity {
         cod = findViewById(R.id.cod_text_startingQuiz);
         //endregion
 
+        //COSMIN - TO DO SELECT TESTUL ALES PENTRU A PORNI
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(getIntent().getStringExtra(Constante.CHEIE_TRANSFER))).build();
         testId = queryTest.list().get(0).getId();
@@ -88,6 +89,7 @@ public class StartingQuizProfesorActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 //salvare id test live
+                //COSMIN - ASTA O SA DISPARA
                 sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putLong(getString(R.string.testLive), testId);
@@ -95,13 +97,17 @@ public class StartingQuizProfesorActivity extends AppCompatActivity {
 
 
                 //adaugare test sustinut
+                //COSMIN - TO DO INSERT TEST SUSTINUT
                 profesor = ((App) getApplication()).getProfesor();
                 ((App) getApplication()).getDaoSession().getTestSustinutDao().insert(new TestSustinut(profesor.getId()));
+
+                //COSMIN - TO DO SELECT TEST SUSTINUT NOU ADAUGAT
                 Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
                         TestSustinutDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
+                //COSMIN - TO DO UPDATE PROFESOR CU LISTA TESTE SUSTINUTE CU CEL NOU ADAUGAT
                 List<TestSustinut> testeSustinute = profesor.getTesteSustinute();
-                testeSustinute.add(new TestSustinut(queryTestSustinut.list().get(queryTestSustinut.list().size()-1).getId(),
+                testeSustinute.add(new TestSustinut(queryTestSustinut.list().get(queryTestSustinut.list().size()-1).getId(), //ULTIMUL ADAUGAT
                         profesor.getId()));
                 profesor.setTesteSustinute(testeSustinute);
                 ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
@@ -112,8 +118,8 @@ public class StartingQuizProfesorActivity extends AppCompatActivity {
                 setResult(RESULT_OK, getIntent());
                 finish();
 
-                //START TIMER PE SERVER CU DURATA TESTULUI
-
+                //COSMIN - TO DO trimitere cod generat pe server + START TIMER PE SERVER CU DURATA TESTULUI
+                //TIMER-UL TREBUIE SINCRONIZAT SI PE PROFESOR SI PE STUDENT
             }
         });
     }
@@ -147,6 +153,7 @@ public class StartingQuizProfesorActivity extends AppCompatActivity {
 
     private void addStudent(){
 
+        //COSMIN - TO DO
         //ADAUGARE STUDENT CAND SE CONECTEAZA CU CODUL TESTULUI CURENT
         adapter.notifyDataSetChanged();
     }

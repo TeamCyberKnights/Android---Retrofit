@@ -40,7 +40,8 @@
         <activity android:name=".IstoricStudentActivity" />
         <activity android:name=".IstoricProfesorActivity" />
         <activity android:name=".TestePubliceActivity" />
-        <activity android:name=".RezumatTestStudentActivity"></activity>
+        <activity android:name=".RezumatTestStudentActivity" />
+        <activity android:name=".TestPartajatDetaliiActivity"></activity>
     </application>
 
 </manifest>

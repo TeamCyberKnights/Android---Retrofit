@@ -85,6 +85,9 @@ public class RezumatStudentActivity extends AppCompatActivity {
 
         //region Initializare intrebari
         rezultatId = getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1);
+
+        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT
+
         Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                 RezultatTestStudentDao.Properties.Id.eq(rezultatId)).build();
 
@@ -94,6 +97,9 @@ public class RezumatStudentActivity extends AppCompatActivity {
         intrebariList.setAdapter(adapter);
 
         for (RaspunsIntrebareGrila raspuns : raspunsuri ) {
+
+            //COSMIN - TO DO SELECT INTREBARI DIN REZULTAT TEST STUDENT
+
             Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                     IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
             if(raspuns.getPunctajObtinut()==0) gresite++;

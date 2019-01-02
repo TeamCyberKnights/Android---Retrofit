@@ -108,6 +108,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
 
 
         //selectare intrebare
+        //COSMIN - TO DO SELECT INTREBARE CURENTA
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Id.eq(intrebariId[index])).build();
         intrebare = queryIntrebare.list().get(0);
@@ -115,6 +116,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
 
 
         //selectare variante
+        //COSMIN - TO DO SELECT VARIANTE DE RASPUNS ALE INTREBARII CURENTE
         Query<VariantaRaspuns> queryVariante = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                 VariantaRaspunsDao.Properties.IntrebareId.eq(intrebare.getId())).build();
         nrRaspunsuriSelectate=0;
@@ -142,6 +144,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
         varianteLayout.removeAllViews();
 
         for(int i=0;i<varianteId.length;i++) {
+            //COSMIN - TO DO SELECT VARIANTA RASPUNS CURENTA
             Query<VariantaRaspuns> queryVarianta = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                     VariantaRaspunsDao.Properties.Id.eq(varianteId[i])).build();
 
@@ -189,6 +192,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
         if(getIntent().getStringExtra(Constante.CHEIE_TRANSFER2).equals(getString(R.string.public1)))
             estePublic=true;
 
+        //COSMIN - TO DO SELECT INTREBARI ALE TESTULUI CURENT
         Query<EvidentaIntrebariTeste> queryIntrebari = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
                 EvidentaIntrebariTesteDao.Properties.TestId.eq(idTest)).build();
         unitateProgres = 100 / queryIntrebari.list().size();
@@ -289,6 +293,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
         double punctajObtinut=0;
         for ( Button buton : butoaneVariante ) {
             if(((ColorDrawable)buton.getBackground()).getColor()==ContextCompat.getColor(getApplicationContext(), R.color.portocaliu)) {
+                //COSMIN - TO DO SELECT VARIANTA CURENTA
                 Query<VariantaRaspuns> queryVarianta = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                         VariantaRaspunsDao.Properties.Id.eq(buton.getId())).build();
                 if(queryVarianta.list().get(0).getCorect()) punctajObtinut+=punctajRaspunsCorect;
@@ -300,6 +305,7 @@ public class GrilaQuizActivity extends AppCompatActivity {
         }
         else
         {
+            //COSMIN - TO DO INSERT RASPUNS INTREBARE GRILA
             RaspunsIntrebareGrila raspuns = new RaspunsIntrebareGrila(intrebare.getId(), (float)punctajObtinut);
             ((App) getApplication()).getDaoSession().getRaspunsIntrebareGrilaDao().insert(raspuns);
             raspunsuri.add(raspuns);
@@ -309,11 +315,13 @@ public class GrilaQuizActivity extends AppCompatActivity {
         //feedback raspuns
         for ( Button buton : butoaneVariante ) {
             if(((ColorDrawable)buton.getBackground()).getColor()==ContextCompat.getColor(getApplicationContext(), R.color.portocaliu)) {
+                //COSMIN - TO DO SELECT VARIANTA CURENTA
                 Query<VariantaRaspuns> queryVariantaSelectata = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                         VariantaRaspunsDao.Properties.Id.eq(buton.getId())).build();
                 if (!(queryVariantaSelectata.list().get(0).getCorect()))
                     buton.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.rosu));
             }
+            //COSMIN - TO DO SELECT VARIANTA CURENTA
             Query<VariantaRaspuns> queryVarianta = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                         VariantaRaspunsDao.Properties.Id.eq(buton.getId())).build();
                 if(queryVarianta.list().get(0).getCorect())  buton.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.verde));
@@ -333,15 +341,18 @@ public class GrilaQuizActivity extends AppCompatActivity {
 
         Student student = ((App) getApplication()).getStudent();
         String data = new SimpleDateFormat(Constante.DATE_FORMAT).format(Calendar.getInstance().getTime());
+        //COSMIN - TO DO INSERT REZULTAT TEST STUDENT
         ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().insert(
                 new RezultatTestStudent(idTest, data, minuteTrecute, raspunsuri,
                         ((App) getApplication()).getPunctajTest(raspunsuri)>50?true:false, student.getId()));
 
+        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT NOU ADAUGAT
         Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                 RezultatTestStudentDao.Properties.TestId.eq(idTest),
                 RezultatTestStudentDao.Properties.Data.eq(data),
                 RezultatTestStudentDao.Properties.StudentId.eq(student.getId())).build();
 
+        //COSMIN - TO DO SUPDATE RASPUNS INTREBARE GRILE CU ID-UL REZULTAT TEST STUDENT NOU ADAUGAT
         for (RaspunsIntrebareGrila raspuns: raspunsuri ) {
             raspuns.setRezultatTestStudentId(queryRezultat.list().get(0).getId());
             ((App) getApplication()).getDaoSession().getRaspunsIntrebareGrilaDao().update(raspuns);

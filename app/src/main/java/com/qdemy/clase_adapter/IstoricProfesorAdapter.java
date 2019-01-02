@@ -55,6 +55,7 @@ public class IstoricProfesorAdapter extends ArrayAdapter<TestSustinut> {
 
         try {
             final TestSustinut test = teste.get(position);
+            //COSMIN - TO DO SELECT TEST CURENT
             Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                     TestDao.Properties.Id.eq(test.getTestId())).build();
 

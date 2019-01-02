@@ -81,6 +81,9 @@ public class IstoricStudentActivity extends AppCompatActivity {
 
         //region Initializare teste
         Student student = ((App) getApplication()).getStudent();
+
+        //COSMIN - TO DO SELECT REZULTATELE TESTELOR STUDENTULUI
+
         final Query<RezultatTestStudent> queryRezultateTeste = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                 RezultatTestStudentDao.Properties.StudentId.eq(student.getId())).build();
 

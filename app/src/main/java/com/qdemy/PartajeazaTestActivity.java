@@ -67,7 +67,7 @@ public class PartajeazaTestActivity extends AppCompatActivity {
         test =  ((App) getApplication()).getTest(getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1));
         nume.setText(test.getNume());
 
-
+        //COSMIN - TO DO SELECT TOTI PROFESORI INAFARA DE CEL CURENT
         Query<Profesor> queryProfesori = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
 
         for ( Profesor profesor : queryProfesori.list()) {
@@ -78,7 +78,7 @@ public class PartajeazaTestActivity extends AppCompatActivity {
         adapterProfesori.setDropDownViewResource(R.layout.item_spinner);
         profesoriSpinner.setAdapter(adapterProfesori);
 
-
+        //COSMIN - TO DO SELECT PROFESORII PARTAJATI CU TESTUL CURENT
         Query<TestPartajat> queryTestPartajat = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
                 TestPartajatDao.Properties.TestId.eq(test.getId())).build();
         for ( TestPartajat testPartajat : queryTestPartajat.list()) {
@@ -104,6 +104,7 @@ public class PartajeazaTestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //actualizare componente vizuale
+                //COSMIN - TO DO SELECT PROFESORI PARTAJATI
                 Query<Profesor> queryProfesor = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
                         ProfesorDao.Properties.Utilizator.eq(profesoriSpinner.getSelectedItem().toString())).build();
                 profesoriPartajati.add(queryProfesor.list().get(0));
@@ -112,6 +113,7 @@ public class PartajeazaTestActivity extends AppCompatActivity {
                 adapterProfesoriPartajati.notifyDataSetChanged();
 
                 //actualizare teste pertajate
+                //COSMIN - TO DO INSERT TEST PARTAJAT
                 ((App) getApplication()).getDaoSession().getTestPartajatDao().insert(
                         new TestPartajat(test.getId(), queryProfesor.list().get(0).getId()));
             }
@@ -121,15 +123,18 @@ public class PartajeazaTestActivity extends AppCompatActivity {
     public void stergeTest(Profesor profesor)
     {
         //selectare test partajat
+        //COSMIN - TO DO SELECT TEST PARTAJAT
         Query<TestPartajat> queryTest = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
                 TestPartajatDao.Properties.ProfesorId.eq(profesor.getId()),
                 TestPartajatDao.Properties.TestId.eq(test.getId())).build();
 
         //selectare profesor
+        //COSMIN - TO DO SELECT PROFESOR PARTAJAT
         Query<Profesor> queryProfesor = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
                 ProfesorDao.Properties.Id.eq(queryTest.list().get(0).getProfesorId())).build();
 //
         //stergere test partajat
+        //COSMIN - TO DO DELETE TEST PARTAJAT
         ((App) getApplication()).getDaoSession().getTestPartajatDao().deleteByKey(queryTest.list().get(0).getId());
 
         profesoriPartajati.remove(queryProfesor.list().get(0));

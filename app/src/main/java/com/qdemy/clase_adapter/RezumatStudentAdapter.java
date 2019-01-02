@@ -54,6 +54,7 @@ public class RezumatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
         try {
             final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
+            //COSMIN - TO DO SELECT INTREBARE CURENT
             Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                     IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
 

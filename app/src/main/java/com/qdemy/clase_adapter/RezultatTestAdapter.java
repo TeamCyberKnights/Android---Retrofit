@@ -53,6 +53,7 @@ public class RezultatTestAdapter extends ArrayAdapter<RezultatTestStudent> {
         TextView punctaj = rand.findViewById(R.id.text2_itt);
 
         try {
+            //COSMIN - TO DO SELECT STUDENTUL ASOCIAT REZULTATULUI CURENT
             Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
                     StudentDao.Properties.Id.eq(rezultate.get(position).getStudentId())).build();
             final Student student = queryStudent.list().get(0);

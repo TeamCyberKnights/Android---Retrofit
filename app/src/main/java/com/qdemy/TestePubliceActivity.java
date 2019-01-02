@@ -88,6 +88,9 @@ public class TestePubliceActivity extends AppCompatActivity {
         //endregion
 
         //incarcare teste publice
+
+        //COSMIN - TO DO SELECT TOATE TESTELE PUBLICE
+
         Query<Test> queryTeste = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().build();
         for ( Test test : queryTeste.list()) {
             if(test.getEstePublic()) testePublice.add(test);

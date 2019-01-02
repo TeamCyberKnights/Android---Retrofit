@@ -68,6 +68,7 @@ public class StartQuizActivity extends AppCompatActivity {
                 //validare cod test
                 try {
                     final long id = Long.parseLong(cod.getText().toString().trim().split("%")[1]);
+                    //COSMIN - TO DO SELECT TEST CU ID-UL PRELUAT DIN COD
                     Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                             TestDao.Properties.Id.eq(id)).build();
                     if (queryTest.list().size() == 0)
@@ -75,6 +76,7 @@ public class StartQuizActivity extends AppCompatActivity {
                     else {
                         Student student = ((App) getApplication()).getStudent();
                         String data = new SimpleDateFormat(Constante.DATE_FORMAT).format(Calendar.getInstance().getTime());
+                        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT => STUDENTUL NU POATE SUSTINE DE 2 ORI IN ACEASI ZI ACELASI TEST INDIFERENT DE CODUL TESTULUI
                         Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                                 RezultatTestStudentDao.Properties.TestId.eq(id),
                                 RezultatTestStudentDao.Properties.Data.eq(data),

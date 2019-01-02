@@ -307,6 +307,7 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
     private void actualizeazaIntrebare() {
 
+        //COSMIN - TO DO SELECT VARIANTELE RASPUNS ALE INTREBARII CURENTE
         Query<VariantaRaspuns> queryVarianteRaspuns = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                 VariantaRaspunsDao.Properties.IntrebareId.eq(intrebare.getId())).build();
 
@@ -338,16 +339,19 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
         /////////////////// stergere variante
 
+        //COSMIN - TO DO SELECT INTREBARE CURENTA
         //actualizare intrebare
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Id.eq(intrebare.getId())).build();
 
+        //COSMIN - TO DO UPDATE INTREBARE CU NOUA LISTA DE VARIANTE RASPUNS
         IntrebareGrila intrebareDeActualizat = queryIntrebare.list().get(0);
         intrebareDeActualizat.setText(text.getText().toString());
         intrebareDeActualizat.setDificultate(dificultatiSpinner.getSelectedItemPosition()+1);
         intrebareDeActualizat.setVariante(varianteRaspunsActualizate);
         ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().update(intrebare);
 
+        //COSMIN - TO DO UPDATE PROFESOR CU INTREBAREA ACTUALIZATA
         //actualizare profesor
         profesor.setIntrebare(intrebareDeActualizat);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);

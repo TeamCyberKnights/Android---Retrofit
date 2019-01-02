@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.qdemy.Constante;
 import com.qdemy.EditeazaTestActivity;
 import com.qdemy.R;
+import com.qdemy.TestPartajatDetaliiActivity;
 import com.qdemy.TesteActivity;
 import com.qdemy.clase.Test;
 import com.qdemy.clase.TestPartajat;
@@ -37,7 +38,7 @@ public class TestAdapter extends ArrayAdapter<Test> {
     private Boolean removable;
     private TesteActivity activity;
     private long profesorId;
-    private boolean estePartajat = true;
+    private boolean estePartajat;
 
     public TestAdapter(@NonNull Context context, int resource,
                        @NonNull List<Test> objects, LayoutInflater inflater, Boolean removable,
@@ -84,28 +85,32 @@ public class TestAdapter extends ArrayAdapter<Test> {
         TextView nume = rand.findViewById(R.id.text_itbb);
         Button partajat = rand.findViewById(R.id.button1_itbb);
         Button sterge = rand.findViewById(R.id.button2_itbb);
+        estePartajat = true;
 
         try {
             nume.setText(teste.get(position).getNume());
 
             //verificare test partajat
+            //COSMIN - TO DO SELECT TEST PARTAJAT CURENT
             Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
                     TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
                     TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
             if (queryTestPartajat.list().size() < 1) {
                 partajat.setVisibility(View.INVISIBLE);
                 estePartajat = false;
-            } else sterge.setVisibility(View.INVISIBLE);
+            }
 
 
             nume.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!estePartajat) {
-                        Intent intent = new Intent(v.getContext(), EditeazaTestActivity.class);
+                        Intent intent;
+                        if(estePartajat==false) intent = new Intent(v.getContext(), EditeazaTestActivity.class);
+                        else intent = new Intent(v.getContext(), TestPartajatDetaliiActivity.class);
+
                         intent.putExtra(Constante.CHEIE_TRANSFER, teste.get(position).getId());
                         v.getContext().startActivity(intent);
-                    }
+
                 }
             });
 
@@ -119,7 +124,9 @@ public class TestAdapter extends ArrayAdapter<Test> {
                     //dlgAlert.setTitle("Ștergere test");
                     dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            activity.stergeTest(teste.get(position).getNume());
+                            if(estePartajat==false) activity.stergeTest(teste.get(position).getNume());
+                            else activity.stergeTestPartajat(teste.get(position).getId());
+
                             teste.remove(position);
                             notifyDataSetChanged();
                         }

@@ -217,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void incarcareProfesorSalvat() {
+
+        //COSMIN - TO DO SELECT PROFESOR
+
         String utilizatorText = sharedPreferences.getString(getString(R.string.utilizator), "");
         String parolaText = sharedPreferences.getString(getString(R.string.parola), "");
         ProfesorDao profesorDao = ((App) getApplication()).getDaoSession().getProfesorDao();
@@ -230,6 +233,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void incarcareStudentSalvat() {
+
+        //COSMIN - TO DO SELECT STUDENT
+
         String utilizatorText = sharedPreferences.getString(getString(R.string.utilizator), "");
         String parolaText = sharedPreferences.getString(getString(R.string.parola), "");
         StudentDao studentDao = ((App) getApplication()).getDaoSession().getStudentDao();

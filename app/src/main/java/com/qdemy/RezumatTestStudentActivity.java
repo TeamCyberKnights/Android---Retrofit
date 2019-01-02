@@ -88,6 +88,8 @@ public class RezumatTestStudentActivity extends AppCompatActivity {
 
         //region Initializare intrebari
         rezultatId = getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1);
+        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT
+
         Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                 RezultatTestStudentDao.Properties.Id.eq(rezultatId)).build();
 
@@ -97,6 +99,8 @@ public class RezumatTestStudentActivity extends AppCompatActivity {
         intrebariList.setAdapter(adapter);
 
         for (RaspunsIntrebareGrila raspuns : raspunsuri ) {
+            //COSMIN - TO DO SELECT INTREBARI DIN REZULTAT TEST STUDENT
+
             Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                     IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
             if(raspuns.getPunctajObtinut()==0) gresite++;
@@ -104,6 +108,7 @@ public class RezumatTestStudentActivity extends AppCompatActivity {
             else partiale++;
         }
 
+        //COSMIN - TO DO SELECT STUDENT ASOCIAT REZULTATULUI CURENT
         Query<Student> queryStudent = ((App) getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
                 StudentDao.Properties.Id.eq(queryRezultat.list().get(0).getStudentId())).build();
         numeStudent.setText(queryStudent.list().get(0).getNume() + " " + queryStudent.list().get(0).getPrenume());

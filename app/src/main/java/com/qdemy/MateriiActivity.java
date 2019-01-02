@@ -100,6 +100,8 @@ public class MateriiActivity extends AppCompatActivity {
                 materii, getLayoutInflater(), MateriiActivity.this, getIntent().getStringExtra(Constante.CHEIE_TRANSFER));
         materiiList.setAdapter(adapter);
 
+        //COSMIN - TO DO SELECT TOATE MATERIILE
+
         Query<Materie> query = ((App) getApplication()).getDaoSession().getMaterieDao().queryBuilder().build();
         nomenclator_materii.add(query.list().get(0).getNume());
         nomenclator_materii.add(query.list().get(1).getNume());

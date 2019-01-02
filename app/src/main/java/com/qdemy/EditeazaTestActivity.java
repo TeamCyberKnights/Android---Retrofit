@@ -115,7 +115,7 @@ public class EditeazaTestActivity extends AppCompatActivity {
         tipuri.check(test.getEstePublic()?estePublic.getId():estePrivat.getId());
 
 
-
+        //COSMIN - TO DO SELECT INTREBARI DIN MATERIA TESTULUI CURENT
         Query<IntrebareGrila> queryIntrebari = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Materie.eq(materie),
                 IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
@@ -187,12 +187,14 @@ public class EditeazaTestActivity extends AppCompatActivity {
     private void actualizeazaTest() {
 
         //selectare test
+        //COSMIN - TO DO SELECT TEST UCRENT
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(nume.getText().toString()),
                 TestDao.Properties.Materie.eq(materie),
                 TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
         //actualizare test
+        //COSMIN - TO DO UPDATE TEST
         Test test = queryTest.list().get(0);
         test.setIntrebari(intrebariSelectate);
         test.setDescriere(descriere.getText().toString());
@@ -203,6 +205,7 @@ public class EditeazaTestActivity extends AppCompatActivity {
 
         //actualizare evidenta intrebari test
         //actualizare intrebari
+        //COSMIN - TO DO UPDATE EVIDENTA INTREBARI TESTE
         for ( IntrebareGrila intrebare : intrebariSelectate) {
             Query<EvidentaIntrebariTeste> queryEvidentaIntrebare = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
                     EvidentaIntrebariTesteDao.Properties.IntrebareId.eq(intrebare.getId()),
@@ -214,6 +217,7 @@ public class EditeazaTestActivity extends AppCompatActivity {
         }
 
         //stergere intrebari neselectate (selectate anterior)
+        //COSMIN - TO DO DELETE INTREBARI CARE NU MAI FAC PARTE DIN TESTUL RESPECTIV
         Query<EvidentaIntrebariTeste> queryEvidentaIntrebari = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
                 EvidentaIntrebariTesteDao.Properties.TestId.eq(test.getId())).build();
         for ( EvidentaIntrebariTeste evidentaIntrebare : queryEvidentaIntrebari.list()) {
@@ -228,6 +232,7 @@ public class EditeazaTestActivity extends AppCompatActivity {
 
 
         //actualizare profesor
+        //COSMIN - TO DO UPDATE PROFESOR CU TESTUL ACTUALIZAT
         profesor.setTest(test);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
 

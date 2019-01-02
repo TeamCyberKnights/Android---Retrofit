@@ -316,6 +316,7 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
     private void adaugaIntrebare() {
 
         //adaugare intrebare
+        //COSMIN - TO DO SELECT INTREBARE DACA EXISTA DEJA
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Text.eq(text.getText().toString()),
                 IntrebareGrilaDao.Properties.Materie.eq(materie.getText().toString()),
@@ -326,9 +327,12 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_existenta), Toast.LENGTH_LONG).show();
             return;
         }
+
+        //COSMIN - TO DO INSERT INTREBARE
         ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().insert(new IntrebareGrila(text.getText().toString(),
                     materie.getText().toString(), (dificultatiSpinner.getSelectedItemPosition()+1), profesor.getId()));
 
+        //COSMIN - TO DO SELECT INTREBARE NOU INSERTA + UPDATE PE EA CU LISTA VARIANTE RASPUNS
         queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Text.eq(text.getText().toString()),
                 IntrebareGrilaDao.Properties.Materie.eq(materie.getText().toString()),
@@ -339,13 +343,16 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
 
 
         //adaugare variante raspuns
+        //COSMIN - TO DO INSERT VARIANTE RASPUNS CU ID-UL INTREBARII NOI
         for ( VariantaRaspuns varianta : varianteRaspuns) {
                 ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().insert(
                  new VariantaRaspuns(varianta.getText(), varianta.getCorect(), intrebare.getId()));
         }
 
 
+
         //actualizare profesor
+        //COSMIN - TO DO UPDATE PROFESOR CU LISTA CARE CONTINE INTREBAREA NOU INSERATA
         List<IntrebareGrila> intrebari = profesor.getIntrebari();
         intrebari.add(intrebare);
         profesor.setIntrebari(intrebari);

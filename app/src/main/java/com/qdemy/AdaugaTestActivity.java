@@ -94,6 +94,7 @@ public class AdaugaTestActivity extends AppCompatActivity {
         profesor = ((App) getApplication()).getProfesor();
         materie = getIntent().getStringExtra(Constante.CHEIE_TRANSFER);
 
+        //COSMIN - TO DO SELECT toate intrebarile materiei testului
         Query<IntrebareGrila> queryIntrebari = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Materie.eq(materie),
                 IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
@@ -147,6 +148,7 @@ public class AdaugaTestActivity extends AppCompatActivity {
     private void adaugaTest() {
 
         //adaugare test
+        //COSMIN - TO DO SELECT TEST DACA EXISTA
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(nume.getText().toString())).build();
 
@@ -155,21 +157,25 @@ public class AdaugaTestActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.error_message_test_existent), Toast.LENGTH_LONG).show();
             return;
         }
+        //COSMIN - TO DO INSERARE TEST
         ((App) getApplication()).getDaoSession().getTestDao().insert(
                 new Test(nume.getText().toString(), descriere.getText().toString(), durate.get(durateSpinner.getSelectedItem()),
                         tipuri.getCheckedRadioButtonId()==estePublic.getId()?true:false, materie, profesor.getId()));
 
+        //COSMIN - TO DO SELECT TEST NOU ADAUGAT
         queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(nume.getText().toString()),
                 TestDao.Properties.Materie.eq(materie),
                 TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
+        //COSMIN - TO DO UPDATE TEST NOU CU LISTA INTREBARI SELECTATE
         Test test = queryTest.list().get(0);
         test.setIntrebari(intrebariSelectate);
         ((App) getApplication()).getDaoSession().getTestDao().update(test);
 
 
         //adaugare evidenta intrebari test
+        //COSMIN - TO DO INSERT EVIDENTA INTREBARI TESTE
         for ( IntrebareGrila intrebare : intrebariSelectate) {
             ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().insert(
                     new EvidentaIntrebariTeste(intrebare.getId(), test.getId()));
@@ -177,6 +183,7 @@ public class AdaugaTestActivity extends AppCompatActivity {
 
 
         //actualizare profesor
+        //COSMIN - TO DO UPDATE PROFESOR CU LISTA CU TESTUL NOU ADAUGAT
         List<Test> teste = profesor.getTeste();
         teste.add(test);
         profesor.setTeste(teste);

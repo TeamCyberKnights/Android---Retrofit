@@ -98,9 +98,11 @@ public class RezumatTestActivity extends AppCompatActivity {
         //endregion
 
         testSustinutId = getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1);
+        //COSMIN - TO DO SELECT TESTUL SUSTINUT SELECTAT
         final Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
                 TestSustinutDao.Properties.Id.eq(testSustinutId)).build();
 
+        //COSMIN - TO DO SELECT TEST AFERENT TESTULUI SUSTINUT
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Id.eq(queryTestSustinut.list().get(0).getTestId())).build();
 

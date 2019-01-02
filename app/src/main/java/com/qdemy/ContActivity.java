@@ -88,6 +88,8 @@ public class ContActivity extends AppCompatActivity {
                     if (query.list().size()>0)
                         Toast.makeText(getApplicationContext(),getString(R.string.eroare_utilizator_deja_inregistrat), Toast.LENGTH_SHORT).show();
                     else {
+                        //COSMIN - TO DO INSERARE STUDENT
+
                         Student student = new Student(utilizator.getText().toString(), nume.getText().toString(), prenume.getText().toString(),
                                                       parola.getText().toString(), mail.getText().toString());
                         DaoSession DaoSession =  ((App) getApplication()).getDaoSession();

@@ -105,6 +105,7 @@ public class TestePubliceAdapter extends ArrayAdapter<Test> {
             descriere.setText(teste.get(position).getDescriere());
             materie.setText(teste.get(position).getMaterie());
 
+            //COSMIN - TO DO SELECT PROFESOR AL TESTULUI PUBLIC
             Query<Profesor> queryProfesor = ((App) activity.getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
                     ProfesorDao.Properties.Id.eq(teste.get(position).getProfesorId())).build();
             autor.setText(activity.getString(R.string.autor_test_public, queryProfesor.list().get(0).getNume(), queryProfesor.list().get(0).getPrenume()));

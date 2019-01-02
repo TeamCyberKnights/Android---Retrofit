@@ -55,6 +55,7 @@ public class RezumatTestStudentiAdapter extends ArrayAdapter<RezultatTestStudent
 
         try {
             RezultatTestStudent rezultat = rezultate.get(position);
+            //COSMIN - TO DO SELECT STUDENT ASOCIAT REZULTATULUI TEST CURENT
             Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
                     StudentDao.Properties.Id.eq(rezultat.getStudentId())).build();
             nume.setText(queryStudent.list().get(0).getNume() + " " + queryStudent.list().get(0).getPrenume());

@@ -56,6 +56,7 @@ public class IstoricStudentAdapter extends ArrayAdapter<RezultatTestStudent> {
 
         try {
             final RezultatTestStudent rezultat = rezultate.get(position);
+            //COSMIN - TO DO SELECT TEST CUREMT
             Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                     TestDao.Properties.Id.eq(rezultat.getTestId())).build();
 

@@ -125,12 +125,15 @@ public class ScorLiveActivity extends AppCompatActivity {
 
     public void actualizareRezultateStudenti()
     {
+        //COSMIN - TO DO
         //ACTUALIZARE LIVE CAND TERMINA STUDENTII TESTUL
         //VA APAREA REZULTATUL FIECARUI STUDENT CARE TERMINA TESTUL
+        //INSERT REZULTAT TEST STUDENT IN LISTA DE REZULTATE DIN TEST SUSTINUT
         Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
                 TestSustinutDao.Properties.ProfesorId.eq(profesor.getId())).build();
         TestSustinut testSustinut = queryTestSustinut.list().get(queryTestSustinut.list().size()-1); //ultimul test sustinut adaugat
         rezultateStudenti = testSustinut.getRezultate();
+        //UPDATE TEST SUSTINUT CU NOUA LISTA DE REZULTATE
         adapter.notifyDataSetChanged();
 
     }

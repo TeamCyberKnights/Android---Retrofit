@@ -96,8 +96,10 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         materie = getIntent().getStringExtra(Constante.CHEIE_TRANSFER);
         materieTitlu.setText(materie);
 
+
         for(int i=0;i<profesor.getIntrebari().size();i++)
             if(profesor.getIntrebari(i).getMaterie().equals(materie))
+                //COSMIN - TO DO SELECT INTREBARI DIN MATERIA SELECTATA ALE PROFESORULUI CURENT
                 intrebari.add(profesor.getIntrebari(i));
         adapter = new IntrebareAdapter(getApplicationContext(),
                 R.layout.item_text_button, intrebari, getLayoutInflater(), IntrebariMaterieActivity.this);
@@ -205,6 +207,7 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
 
     public void stergeIntrebare(String textIntrebare)
     {
+        //COSMIN - TO DO SELECT INTREBAREA CURENTA
         //selectareintrebare
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Text.eq(textIntrebare),
@@ -212,6 +215,7 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
                 IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
 
+        //COSMIN - TO DO DELETE VARIANTE RASPOUNS INTREBAREA CURENTA
         //stergere variante raspuns
         Query<VariantaRaspuns> queryVarianteRaspuns = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao()
                 .queryBuilder().where(VariantaRaspunsDao.Properties.IntrebareId.eq(queryIntrebare.list().get(0).getId())).build();
@@ -220,7 +224,8 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         }
 
 
-        //stergere evidente intrebari test
+        //COSMIN - TO DO DELETE STERGERE INTREBARE DIN TOATE TESTELE CARE O CONTIN
+        //        //stergere evidente intrebari test
         Query<EvidentaIntrebariTeste> queryEvidenta = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao()
                 .queryBuilder().where(EvidentaIntrebariTesteDao.Properties.IntrebareId.eq(queryIntrebare.list().get(0).getId())).build();
 
@@ -228,11 +233,14 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
             ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().deleteByKey(evidenta.getId()); }
 
 
+
         //actualizare profesor
+        //COSMIN - TO DO UPDATE PROFESOR LISTA INTREBARI FARA CEA STERASA ACUM
         List<IntrebareGrila> intrebariActualizate = profesor.getIntrebari();
         intrebariActualizate.remove(queryIntrebare.list().get(0));
         profesor.setIntrebari(intrebariActualizate);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
+        //COSMIN - TO DO DELETE INTREBARE DIN TABELE
         ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().deleteByKey(queryIntrebare.list().get(0).getId());
     }
 

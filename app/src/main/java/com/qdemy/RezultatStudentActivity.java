@@ -64,6 +64,7 @@ public class RezultatStudentActivity extends AppCompatActivity {
         intrebariList.setAdapter(adapter);
 
 
+        //COSMIN - TO DO ADAUGARE ACEST REZULTAT LA LISTA REZULTATELOR DIN TEST SUSTINUT + UPDATE TEST SUSTINUT
         /*//ACTUALIZARE TEST SUSTINUT CU REZULTATUL ACESTUI STUDENT
         long id=-1; //= preluat de pe server
         Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
