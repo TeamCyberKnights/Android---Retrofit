@@ -98,6 +98,7 @@ public class MaterieAdapter extends ArrayAdapter<String> {
                     dlgAlert.setNegativeButton(R.string.nu, null);
                     AlertDialog dialog = dlgAlert.create();
                     dialog.show();
+                    dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
                 }
 
             });

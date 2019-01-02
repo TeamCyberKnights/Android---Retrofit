@@ -127,7 +127,7 @@ public class TestAdapter extends ArrayAdapter<Test> {
                     dlgAlert.setNegativeButton(R.string.nu, null);
                     AlertDialog dialog = dlgAlert.create();
                     dialog.show();
-
+                    dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
                 }
             });
         }

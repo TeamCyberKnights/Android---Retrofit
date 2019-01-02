@@ -91,7 +91,9 @@ public class TestSustinut {
         return rezultate;
     }
 
-
+    public RezultatTestStudent getRezultat(int index) {
+        return rezultate.get(index);
+    }
     
 
 

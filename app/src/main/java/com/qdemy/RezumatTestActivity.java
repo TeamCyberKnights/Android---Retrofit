@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -46,13 +47,13 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class RezumatTestActivity extends AppCompatActivity {
 
-    private TextView promovati;
     private TextView scor;
     private TextView nume;
     private ImageView inapoi;
     private ImageView intrebarileMele;
     private ImageView acasa;
     private ImageView testeleMele;
+    private ImageView istoric;
     private RadioButton studentiRadioButton;
     private RadioButton intrebariRadioButton;
     private RadioGroup optiuni;
@@ -83,10 +84,10 @@ public class RezumatTestActivity extends AppCompatActivity {
     private void initializare() {
 
         //region Initializare componente vizuale
-        promovati = findViewById(R.id.promovati_text_rezumatTest);
         scor = findViewById(R.id.scor_text_rezumatTest);
         nume = findViewById(R.id.nume_text_rezumatTest);
         inapoi = findViewById(R.id.back_image_rezumatTest);
+        istoric = findViewById(R.id.istoric_image_rezumatTest);
         intrebarileMele = findViewById(R.id.intrebari_image_rezumatTest);
         acasa = findViewById(R.id.acasa_image_rezumatTest);
         testeleMele = findViewById(R.id.teste_image_rezumatTest);
@@ -136,6 +137,17 @@ public class RezumatTestActivity extends AppCompatActivity {
             }
         });
 
+        informatiiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(studentiRadioButton.isChecked()) {
+                    Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, queryTestSustinut.list().get(0).getRezultat(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
 
         //region Meniu
 
@@ -184,6 +196,15 @@ public class RezumatTestActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
                 intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        istoric.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
                 startActivity(intent);
                 finish();
             }

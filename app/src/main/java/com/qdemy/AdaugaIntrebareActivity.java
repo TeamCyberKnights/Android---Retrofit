@@ -254,6 +254,28 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
 
                 //region Validare variante raspuns
 
+                boolean raspunsuriCorecte = false;
+                if(raspunsA.isChecked() || raspunsB.isChecked() ||raspunsC.isChecked() ||
+                        raspunsD.isChecked() ||raspunsE.isChecked() ||raspunsF.isChecked())
+                    raspunsuriCorecte=true;
+                if (raspunsuriCorecte==false)
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_1_corect), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (text.getText().toString().trim().isEmpty())
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_inexistenta), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (!(text.getText().toString().contains("?")))
+                {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_invalida), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 if(!(variantaA.getText().toString().trim().isEmpty()))
                     varianteRaspuns.add(new VariantaRaspuns(variantaA.getText().toString(), raspunsA.isChecked()));
                 else {
@@ -280,27 +302,6 @@ public class AdaugaIntrebareActivity extends AppCompatActivity {
                 if(!(variantaF.getText().toString().trim().isEmpty()))
                     varianteRaspuns.add(new VariantaRaspuns(variantaF.getText().toString(), raspunsF.isChecked()));
 
-                boolean raspunsuriCorecte = false;
-                if(raspunsA.isChecked() || raspunsB.isChecked() ||raspunsC.isChecked() ||
-                        raspunsD.isChecked() ||raspunsE.isChecked() ||raspunsF.isChecked())
-                    raspunsuriCorecte=true;
-                if (raspunsuriCorecte==false)
-                {
-                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_min_1_corect), Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                if (text.getText().toString().trim().isEmpty())
-                {
-                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_inexistenta), Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                if (!(text.getText().toString().contains("?")))
-                {
-                    Toast.makeText(getApplicationContext(), getString(R.string.error_message_intrebare_invalida), Toast.LENGTH_LONG).show();
-                    return;
-                }
                 //endregion
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

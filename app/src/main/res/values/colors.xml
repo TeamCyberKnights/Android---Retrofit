@@ -10,7 +10,7 @@
     <color name="bleu_marin">#0e354a</color>
     <color name="galben">#fac100</color>
     <color name="foreground_material_light">#0e354a</color>
-    <color name="colorAccent">#FFC966</color>
+    <color name="colorAccent">#ffc966</color>
     <color name="alb">#ffffff</color>
 
 </resources>

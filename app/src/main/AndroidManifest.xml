@@ -39,7 +39,8 @@
         <activity android:name=".AdaugaTestActivity" />
         <activity android:name=".IstoricStudentActivity" />
         <activity android:name=".IstoricProfesorActivity" />
-        <activity android:name=".TestePubliceActivity"></activity>
+        <activity android:name=".TestePubliceActivity" />
+        <activity android:name=".RezumatTestStudentActivity"></activity>
     </application>
 
 </manifest>

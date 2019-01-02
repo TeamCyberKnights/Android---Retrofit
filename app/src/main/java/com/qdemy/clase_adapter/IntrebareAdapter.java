@@ -105,7 +105,7 @@ public class IntrebareAdapter extends ArrayAdapter<IntrebareGrila> {
                     dlgAlert.setNegativeButton(R.string.nu, null);
                     AlertDialog dialog = dlgAlert.create();
                     dialog.show();
-
+                    dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
                 }
             });
         }

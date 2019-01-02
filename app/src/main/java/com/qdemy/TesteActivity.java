@@ -48,6 +48,7 @@ public class TesteActivity extends AppCompatActivity {
     private ImageView acasa;
     private ImageView istoric;
     private ImageView intrebari;
+    private ImageView testeleMele;
     private FloatingActionButton adauga;
     private ListView testeList;
     private String materie;
@@ -74,6 +75,7 @@ public class TesteActivity extends AppCompatActivity {
 
         //region Intializare componenete vizuale
         inapoi = findViewById(R.id.back_image_teste);
+        testeleMele = findViewById(R.id.teste_image_teste);
         acasa = findViewById(R.id.acasa_image_teste);
         istoric = findViewById(R.id.istoric_image_teste);
         intrebari = findViewById(R.id.intrebari_image_teste);
@@ -190,6 +192,16 @@ public class TesteActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
                 intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        testeleMele.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
                 startActivity(intent);
                 finish();
             }

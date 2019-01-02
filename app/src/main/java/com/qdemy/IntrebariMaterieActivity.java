@@ -48,6 +48,7 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
     private ImageView acasa;
     private ImageView istoric;
     private ImageView teste;
+    private ImageView intrebarileMele;
     private FloatingActionButton adauga;
     private ListView intrebariList;
     private TextView materieTitlu;
@@ -77,6 +78,7 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         inapoi = findViewById(R.id.back_image_intrebariMaterie);
         acasa = findViewById(R.id.acasa_image_intrebariMaterie);
         istoric = findViewById(R.id.istoric_image_intrebariMaterie);
+        intrebarileMele = findViewById(R.id.intrebari_image_intrebariMaterie);
         teste = findViewById(R.id.teste_image_intrebariMaterie);
         adauga = findViewById(R.id.adauga_button_intrebariMaterie);
         intrebariList = findViewById(R.id.intrebari_list_intrebariMaterie);
@@ -181,6 +183,16 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
                 intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        intrebarileMele.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
                 startActivity(intent);
                 finish();
             }
