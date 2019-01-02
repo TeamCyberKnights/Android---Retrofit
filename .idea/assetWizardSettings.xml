@@ -34,9 +34,9 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
-                                      <entry key="foregroundImage" value="F:\New folder\icon.png" />
+                                      <entry key="foregroundImage" value="F:\Qdemy\poo.png" />
                                       <entry key="foregroundLayerName" value="ic_launcher_foreground" />
-                                      <entry key="outputName" value="icon" />
+                                      <entry key="outputName" value="poo" />
                                     </map>
                                   </option>
                                 </PersistentState>

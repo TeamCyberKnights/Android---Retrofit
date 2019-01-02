@@ -110,17 +110,17 @@ public class TestePubliceAdapter extends ArrayAdapter<Test> {
             autor.setText(activity.getString(R.string.autor_test_public, queryProfesor.list().get(0).getNume(), queryProfesor.list().get(0).getPrenume()));
 
 
-            if (teste.get(position).getMaterie().equals(R.string.poo))
+            if (teste.get(position).getMaterie().equals(activity.getString(R.string.poo)))
                 logo.setImageResource(R.drawable.poo);
-            else if (teste.get(position).getMaterie().equals(R.string.paw))
+            else if (teste.get(position).getMaterie().equals(activity.getString(R.string.paw)))
                 logo.setImageResource(R.drawable.paw);
-            else if (teste.get(position).getMaterie().equals(R.string.sdd))
+            else if (teste.get(position).getMaterie().equals(activity.getString(R.string.sdd)))
                 logo.setImageResource(R.drawable.sdd);
-            else if (teste.get(position).getMaterie().equals(R.string.dam))
+            else if (teste.get(position).getMaterie().equals(activity.getString(R.string.dam)))
                 logo.setImageResource(R.drawable.dam);
-            else if (teste.get(position).getMaterie().equals(R.string.tw))
+            else if (teste.get(position).getMaterie().equals(activity.getString(R.string.tw)))
                 logo.setImageResource(R.drawable.web);
-            else if (teste.get(position).getMaterie().equals(R.string.java))
+            else if (teste.get(position).getMaterie().equals(activity.getString(R.string.java)))
                 logo.setImageResource(R.drawable.java);
 
 
