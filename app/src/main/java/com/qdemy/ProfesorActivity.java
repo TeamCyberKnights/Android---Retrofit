@@ -18,7 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qdemy.clase.Profesor;
+import com.qdemy.clase.Test;
+import com.qdemy.clase.TestDao;
+import com.qdemy.clase.TestPartajat;
+import com.qdemy.clase.TestPartajatDao;
 import com.qdemy.db.App;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,10 +69,19 @@ public class ProfesorActivity extends AppCompatActivity {
         progresBar = findViewById(R.id.progressBar_profesor);
         //endregion
 
+
         profesor = ((App) getApplication()).getProfesor();
         for(int i=0;i<profesor.getTeste().size();i++)
            testeProfesor.add(profesor.getTeste(i).getNume());
 
+        //COSMIN -TO DO SELECT TESTE PARTAJATE ALE PROFESORULUI
+        Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
+        for(int i=0;i<queryTestePartajate.list().size();i++) {
+            Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                    TestDao.Properties.Id.eq(queryTestePartajate.list().get(i).getTestId())).build();
+            testeProfesor.add(queryTest.list().get(0).getNume());
+        }
 
         //region Meniu
 

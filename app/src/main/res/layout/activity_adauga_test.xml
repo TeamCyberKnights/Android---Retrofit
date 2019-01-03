@@ -142,12 +142,22 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:text="@string/selecteaz_ntreb_rile"
+            android:textColor="@color/bleu_marin"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <ListView
             android:id="@+id/intrebari_list_adaugaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="4.5">
+            android:layout_weight="4">
 
         </ListView>
 

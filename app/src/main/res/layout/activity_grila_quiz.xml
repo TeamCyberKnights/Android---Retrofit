@@ -9,24 +9,28 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/raspunde_button_grila"
-        android:layout_width="115dp"
-        android:layout_height="65dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/ic_promovat"
         android:clickable="true"
+        android:contentDescription="@string/adauga"
+        android:focusable="true"
+        android:scaleType="center"
         app:backgroundTint="@color/portocaliu"
+        app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.427"
-        app:srcCompat="@mipmap/ic_launcher" />
+        app:layout_constraintVertical_bias="0.478"
+        app:maxImageSize="50dp"
+        app:srcCompat="@drawable/ic_check_black_24dp" />
 
     <LinearLayout
         android:id="@+id/linearLayout"

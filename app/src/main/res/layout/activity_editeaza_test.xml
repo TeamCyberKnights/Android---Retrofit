@@ -9,8 +9,8 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/partajeaza_button_editeazaTest"
-        android:layout_width="49dp"
-        android:layout_height="46dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
@@ -18,16 +18,18 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
-        android:contentDescription="@string/partajeaza"
+        android:contentDescription="@string/adauga"
         android:focusable="true"
+        android:scaleType="center"
         app:backgroundTint="@color/portocaliu"
+        app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.964"
-        app:maxImageSize="30dp"
+        app:layout_constraintVertical_bias="0.983"
+        app:maxImageSize="50dp"
         app:srcCompat="@drawable/ic_share_black_24dp" />
 
     <LinearLayout
@@ -158,12 +160,23 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:text="@string/selecteaz_ntreb_rile"
+            android:textColor="@color/bleu_marin"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <ListView
             android:id="@+id/intrebari_list_editeazaTest"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="0dp"
-            android:layout_weight="4.5">
+            android:layout_weight="4">
 
         </ListView>
 

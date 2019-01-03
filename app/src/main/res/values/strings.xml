@@ -136,4 +136,5 @@
     <string name="terminare_test">Ai terminat testul!</string>
     <string name="rezolva_alt_test">Rezolvă alt test!</string>
     <string name="error_message_niciun_test_sustinut">Nu există niciun test susținut!</string>
+    <string name="selecteaz_ntreb_rile">Selectează întrebările:</string>
 </resources>
