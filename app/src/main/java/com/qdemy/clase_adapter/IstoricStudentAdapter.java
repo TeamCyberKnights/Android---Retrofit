@@ -19,10 +19,17 @@ import com.qdemy.clase.RezultatTestStudentDao;
 import com.qdemy.clase.Test;
 import com.qdemy.clase.TestDao;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class IstoricStudentAdapter extends ArrayAdapter<RezultatTestStudent> {
 
@@ -31,6 +38,8 @@ public class IstoricStudentAdapter extends ArrayAdapter<RezultatTestStudent> {
     private List<RezultatTestStudent> rezultate;
     private LayoutInflater inflater;
     private IstoricStudentActivity activity;
+    private Test test;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public IstoricStudentAdapter(@NonNull Context context, int resource,
                                  @NonNull List<RezultatTestStudent> objects, LayoutInflater inflater,
@@ -56,17 +65,42 @@ public class IstoricStudentAdapter extends ArrayAdapter<RezultatTestStudent> {
 
         try {
             final RezultatTestStudent rezultat = rezultate.get(position);
-            //COSMIN - TO DO SELECT TEST CUREMT
-            Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                    TestDao.Properties.Id.eq(rezultat.getTestId())).build();
 
-            nume.setText(queryTest.list().get(0).getNume());
-            data.setText(rezultat.getData());
-            punctaj.setText(String.valueOf((int) ((App) activity.getApplication()).getPunctajTest(rezultat.getRaspunsuri())));
+            if (networkConnectionService.isInternetAvailable()) {
+                TestService testService = ServiceBuilder.buildService(TestService.class);
+                Call<Test> testRequest = testService.getTestById((int) (long) rezultat.getTestId());
+                testRequest.enqueue(new Callback<Test>() {
+                    @Override
+                    public void onResponse(Call<Test> call, Response<Test> response) {
+                        test = response.body();
+                    }
 
-            if (Integer.parseInt(punctaj.getText().toString()) < 50)
-                punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.rosu));
-            else punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.verde));
+                    @Override
+                    public void onFailure(Call<Test> call, Throwable t) {
+
+                    }
+                });
+
+                nume.setText(test.getNume());
+                data.setText(rezultat.getData());
+                punctaj.setText(String.valueOf((int) ((App) activity.getApplication()).getPunctajTest(rezultat.getRaspunsuri())));
+
+                if (Integer.parseInt(punctaj.getText().toString()) < 50)
+                    punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.rosu));
+                else punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.verde));
+            } else {
+
+                Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                        TestDao.Properties.Id.eq(rezultat.getTestId())).build();
+
+                nume.setText(queryTest.list().get(0).getNume());
+                data.setText(rezultat.getData());
+                punctaj.setText(String.valueOf((int) ((App) activity.getApplication()).getPunctajTest(rezultat.getRaspunsuri())));
+
+                if (Integer.parseInt(punctaj.getText().toString()) < 50)
+                    punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.rosu));
+                else punctaj.setTextColor(ContextCompat.getColor(rand.getContext(), R.color.verde));
+            }
         }
         catch (Exception e) {}
 

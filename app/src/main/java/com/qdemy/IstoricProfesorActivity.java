@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -32,12 +34,18 @@ import com.qdemy.clase.TestSustinutDao;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.IstoricProfesorAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestSustinutService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class IstoricProfesorActivity extends AppCompatActivity {
@@ -54,6 +62,8 @@ public class IstoricProfesorActivity extends AppCompatActivity {
     private int nrRezultate=0;
     private int promovate=0;
     private int picate=0;
+    private List<TestSustinut> testeSustinute2;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -64,7 +74,14 @@ public class IstoricProfesorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_istoric_profesor);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
         //setPieChart();
 
@@ -83,34 +100,76 @@ public class IstoricProfesorActivity extends AppCompatActivity {
 
         //region Initializare rezultate
         profesor = ((App) getApplication()).getProfesor();
-        //COSMIN - TO DO SELECT TESTE SUSTINUTE ALE PROFESORULUI CURENT
-        final Query<TestSustinut> queryTesteSustinute = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
-                TestSustinutDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
-        for (TestSustinut testSustinut : queryTesteSustinute.list()) {
-            for ( RezultatTestStudent rezultat : testSustinut.getRezultate()) {
-                nrRezultate++;
-                if(rezultat.isPromovat()) promovate++;
-                else picate++;
+
+        if (internetIsAvailable) {
+
+            TestSustinutService testSustinutService = ServiceBuilder.buildService(TestSustinutService.class);
+            Call<List<TestSustinut>> testeSustinutRequest = testSustinutService.getTesteSustinutByProfesorId((int) (long) profesor.getId());
+            testeSustinutRequest.enqueue(new Callback<List<TestSustinut>>() {
+                @Override
+                public void onResponse(Call<List<TestSustinut>> call, Response<List<TestSustinut>> response) {
+                    testeSustinute2 = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<TestSustinut>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut incarca testele sustinute", Toast.LENGTH_SHORT).show();
+                }
+
+            });
+            for (TestSustinut testSustinut : testeSustinute2) {
+                for ( RezultatTestStudent rezultat : testSustinut.getRezultate()) {
+                    nrRezultate++;
+                    if(rezultat.isPromovat()) promovate++;
+                    else picate++;
+                }
+            }  IstoricProfesorAdapter adapter = new IstoricProfesorAdapter(getApplicationContext(),
+                    R.layout.item_text_text_text, testeSustinute2, getLayoutInflater(), IstoricProfesorActivity.this);
+            testeList.setAdapter(adapter);
+
+            //endregion
+
+
+            testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), RezumatTestActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, testeSustinute2.get(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+        } else {
+            final Query<TestSustinut> queryTesteSustinute = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
+                    TestSustinutDao.Properties.ProfesorId.eq(profesor.getId())).build();
+
+            for (TestSustinut testSustinut : queryTesteSustinute.list()) {
+                for ( RezultatTestStudent rezultat : testSustinut.getRezultate()) {
+                    nrRezultate++;
+                    if(rezultat.isPromovat()) promovate++;
+                    else picate++;
+                }
             }
+            IstoricProfesorAdapter adapter = new IstoricProfesorAdapter(getApplicationContext(),
+                    R.layout.item_text_text_text, queryTesteSustinute.list(), getLayoutInflater(), IstoricProfesorActivity.this);
+            testeList.setAdapter(adapter);
+
+            //endregion
+
+
+            testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), RezumatTestActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, queryTesteSustinute.list().get(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            });
         }
-
-        IstoricProfesorAdapter adapter = new IstoricProfesorAdapter(getApplicationContext(),
-                R.layout.item_text_text_text, queryTesteSustinute.list(), getLayoutInflater(), IstoricProfesorActivity.this);
-        testeList.setAdapter(adapter);
-
-        //endregion
-
-
-        testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), RezumatTestActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, queryTesteSustinute.list().get(position).getId());
-                startActivity(intent);
-                finish();
-            }
-        });
 
         //region Meniu
 

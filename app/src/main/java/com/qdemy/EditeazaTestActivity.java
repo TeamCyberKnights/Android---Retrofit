@@ -2,6 +2,8 @@ package com.qdemy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,12 @@ import com.qdemy.clase.TestDao;
 import com.qdemy.clase_adapter.AdaugaTestAdapter;
 import com.qdemy.clase_adapter.EditeazaTestAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.EvidentaIntrebariTesteService;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -35,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class EditeazaTestActivity extends AppCompatActivity {
@@ -53,10 +64,15 @@ public class EditeazaTestActivity extends AppCompatActivity {
     public List<Boolean> selectari = new ArrayList<>();
     public List<IntrebareGrila> intrebariSelectate = new ArrayList<>();
     private Map<String, Integer> durate = new TreeMap<String, Integer>();
-
+    public List<IntrebareGrila> intrebariGrila2;
     private Profesor profesor;
     private Test test;
     private String materie;
+    private Test test2;
+    private EvidentaIntrebariTeste evidentaIntrebariTeste2;
+    private List<EvidentaIntrebariTeste> evidentaIntrebariTeste;
+
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -67,7 +83,14 @@ public class EditeazaTestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editeaza_test);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -115,28 +138,63 @@ public class EditeazaTestActivity extends AppCompatActivity {
         tipuri.check(test.getEstePublic()?estePublic.getId():estePrivat.getId());
 
 
-        //COSMIN - TO DO SELECT INTREBARI DIN MATERIA TESTULUI CURENT
-        Query<IntrebareGrila> queryIntrebari = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                IntrebareGrilaDao.Properties.Materie.eq(materie),
-                IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
-        intrebari = queryIntrebari.list();
-        intrebariSelectate = test.getIntrebari();
 
-        for(int i=0;i<intrebari.size();i++) {
-            boolean selectat = false;
-            for (int j = 0; j < intrebariSelectate.size(); j++)
-                if (intrebari.get(i).equals(intrebariSelectate.get(j))) {selectat = true; break;}
+        if (internetIsAvailable) {
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            Call<List<IntrebareGrila>> intrebariGrilaRequest = intrebareGrilaService
+                    .getIntrebareGrilaByMaterieAndProfesorId(materie, (int) (long) profesor.getId());
+            intrebariGrilaRequest.enqueue(new Callback<List<IntrebareGrila>>() {
+                @Override
+                public void onResponse(Call<List<IntrebareGrila>> call, Response<List<IntrebareGrila>> response) {
+                    intrebariGrila2 = response.body();
+                }
 
-            selectari.add(selectat);
+                @Override
+                public void onFailure(Call<List<IntrebareGrila>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu au putut fi gasite intrebari", Toast.LENGTH_SHORT).show();
+                }
+            });
+            intrebari = intrebariGrila2;
+            intrebariSelectate = test.getIntrebari();
+
+            for(int i=0;i<intrebari.size();i++) {
+                boolean selectat = false;
+                for (int j = 0; j < intrebariSelectate.size(); j++)
+                    if (intrebari.get(i).equals(intrebariSelectate.get(j))) {selectat = true; break;}
+
+                selectari.add(selectat);
+            }
+
+            final EditeazaTestAdapter adapter = new EditeazaTestAdapter(getApplicationContext(),
+                    R.layout.item_text_button, intrebari, getLayoutInflater(), EditeazaTestActivity.this);
+            intrebariList.setAdapter(adapter);
+            //endregion
+        } else {
+
+            Query<IntrebareGrila> queryIntrebari = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                    IntrebareGrilaDao.Properties.Materie.eq(materie),
+                    IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
+            intrebari = queryIntrebari.list();
+            intrebariSelectate = test.getIntrebari();
+
+            for (int i = 0; i < intrebari.size(); i++) {
+                boolean selectat = false;
+                for (int j = 0; j < intrebariSelectate.size(); j++)
+                    if (intrebari.get(i).equals(intrebariSelectate.get(j))) {
+                        selectat = true;
+                        break;
+                    }
+
+                selectari.add(selectat);
+            }
+
+            final EditeazaTestAdapter adapter = new EditeazaTestAdapter(getApplicationContext(),
+                    R.layout.item_text_button, intrebari, getLayoutInflater(), EditeazaTestActivity.this);
+            intrebariList.setAdapter(adapter);
+
+
+            //endregion
         }
-
-        final EditeazaTestAdapter adapter = new EditeazaTestAdapter(getApplicationContext(),
-                R.layout.item_text_button, intrebari, getLayoutInflater(), EditeazaTestActivity.this);
-        intrebariList.setAdapter(adapter);
-
-
-        //endregion
-
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,14 +245,153 @@ public class EditeazaTestActivity extends AppCompatActivity {
     private void actualizeazaTest() {
 
         //selectare test
-        //COSMIN - TO DO SELECT TEST UCRENT
+
+        if (internetIsAvailable) {
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<Test> testRequest = testService.getTestByNumeMaterieAndProfesorId(nume.getText().toString(), materie, (int) (long) profesor.getId());
+            testRequest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    test2 = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
+                }
+
+            });
+            //actualizare test
+            Test test = test2;
+            test.setIntrebari(intrebariSelectate);
+            test.setDescriere(descriere.getText().toString());
+            test.setTimpDisponibil(durate.get(durateSpinner.getSelectedItem()));
+            test.setEstePublic(tipuri.getCheckedRadioButtonId()==estePublic.getId()?true:false);
+
+            Call<Test> updateTest = testService.updateTest((int)(long)test.getId(),test);
+            updateTest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    Toast.makeText(getApplicationContext(), "Testul a fost actualizat", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Testul nu a putut fi actualizat", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            //actualizare evidenta intrebari test
+            //actualizare intrebari
+
+
+            EvidentaIntrebariTesteService evidentaIntrebariTesteService = ServiceBuilder.buildService(EvidentaIntrebariTesteService.class);
+
+            for ( IntrebareGrila intrebare : intrebariSelectate) {
+                Call<EvidentaIntrebariTeste> evidentaIntrebariTesteRequest = evidentaIntrebariTesteService
+                        .getEvidentaIntrebariTesteByIntrebareIdAndTestId((int)(long)intrebare.getId(),(int)(long)test.getId());
+                evidentaIntrebariTesteRequest.enqueue(new Callback<EvidentaIntrebariTeste>() {
+                    @Override
+                    public void onResponse(Call<EvidentaIntrebariTeste> call, Response<EvidentaIntrebariTeste> response) {
+                        evidentaIntrebariTeste2 = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvidentaIntrebariTeste> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Nu s-a putut gasi evidenta", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+
+                if(evidentaIntrebariTeste2==null) {
+                    Call<EvidentaIntrebariTeste> insertEvidentaIntrebariTeste = evidentaIntrebariTesteService
+                            .saveEvidentaIntrebariTeste(new EvidentaIntrebariTeste(intrebare.getId(), test.getId()));
+
+                    insertEvidentaIntrebariTeste.enqueue(new Callback<EvidentaIntrebariTeste>() {
+                        @Override
+                        public void onResponse(Call<EvidentaIntrebariTeste> call, Response<EvidentaIntrebariTeste> response) {
+                            Toast.makeText(getApplicationContext(), "Evidenta a fost actualizata", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<EvidentaIntrebariTeste> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Evidenta nu a putut fi actualizata", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+
+            //stergere intrebari neselectate (selectate anterior)
+
+
+            Call<List<EvidentaIntrebariTeste>> evidentaIntrebariTesteRequest = evidentaIntrebariTesteService
+                    .getEvidentaIntrebariTesteByTestId((int)(long)test.getId());
+            evidentaIntrebariTesteRequest.enqueue(new Callback<List<EvidentaIntrebariTeste>>() {
+                @Override
+                public void onResponse(Call<List<EvidentaIntrebariTeste>> call, Response<List<EvidentaIntrebariTeste>> response) {
+                    evidentaIntrebariTeste = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<EvidentaIntrebariTeste>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Evidenta nu a putut fi gasita", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            for ( EvidentaIntrebariTeste evidentaIntrebare : evidentaIntrebariTeste) {
+                boolean gasit = false;
+                for (int i = 0; i < intrebariSelectate.size(); i++)
+                    if(intrebariSelectate.get(i).getId().equals(evidentaIntrebare.getIntrebareId()))
+                    {gasit=true; break;}
+
+                if(gasit==false) {
+
+                    Call<EvidentaIntrebariTeste> deleteEvidentaIntrebariTesteRequest = evidentaIntrebariTesteService
+                            .deleteEvidentaIntrebariTesteById((int)(long)evidentaIntrebare.getIntrebareId());
+                    deleteEvidentaIntrebariTesteRequest.enqueue(new Callback<EvidentaIntrebariTeste>() {
+                        @Override
+                        public void onResponse(Call<EvidentaIntrebariTeste> call, Response<EvidentaIntrebariTeste> response) {
+                            Toast.makeText(getApplicationContext(), "Evidenta a fost stearsa cu succes", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<EvidentaIntrebariTeste> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Evidenta nu a putut fi stearsa", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+
+            profesor.setTest(test);
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+            Call<Profesor> updateProfesor = profesorService.updateProfesor((int) (long)profesor.getId(), profesor);
+            updateProfesor.enqueue(new Callback<Profesor>() {
+                @Override
+                public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                    Toast.makeText(getApplicationContext(), "Datele au fost modificate cu succes", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Profesor> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Datele nu au putut fi modificate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+
+        }
+
+
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(nume.getText().toString()),
                 TestDao.Properties.Materie.eq(materie),
                 TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
         //actualizare test
-        //COSMIN - TO DO UPDATE TEST
+
         Test test = queryTest.list().get(0);
         test.setIntrebari(intrebariSelectate);
         test.setDescriere(descriere.getText().toString());
@@ -205,7 +402,6 @@ public class EditeazaTestActivity extends AppCompatActivity {
 
         //actualizare evidenta intrebari test
         //actualizare intrebari
-        //COSMIN - TO DO UPDATE EVIDENTA INTREBARI TESTE
         for ( IntrebareGrila intrebare : intrebariSelectate) {
             Query<EvidentaIntrebariTeste> queryEvidentaIntrebare = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
                     EvidentaIntrebariTesteDao.Properties.IntrebareId.eq(intrebare.getId()),
@@ -217,7 +413,6 @@ public class EditeazaTestActivity extends AppCompatActivity {
         }
 
         //stergere intrebari neselectate (selectate anterior)
-        //COSMIN - TO DO DELETE INTREBARI CARE NU MAI FAC PARTE DIN TESTUL RESPECTIV
         Query<EvidentaIntrebariTeste> queryEvidentaIntrebari = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().queryBuilder().where(
                 EvidentaIntrebariTesteDao.Properties.TestId.eq(test.getId())).build();
         for ( EvidentaIntrebariTeste evidentaIntrebare : queryEvidentaIntrebari.list()) {
@@ -232,7 +427,6 @@ public class EditeazaTestActivity extends AppCompatActivity {
 
 
         //actualizare profesor
-        //COSMIN - TO DO UPDATE PROFESOR CU TESTUL ACTUALIZAT
         profesor.setTest(test);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
 

@@ -2,6 +2,8 @@ package com.qdemy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,10 @@ import com.qdemy.clase.Student;
 import com.qdemy.clase.Test;
 import com.qdemy.clase.TestDao;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.RezultatTestStudentService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -27,8 +33,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class StartQuizActivity extends AppCompatActivity {
@@ -37,6 +47,10 @@ public class StartQuizActivity extends AppCompatActivity {
     private TextView asteapta;
     private Button acceseaza;
     private TextView renunta;
+    private Test test;
+    private RezultatTestStudent rezultatTestStudent;
+    private Student student1;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -47,7 +61,14 @@ public class StartQuizActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_quiz);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -60,7 +81,7 @@ public class StartQuizActivity extends AppCompatActivity {
 
         cod.setText(citesteCodTestFisier());
 
-
+        student1 = ((App) getApplication()).getStudent(); // DE CE?
         acceseaza.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,7 +89,72 @@ public class StartQuizActivity extends AppCompatActivity {
                 //validare cod test
                 try {
                     final long id = Long.parseLong(cod.getText().toString().trim().split("%")[1]);
-                    //COSMIN - TO DO SELECT TEST CU ID-UL PRELUAT DIN COD
+
+                    if (internetIsAvailable) {
+                        TestService testService = ServiceBuilder.buildService(TestService.class);
+                        Call<Test> testRequest = testService.getTestById((int)(long)id);
+                        testRequest.enqueue(new Callback<Test>() {
+                            @Override
+                            public void onResponse(Call<Test> call, Response<Test> response) {
+                                test = response.body();
+                            }
+
+                            @Override
+                            public void onFailure(Call<Test> call, Throwable t) {
+                                Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        if (test == null)
+                            Toast.makeText(getApplicationContext(), getString(R.string.error_message_cod_invalid), Toast.LENGTH_LONG).show();
+                        else {
+                            Student student = ((App) getApplication()).getStudent();
+                            String data = new SimpleDateFormat(Constante.DATE_FORMAT).format(Calendar.getInstance().getTime());
+
+
+                            RezultatTestStudentService rezultatTestStudentService = ServiceBuilder.buildService(RezultatTestStudentService.class);
+                            Call<RezultatTestStudent> rezultatTestStudentRequest = rezultatTestStudentService.getRezultatTestStudentByTestIdDataAndStudentId((int)(long)id, data, (int)(long)student.getId());
+                            rezultatTestStudentRequest.enqueue(new Callback<RezultatTestStudent>() {
+                                @Override
+                                public void onResponse(Call<RezultatTestStudent> call, Response<RezultatTestStudent> response) {
+                                    rezultatTestStudent = response.body();
+                                }
+
+                                @Override
+                                public void onFailure(Call<RezultatTestStudent> call, Throwable t) {
+                                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi rezultatul studentului", Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+
+                            if (rezultatTestStudent != null) {
+                                Toast.makeText(getApplicationContext(), getString(R.string.error_message_test_deja_sustinut), Toast.LENGTH_LONG).show();
+                                finish();
+                            } else {
+                                asteapta.setVisibility(View.VISIBLE);
+                                cod.setVisibility(View.INVISIBLE);
+                                cod.setVisibility(View.GONE);
+                                acceseaza.setVisibility(View.GONE);
+
+                               // trebuie trimis request ca s-a conectat studentul
+                                // ii apare profesorului in lista profesorului ca studentul s-a conectat
+
+                                //delay
+                                // asta e o alta metoda apelata atunci cand profesorul da start test in StartingQuizProfesorActivity
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(getApplicationContext(), GrilaQuizActivity.class);
+                                        intent.putExtra(Constante.CHEIE_TRANSFER, id);
+                                        intent.putExtra(Constante.CHEIE_TRANSFER2, "");
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }, 1000);
+                            }
+                        }
+                    }  else {
+
                     Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                             TestDao.Properties.Id.eq(id)).build();
                     if (queryTest.list().size() == 0)
@@ -76,7 +162,7 @@ public class StartQuizActivity extends AppCompatActivity {
                     else {
                         Student student = ((App) getApplication()).getStudent();
                         String data = new SimpleDateFormat(Constante.DATE_FORMAT).format(Calendar.getInstance().getTime());
-                        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT => STUDENTUL NU POATE SUSTINE DE 2 ORI IN ACEASI ZI ACELASI TEST INDIFERENT DE CODUL TESTULUI
+
                         Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
                                 RezultatTestStudentDao.Properties.TestId.eq(id),
                                 RezultatTestStudentDao.Properties.Data.eq(data),
@@ -104,11 +190,13 @@ public class StartQuizActivity extends AppCompatActivity {
                             }, 1000);
                         }
                     }
+                    }
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), getString(R.string.error_message_cod_invalid), Toast.LENGTH_LONG).show();
                 }
             }
         });
+
 
         renunta.setOnClickListener(new View.OnClickListener() {
             @Override

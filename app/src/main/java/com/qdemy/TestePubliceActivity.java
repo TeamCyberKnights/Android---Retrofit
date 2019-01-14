@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -39,12 +41,19 @@ import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.TestAdapter;
 import com.qdemy.clase_adapter.TestePubliceAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class TestePubliceActivity extends AppCompatActivity {
@@ -57,7 +66,10 @@ public class TestePubliceActivity extends AppCompatActivity {
     private SearchView cautaTest;
     private TestePubliceAdapter adapter;
     private List<Test> testePublice = new ArrayList<>();
+    private List<Test> teste = new ArrayList<>();
     private Student student;
+    private List<Profesor> profesori;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -68,7 +80,14 @@ public class TestePubliceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teste_publice);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -89,16 +108,39 @@ public class TestePubliceActivity extends AppCompatActivity {
 
         //incarcare teste publice
 
-        //COSMIN - TO DO SELECT TOATE TESTELE PUBLICE
 
-        Query<Test> queryTeste = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().build();
-        for ( Test test : queryTeste.list()) {
-            if(test.getEstePublic()) testePublice.add(test);
+        if (internetIsAvailable) {
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<List<Test>> testeRequest = testService.getTeste();
+            testeRequest.enqueue(new Callback<List<Test>>() {
+                @Override
+                public void onResponse(Call<List<Test>> call, Response<List<Test>> response) {
+                    teste = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<Test>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut gasi teste", Toast.LENGTH_SHORT).show();
+                }
+            });
+            for ( Test test : teste) {
+                if(test.getEstePublic()) testePublice.add(test);
+            }
+            adapter = new TestePubliceAdapter(getApplicationContext(), R.layout.item_test_public,
+                    testePublice, getLayoutInflater(), TestePubliceActivity.this);
+            testeList.setAdapter(adapter);
+
         }
+        else {
+            Query<Test> queryTeste = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().build();
+            for (Test test : queryTeste.list()) {
+                if (test.getEstePublic()) testePublice.add(test);
+            }
 
-        adapter = new TestePubliceAdapter(getApplicationContext(), R.layout.item_test_public,
-                testePublice, getLayoutInflater(), TestePubliceActivity.this);
-        testeList.setAdapter(adapter);
+            adapter = new TestePubliceAdapter(getApplicationContext(), R.layout.item_test_public,
+                    testePublice, getLayoutInflater(), TestePubliceActivity.this);
+            testeList.setAdapter(adapter);
+        }
         //endregion
 
 
@@ -159,11 +201,34 @@ public class TestePubliceActivity extends AppCompatActivity {
         mail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
                 List<String> mailuriProfesori = new ArrayList<>();
-                for (Profesor profesor : query.list()) {
-                    mailuriProfesori.add(profesor.getMail());}
+
+                if (internetIsAvailable) {
+                    ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+                    Call<List<Profesor>> profesoriRequest = profesorService.getProfesori();
+                    profesoriRequest.enqueue(new Callback<List<Profesor>>() {
+                        @Override
+                        public void onResponse(Call<List<Profesor>> call, Response<List<Profesor>> response) {
+                            profesori = response.body();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Profesor>> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Nu s-au putut gasi profesori", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    for (Profesor profesor : profesori) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+
+                }
+                else {
+                    Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
+                    for (Profesor profesor : query.list()) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(R.string.alege_profesorul);

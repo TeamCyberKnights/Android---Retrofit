@@ -2,26 +2,33 @@ package com.qdemy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.qdemy.clase.DaoMaster;
+import com.qdemy.Constante;
+import com.qdemy.R;
 import com.qdemy.clase.DaoSession;
-import com.qdemy.clase.Profesor;
 import com.qdemy.clase.Student;
 import com.qdemy.clase.StudentDao;
 import com.qdemy.db.App;
-import com.qdemy.db.DbOpenHelper;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.StudentService;
 
 import org.greenrobot.greendao.query.Query;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 
 public class ContActivity extends AppCompatActivity {
 
@@ -33,6 +40,8 @@ public class ContActivity extends AppCompatActivity {
     private Button salveaza;
     private TextView renunta;
     Intent intent;
+    private Student student;
+    private boolean internetIsAvailable = false;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -43,6 +52,15 @@ public class ContActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cont);
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+       if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+           internetIsAvailable = true;
+       }
 
         initializare();
     }
@@ -82,21 +100,63 @@ public class ContActivity extends AppCompatActivity {
 
                 else
                 {
-                    StudentDao studentDao = ((App) getApplication()).getDaoSession().getStudentDao();
-                    Query<Student> query = studentDao.queryBuilder().where(
-                            StudentDao.Properties.Utilizator.eq(utilizator.getText())).build();
-                    if (query.list().size()>0)
-                        Toast.makeText(getApplicationContext(),getString(R.string.eroare_utilizator_deja_inregistrat), Toast.LENGTH_SHORT).show();
-                    else {
-                        //COSMIN - TO DO INSERARE STUDENT
+                    if (internetIsAvailable) {
+                        Toast.makeText(getApplicationContext(), "There is internet", Toast.LENGTH_SHORT).show();
+                        StudentService studentService = ServiceBuilder.buildService(StudentService.class);
+                        Call<Student> studentRequest = studentService.getStudentByUtilizator(utilizator.getText().toString());
+                        studentRequest.enqueue(new Callback<Student>() {
+                            @Override
+                            public void onResponse(Call<Student> call, Response<Student> response) {
+                                student = response.body();
+                            }
 
-                        Student student = new Student(utilizator.getText().toString(), nume.getText().toString(), prenume.getText().toString(),
-                                                      parola.getText().toString(), mail.getText().toString());
-                        DaoSession DaoSession =  ((App) getApplication()).getDaoSession();
-                        DaoSession.getStudentDao().insert( student );
+                            @Override
+                            public void onFailure(Call<Student> call, Throwable t) {
 
-                        setResult(RESULT_OK, intent);
-                        finish();
+                            }
+                        });
+
+                        if (student!=null)
+                            Toast.makeText(getApplicationContext(), getString(R.string.eroare_utilizator_deja_inregistrat), Toast.LENGTH_SHORT).show();
+                        else {
+                            Toast.makeText(getApplicationContext(), "se face request", Toast.LENGTH_SHORT).show();
+                            Student student = new Student(utilizator.getText().toString(), nume.getText().toString(), prenume.getText().toString(),
+                                    parola.getText().toString(), mail.getText().toString());
+
+                            Call<Student> insertStudentRequest = studentService.saveStudent(student);
+                            insertStudentRequest.enqueue(new Callback<Student>() {
+                                @Override
+                                public void onResponse(Call<Student> call, Response<Student> response) {
+                                    Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_SHORT).show();
+
+                                }
+
+                                @Override
+                                public void onFailure(Call<Student> call, Throwable t) {
+                                    Toast.makeText(getApplicationContext(), "Studentul nu a putut fi salvat", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "There is no internet", Toast.LENGTH_SHORT).show();
+                        StudentDao studentDao = ((App) getApplication()).getDaoSession().getStudentDao();
+                        Query<Student> query = studentDao.queryBuilder().where(
+                                StudentDao.Properties.Utilizator.eq(utilizator.getText())).build();
+                        if (query.list().size() > 0)
+                            Toast.makeText(getApplicationContext(), getString(R.string.eroare_utilizator_deja_inregistrat), Toast.LENGTH_SHORT).show();
+                        else {
+
+                            Student student = new Student(utilizator.getText().toString(), nume.getText().toString(), prenume.getText().toString(),
+                                    parola.getText().toString(), mail.getText().toString());
+                            DaoSession DaoSession = ((App) getApplication()).getDaoSession();
+                            DaoSession.getStudentDao().insert(student);
+
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
                     }
                 }
             }
@@ -110,3 +170,4 @@ public class ContActivity extends AppCompatActivity {
         });
     }
 }
+

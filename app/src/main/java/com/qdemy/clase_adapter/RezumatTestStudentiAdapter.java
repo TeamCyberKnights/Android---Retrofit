@@ -18,10 +18,17 @@ import com.qdemy.clase.Student;
 import com.qdemy.clase.StudentDao;
 import com.qdemy.clase.TestSustinut;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.StudentService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RezumatTestStudentiAdapter extends ArrayAdapter<RezultatTestStudent> {
 
@@ -31,6 +38,8 @@ public class RezumatTestStudentiAdapter extends ArrayAdapter<RezultatTestStudent
     private LayoutInflater inflater;
     private TestSustinut test;
     private RezumatTestActivity activity;
+    private Student student ;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public RezumatTestStudentiAdapter(@NonNull Context context, int resource,
                                       @NonNull List<RezultatTestStudent> objects, LayoutInflater inflater,
@@ -55,10 +64,30 @@ public class RezumatTestStudentiAdapter extends ArrayAdapter<RezultatTestStudent
 
         try {
             RezultatTestStudent rezultat = rezultate.get(position);
-            //COSMIN - TO DO SELECT STUDENT ASOCIAT REZULTATULUI TEST CURENT
-            Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
-                    StudentDao.Properties.Id.eq(rezultat.getStudentId())).build();
-            nume.setText(queryStudent.list().get(0).getNume() + " " + queryStudent.list().get(0).getPrenume());
+
+
+            if (networkConnectionService.isInternetAvailable()) {
+                StudentService studentService = ServiceBuilder.buildService(StudentService.class);
+                Call<Student> studentRequest = studentService.getStudentById((int)(long)rezultat.getStudentId());
+                studentRequest.enqueue(new Callback<Student>() {
+                    @Override
+                    public void onResponse(Call<Student> call, Response<Student> response) {
+                        student = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Student> call, Throwable t) {
+
+                    }
+                });
+                nume.setText(student.getNume() + " " + student.getPrenume());
+
+            } else {
+                Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
+                StudentDao.Properties.Id.eq(rezultat.getStudentId())).build();
+                nume.setText(queryStudent.list().get(0).getNume() + " " + queryStudent.list().get(0).getPrenume());
+
+            }
 
             float punctajStudent = ((App) activity.getApplication()).getPunctajTest(rezultat.getRaspunsuri());
             punctaj.setText(String.valueOf(punctajStudent));

@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qdemy.Constante;
 import com.qdemy.EditeazaTestActivity;
@@ -30,11 +31,18 @@ import com.qdemy.clase.TestDao;
 import com.qdemy.clase.TestPartajat;
 import com.qdemy.clase.TestPartajatDao;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TestePubliceAdapter extends ArrayAdapter<Test> {
 
@@ -44,6 +52,9 @@ public class TestePubliceAdapter extends ArrayAdapter<Test> {
     private ArrayList<Test> testeOriginal;
     private LayoutInflater inflater;
     private TestePubliceActivity activity;
+    private Profesor profesor;
+    private Profesor profesor2;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public TestePubliceAdapter(@NonNull Context context, int resource,
                        @NonNull List<Test> objects, LayoutInflater inflater,
@@ -62,29 +73,77 @@ public class TestePubliceAdapter extends ArrayAdapter<Test> {
 
 
     //filter
-    public void filter(String charText){
-        charText = charText.toLowerCase();
-        teste.clear();
-        if (charText.equals("")){
-            teste.addAll(testeOriginal);
-        }
-        else {
-            for (Test test : testeOriginal){
-                try {
-                    Query<Profesor> queryProfesor = ((App) activity.getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
-                            ProfesorDao.Properties.Id.eq(test.getProfesorId())).build();
-                    if (test.getNume().toLowerCase().contains(charText) ||
-                            test.getDescriere().toLowerCase().contains(charText) ||
-                            test.getMaterie().toLowerCase().contains(charText) ||
-                            queryProfesor.list().get(0).getNume().toLowerCase().contains(charText) ||
-                            queryProfesor.list().get(0).getPrenume().toLowerCase().contains(charText)) {
-                        teste.add(test);
+    public void filter(String charText) {
+
+        if (networkConnectionService.isInternetAvailable()) {
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+
+
+            charText = charText.toLowerCase();
+            teste.clear();
+
+
+            if (charText.equals("")) {
+                teste.addAll(testeOriginal);
+            } else {
+                for (Test test : testeOriginal) {
+                    try {
+                        final Call<Profesor> profesorRequest = profesorService
+                                .getProfesorById((int) (long) test.getProfesorId());
+                        profesorRequest.enqueue(new Callback<Profesor>() {
+                            @Override
+                            public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                                profesor = response.body();
+                            }
+
+                            @Override
+                            public void onFailure(Call<Profesor> call, Throwable t) {
+
+                            }
+                        });
+
+
+                        if (test.getNume().toLowerCase().contains(charText) ||
+                                test.getDescriere().toLowerCase().contains(charText) ||
+                                test.getMaterie().toLowerCase().contains(charText) ||
+                                profesor.getNume().toLowerCase().contains(charText) ||
+                                profesor.getPrenume().toLowerCase().contains(charText)) {
+                            teste.add(test);
+                        }
+                    } catch (Exception e) {
                     }
                 }
-                catch(Exception e) {}
             }
+            notifyDataSetChanged();
+
+
+        } else {
+
+
+            charText = charText.toLowerCase();
+            teste.clear();
+
+
+            if (charText.equals("")) {
+                teste.addAll(testeOriginal);
+            } else {
+                for (Test test : testeOriginal) {
+                    try {
+                        Query<Profesor> queryProfesor = ((App) activity.getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
+                                ProfesorDao.Properties.Id.eq(test.getProfesorId())).build();
+                        if (test.getNume().toLowerCase().contains(charText) ||
+                                test.getDescriere().toLowerCase().contains(charText) ||
+                                test.getMaterie().toLowerCase().contains(charText) ||
+                                queryProfesor.list().get(0).getNume().toLowerCase().contains(charText) ||
+                                queryProfesor.list().get(0).getPrenume().toLowerCase().contains(charText)) {
+                            teste.add(test);
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+            }
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
     }
 
 
@@ -105,11 +164,29 @@ public class TestePubliceAdapter extends ArrayAdapter<Test> {
             descriere.setText(teste.get(position).getDescriere());
             materie.setText(teste.get(position).getMaterie());
 
-            //COSMIN - TO DO SELECT PROFESOR AL TESTULUI PUBLIC
-            Query<Profesor> queryProfesor = ((App) activity.getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
-                    ProfesorDao.Properties.Id.eq(teste.get(position).getProfesorId())).build();
-            autor.setText(activity.getString(R.string.autor_test_public, queryProfesor.list().get(0).getNume(), queryProfesor.list().get(0).getPrenume()));
 
+            if (networkConnectionService.isInternetAvailable()) {
+                ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+                Call<Profesor> profesorRequest = profesorService.
+                        getProfesorById((int)(long)teste.get(position).getProfesorId());
+                profesorRequest.enqueue(new Callback<Profesor>() {
+                    @Override
+                    public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                        profesor2 = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Profesor> call, Throwable t) {
+
+                    }
+                });
+                autor.setText(activity.getString(R.string.autor_test_public, profesor2.getNume(), profesor2.getPrenume()));
+            } else {
+
+                Query<Profesor> queryProfesor = ((App) activity.getApplication()).getDaoSession().getProfesorDao().queryBuilder().where(
+                        ProfesorDao.Properties.Id.eq(teste.get(position).getProfesorId())).build();
+                autor.setText(activity.getString(R.string.autor_test_public, queryProfesor.list().get(0).getNume(), queryProfesor.list().get(0).getPrenume()));
+            }
 
             if (teste.get(position).getMaterie().equals(activity.getString(R.string.poo)))
                 logo.setImageResource(R.drawable.poo);

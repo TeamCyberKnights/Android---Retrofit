@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -32,12 +34,21 @@ import com.qdemy.clase.RezultatTestStudentDao;
 import com.qdemy.clase_adapter.RezultatStudentAdapter;
 import com.qdemy.clase_adapter.RezumatStudentAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.RaspunsIntrebareGrilaService;
+import com.qdemy.servicii.RezultatTestStudentService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class RezumatStudentActivity extends AppCompatActivity {
@@ -56,6 +67,10 @@ public class RezumatStudentActivity extends AppCompatActivity {
     private float gresite=0;
     private float partiale=0;
     private long rezultatId;
+    private RezultatTestStudent rezultatTestStudent;
+    private IntrebareGrila intrebareGrila;
+    private List<Profesor> profesori;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -66,7 +81,14 @@ public class RezumatStudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rezumat_student);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -86,29 +108,89 @@ public class RezumatStudentActivity extends AppCompatActivity {
         //region Initializare intrebari
         rezultatId = getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1);
 
-        //COSMIN - TO DO SELECT REZULTAT TEST STUDENT
+        if (internetIsAvailable) {
+            RezultatTestStudentService rezultatTestStudentService = ServiceBuilder.buildService(RezultatTestStudentService.class);
+            Call<RezultatTestStudent> rezultatTestStudentRequest = rezultatTestStudentService.getRezultatTestStudentById((int)(long)rezultatId);
+            rezultatTestStudentRequest.enqueue(new Callback<RezultatTestStudent>() {
+                @Override
+                public void onResponse(Call<RezultatTestStudent> call, Response<RezultatTestStudent> response) {
+                    rezultatTestStudent = response.body();
+                }
 
-        Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
-                RezultatTestStudentDao.Properties.Id.eq(rezultatId)).build();
+                @Override
+                public void onFailure(Call<RezultatTestStudent> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi rezultatul studentului", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        raspunsuri = queryRezultat.list().get(0).getRaspunsuri();
-        RezumatStudentAdapter adapter = new RezumatStudentAdapter(getApplicationContext(),
-                R.layout.item_text_text, raspunsuri, getLayoutInflater(), RezumatStudentActivity.this);
-        intrebariList.setAdapter(adapter);
 
-        for (RaspunsIntrebareGrila raspuns : raspunsuri ) {
+            RaspunsIntrebareGrilaService raspunsIntrebareGrilaService = ServiceBuilder.buildService(RaspunsIntrebareGrilaService.class);
+            Call<List<RaspunsIntrebareGrila>> raspunsuriIntrebareGrila = raspunsIntrebareGrilaService
+                    .getRaspunsIntrebareGrilaByRezultatTestStudentId((int)(long)rezultatTestStudent.getId());
+            raspunsuriIntrebareGrila.enqueue(new Callback<List<RaspunsIntrebareGrila>>() {
+                @Override
+                public void onResponse(Call<List<RaspunsIntrebareGrila>> call, Response<List<RaspunsIntrebareGrila>> response) {
+                    raspunsuri = response.body();
+                }
 
-            //COSMIN - TO DO SELECT INTREBARI DIN REZULTAT TEST STUDENT
+                @Override
+                public void onFailure(Call<List<RaspunsIntrebareGrila>> call, Throwable t) {
 
-            Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
-            if(raspuns.getPunctajObtinut()==0) gresite++;
-            else if (raspuns.getPunctajObtinut()==queryIntrebare.list().get(0).getDificultate()) corecte++;
-            else partiale++;
+                }
+            });
+
+
+            RezumatStudentAdapter adapter = new RezumatStudentAdapter(getApplicationContext(),
+                    R.layout.item_text_text, raspunsuri, getLayoutInflater(), RezumatStudentActivity.this);
+            intrebariList.setAdapter(adapter);
+
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+
+            for (RaspunsIntrebareGrila raspuns : raspunsuri ) {
+
+
+                Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService.getIntrebareGrilaById((int)(long)raspuns.getIntrebareId());
+                intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                    @Override
+                    public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                        intrebareGrila = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Nu s-a putut gasi intrebarea", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+                if(raspuns.getPunctajObtinut()==0) gresite++;
+                else if (raspuns.getPunctajObtinut()==intrebareGrila.getDificultate()) corecte++;
+                else partiale++;
+            }
+
+            setPieChart( raspunsuri.size());
+        } else {
+
+            Query<RezultatTestStudent> queryRezultat = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
+                    RezultatTestStudentDao.Properties.Id.eq(rezultatId)).build();
+
+            raspunsuri = queryRezultat.list().get(0).getRaspunsuri();
+            RezumatStudentAdapter adapter = new RezumatStudentAdapter(getApplicationContext(),
+                    R.layout.item_text_text, raspunsuri, getLayoutInflater(), RezumatStudentActivity.this);
+            intrebariList.setAdapter(adapter);
+
+            for (RaspunsIntrebareGrila raspuns : raspunsuri) {
+
+                Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                        IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+                if (raspuns.getPunctajObtinut() == 0) gresite++;
+                else if (raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate())
+                    corecte++;
+                else partiale++;
+            }
+
+            setPieChart(raspunsuri.size());
         }
-
-        setPieChart( raspunsuri.size());
-
         //endregion
 
         //region Meniu
@@ -149,10 +231,34 @@ public class RezumatStudentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
                 List<String> mailuriProfesori = new ArrayList<>();
-                for (Profesor profesor : query.list()) {
-                    mailuriProfesori.add(profesor.getMail());}
+
+                if (internetIsAvailable) {
+                    ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+                    Call<List<Profesor>> profesoriRequest = profesorService.getProfesori();
+                    profesoriRequest.enqueue(new Callback<List<Profesor>>() {
+                        @Override
+                        public void onResponse(Call<List<Profesor>> call, Response<List<Profesor>> response) {
+                            profesori = response.body();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Profesor>> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Nu s-au putut gasi profesori", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    for (Profesor profesor : profesori) {
+                        mailuriProfesori.add(profesor.getMail());}
+                } else {
+
+
+                    Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
+
+                    for (Profesor profesor : query.list()) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(R.string.alege_profesorul);

@@ -1,9 +1,13 @@
 package com.qdemy;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,12 +38,21 @@ import com.qdemy.clase.VariantaRaspunsDao;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.TestAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.EvidentaIntrebariTesteService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestPartajatService;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class TesteActivity extends AppCompatActivity {
@@ -56,7 +69,14 @@ public class TesteActivity extends AppCompatActivity {
     private SearchView cautaTest;
     private TestAdapter adapter;
     private List<Test> teste = new ArrayList<>();
+    private List<TestPartajat> testePartajate = new ArrayList<>();
+    private Test test;
     private Profesor profesor;
+    private List<EvidentaIntrebariTeste> evidentaIntrebariTeste;
+    private TestPartajat testPartajat;
+    private List<Test> testeAux;
+    private List<Test> testeAux2;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -67,7 +87,14 @@ public class TesteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teste);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -90,33 +117,93 @@ public class TesteActivity extends AppCompatActivity {
         //endregion
 
         //region Initializare intrebari
-        profesor = ((App) getApplication()).getProfesor();
+
+            profesor = ((App) getApplication()).getProfesor();
+
 
         materie = getIntent().getStringExtra(Constante.CHEIE_TRANSFER);
         materieTitlu.setText(materie);
 
         //incarcare teste proprii si partajate
-        //COSMIN - TO DO SELECT TESTELE PROFESORULUI + TESTELE PARTAJATE
-        for(int i=0;i<profesor.getTeste().size();i++)
-            if(profesor.getTeste(i).getMaterie().equals(materie))
-                teste.add(profesor.getTeste(i));
+        if (internetIsAvailable) {
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<List<Test>> testeRequest = testService.getTesteByProfesorId((int)(long)profesor.getId());
+            testeRequest.enqueue(new Callback<List<Test>>() {
+                @Override
+                public void onResponse(Call<List<Test>> call, Response<List<Test>> response) {
+                    testeAux = response.body();
+                }
 
-        Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
-                TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
-        for(int i=0;i<queryTestePartajate.list().size();i++) {
-            Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                    TestDao.Properties.Id.eq(queryTestePartajate.list().get(i).getTestId())).build();
-            if (queryTest.list().get(0).getMaterie().equals(materie))
-                teste.add(queryTest.list().get(0));
+                @Override
+                public void onFailure(Call<List<Test>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut gasi teste", Toast.LENGTH_SHORT).show();
+                }
+            });
+            for(int i=0;i<testeAux.size();i++)
+                if(testeAux.get(i).getMaterie().equals(materie))
+                    teste.add(testeAux.get(i));
+        } else {
+            for (int i = 0; i < profesor.getTeste().size(); i++)
+                if (profesor.getTeste(i).getMaterie().equals(materie))
+                    teste.add(profesor.getTeste(i));
         }
 
+        if (internetIsAvailable) {
+            TestPartajatService testPartajatService = ServiceBuilder.buildService(TestPartajatService.class);
+            Call<List<TestPartajat>> testePartajateRequest = testPartajatService.getTestePartajateByProfesorId((int) (long)profesor.getId());
+            testePartajateRequest.enqueue(new Callback<List<TestPartajat>>() {
+                @Override
+                public void onResponse(Call<List<TestPartajat>> call, Response<List<TestPartajat>> response) {
+                    testePartajate = response.body();
+                }
 
-        adapter = new TestAdapter(getApplicationContext(), R.layout.item_text_button_button,
-                teste, getLayoutInflater(), true, TesteActivity.this, profesor.getId());
-        testeList.setAdapter(adapter);
+                @Override
+                public void onFailure(Call<List<TestPartajat>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut gasi teste partajate", Toast.LENGTH_SHORT).show();
+                }
+            });
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+
+            for(int i=0;i<testePartajate.size();i++) {
+                Call<Test> testRequest = testService.getTestById((int)testePartajate.get(i).getTestId());
+                testRequest.enqueue(new Callback<Test>() {
+                    @Override
+                    public void onResponse(Call<Test> call, Response<Test> response) {
+                        test = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Test> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                if (test.getMaterie().equals(materie))
+                    teste.add(test);
+            }
+
+
+            adapter = new TestAdapter(getApplicationContext(), R.layout.item_text_button_button,
+                    teste, getLayoutInflater(), true, TesteActivity.this, profesor.getId());
+            testeList.setAdapter(adapter);
+
+        } else {
+            Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                    TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
+            for(int i=0;i<queryTestePartajate.list().size();i++) {
+                Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                        TestDao.Properties.Id.eq(queryTestePartajate.list().get(i).getTestId())).build();
+                if (queryTest.list().get(0).getMaterie().equals(materie))
+                    teste.add(queryTest.list().get(0));
+            }
+
+
+            adapter = new TestAdapter(getApplicationContext(), R.layout.item_text_button_button,
+                    teste, getLayoutInflater(), true, TesteActivity.this, profesor.getId());
+            testeList.setAdapter(adapter);
+
+        }
         //endregion
-
-
 
         adauga.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -216,16 +303,13 @@ public class TesteActivity extends AppCompatActivity {
 
     public void stergeTest(String numeTest)
     {
-        //selectare test
-        //COSMIN - TO DO SELECT TEST CURENT
+
+        // SQLLITE
         Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
                 TestDao.Properties.Nume.eq(numeTest),
                 TestDao.Properties.Materie.eq(materie),
                 TestDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
-
-        //stergere evidente intrebari test
-        //COSMIN - TO DO DELETE TEST DIN EVIDENTA TESTE
         Query<EvidentaIntrebariTeste> queryEvidenta = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao()
                 .queryBuilder().where(EvidentaIntrebariTesteDao.Properties.TestId.eq(queryTest.list().get(0).getId())).build();
 
@@ -233,8 +317,6 @@ public class TesteActivity extends AppCompatActivity {
             ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().deleteByKey(evidenta.getId()); }
 
 
-        //stergere test partajat
-        //COSMIN - TO DO DELETE TEST DIN TESTE PARTAJATE
         Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao()
                 .queryBuilder().where(TestPartajatDao.Properties.TestId.eq(queryTest.list().get(0).getId())).build();
 
@@ -242,29 +324,181 @@ public class TesteActivity extends AppCompatActivity {
             ((App) getApplication()).getDaoSession().getTestPartajatDao().deleteByKey(testPartajat.getId()); }
 
 
-        //actualizare profesor
-        //COSMIN - TO DO UPDATE PROFESOR CU LISTA FARA TESTUL DEJA STERS
         List<Test> testeActualizate = profesor.getTeste();
         testeActualizate.remove(queryTest.list().get(0));
         profesor.setTeste(testeActualizate);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
 
-
-        //COSMIN - TO DO UPDATE TEST CURENT CU ID-UL PROFESORULUI CU -1 (SA NU APARA NICIUNUI PROFESOR)
-        //NU se sterge testul ci doar se elimina id-ul profesorului
         queryTest.list().get(0).setProfesorId(-1);
         ((App) getApplication()).getDaoSession().getTestDao().update(queryTest.list().get(0));
+
+
+        // RETROFIT
+        if (internetIsAvailable) {
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<Test> testRequest = testService.getTestByNumeMaterieAndProfesorId(numeTest, materie, (int) (long)profesor.getId());
+            testRequest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    test = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
+                }
+            });
+            EvidentaIntrebariTesteService intrebariTesteService = ServiceBuilder.buildService(
+                    EvidentaIntrebariTesteService.class);
+            Call<List<EvidentaIntrebariTeste>> evidentaIntrebariTesteRequest = intrebariTesteService
+                    .getEvidentaIntrebariTesteByTestId((int) (long)test.getId());
+            evidentaIntrebariTesteRequest.enqueue(new Callback<List<EvidentaIntrebariTeste>>() {
+                @Override
+                public void onResponse(Call<List<EvidentaIntrebariTeste>> call, Response<List<EvidentaIntrebariTeste>> response) {
+                    evidentaIntrebariTeste = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<EvidentaIntrebariTeste>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi evidenta testelor", Toast.LENGTH_SHORT).show();
+                }
+            });
+            for ( EvidentaIntrebariTeste evidenta : evidentaIntrebariTeste) {
+                Call<EvidentaIntrebariTeste> deleteRequest = intrebariTesteService
+                        .deleteEvidentaIntrebariTesteById((int) (long)evidenta.getId());
+                deleteRequest.enqueue(new Callback<EvidentaIntrebariTeste>() {
+                    @Override
+                    public void onResponse(Call<EvidentaIntrebariTeste> call, Response<EvidentaIntrebariTeste> response) {
+                        Toast.makeText(getApplicationContext(), "Evidenta a fost stearsa cu succes", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvidentaIntrebariTeste> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Evidenta nu a putut fi stearsa", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            TestPartajatService testPartajatService = ServiceBuilder.buildService(TestPartajatService.class);
+            Call<List<TestPartajat>> testePartajateRequest = testPartajatService.getTestePartajatByTestId((int) (long)test.getId());
+            testePartajateRequest.enqueue(new Callback<List<TestPartajat>>() {
+                @Override
+                public void onResponse(Call<List<TestPartajat>> call, Response<List<TestPartajat>> response) {
+                    testePartajate = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<TestPartajat>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi teste partajate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            for ( TestPartajat testPartajat : testePartajate) {
+                Call<TestPartajat> deleteTestPartajatRequest = testPartajatService
+                        .deleteTestPartajatById((int) (long)testPartajat.getId());
+                deleteTestPartajatRequest.enqueue(new Callback<TestPartajat>() {
+                    @Override
+                    public void onResponse(Call<TestPartajat> call, Response<TestPartajat> response) {
+                        Toast.makeText(getApplicationContext(), "Testul partajat a fost sters cu succes", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Call<TestPartajat> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Testul partajat nu a putut fi fost sters", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+
+            Call<List<Test>> testeRequest =  testService.getTesteByProfesorId((int)(long)profesor.getId());
+            testeRequest.enqueue(new Callback<List<Test>>() {
+                @Override
+                public void onResponse(Call<List<Test>> call, Response<List<Test>> response) {
+                    testeAux2 = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<Test>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut gasi teste", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            testeActualizate =  testeAux2;
+            testeActualizate.remove(test);
+            profesor.setTeste(testeActualizate);
+
+
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+            Call<Profesor> updateProfesor = profesorService.updateProfesor((int) (long)profesor.getId(), profesor);
+            updateProfesor.enqueue(new Callback<Profesor>() {
+                @Override
+                public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                    Toast.makeText(getApplicationContext(), "Datele au fost modificate cu succes", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Profesor> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Datele nu au putut fi modificate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            test.setProfesorId(-1);
+            Call<Test> updateTest = testService.updateTest((int) (long)test.getId(), test);
+            updateTest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    Toast.makeText(getApplicationContext(), "Datele au fost modificate cu succes", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Datele nu au putut fi modificate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+
     }
 
-    public void stergeTestPartajat(Long id)
+    public void stergeTestPartajat(long id)
     {
-        //stergere test partajat
-        //COSMIN - TO DO SELECT + DELETE TEST PARTAJAT CURENT
+
+        // SQLITE
         Query<TestPartajat> queryTestePartajate = ((App) getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
                 TestPartajatDao.Properties.TestId.eq(id),
                 TestPartajatDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
         ((App) getApplication()).getDaoSession().getTestPartajatDao().deleteByKey(queryTestePartajate.list().get(0).getId());
 
+
+         // RETROFIT
+        TestPartajatService testPartajatService = ServiceBuilder.buildService(TestPartajatService.class);
+        Call<TestPartajat> testePartajateRequest = testPartajatService.getTestPartajatByTestIdAndProfesorId((int)id, (int) (long)profesor.getId());
+        testePartajateRequest.enqueue(new Callback<TestPartajat>() {
+            @Override
+            public void onResponse(Call<TestPartajat> call, Response<TestPartajat> response) {
+                testPartajat = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<TestPartajat> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Testul partajat nu a putut fi gasit", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Call<TestPartajat> deleteTestPartajat = testPartajatService.deleteTestPartajatById((int) (long)testPartajat.getId());
+        deleteTestPartajat.enqueue(new Callback<TestPartajat>() {
+            @Override
+            public void onResponse(Call<TestPartajat> call, Response<TestPartajat> response) {
+                Toast.makeText(getApplicationContext(), "Testul a fost sters cu succes", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<TestPartajat> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Testul nu a putut fi sters", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

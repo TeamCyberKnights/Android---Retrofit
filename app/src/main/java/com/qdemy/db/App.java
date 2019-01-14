@@ -19,16 +19,33 @@ import com.qdemy.clase.Student;
 import com.qdemy.clase.StudentDao;
 import com.qdemy.clase.Test;
 import com.qdemy.clase.TestDao;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.RezultatTestStudentService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.StudentService;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class App extends Application {
 
     private DaoSession mDaoSession;
+    private Profesor profesor;
+    private Student student;
+    private IntrebareGrila intrebareGrila;
+    private Test test;
+    private RezultatTestStudent rezultatTestStudent;
+    private IntrebareGrila intrebareGrila2;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     @Override
     public void onCreate() {
@@ -75,57 +92,146 @@ public class App extends Application {
 
     public Profesor getProfesor()
     {
-        //COSMIN - TO DO SELECT PROFESOR
 
         SharedPreferences sharedPreferences;
         sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
         String utilizator = sharedPreferences.getString(getString(R.string.utilizator), "");
 
-        Query<Profesor> query = getDaoSession().getProfesorDao().queryBuilder().where(
-                ProfesorDao.Properties.Utilizator.eq(utilizator)).build();
+        if (networkConnectionService.isInternetAvailable()) {
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+            final Call<Profesor> profesorRequest = profesorService.getProfesorByUtilizator(utilizator);
+            profesorRequest.enqueue(new Callback<Profesor>() {
+                @Override
+                public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                    profesor = response.body();
+                }
 
-        return query.list().get(0);
+                @Override
+                public void onFailure(Call<Profesor> call, Throwable t) {
+
+                }
+            });
+
+            return profesor;
+        } else {
+
+            Query<Profesor> query = getDaoSession().getProfesorDao().queryBuilder().where(
+                    ProfesorDao.Properties.Utilizator.eq(utilizator)).build();
+
+            return query.list().get(0);
+        }
     }
 
     public Student getStudent()
     {
-        //COSMIN - TO DO SELECT STUDENT
 
         SharedPreferences sharedPreferences;
         sharedPreferences = getSharedPreferences(Constante.FISIER_PREFERINTA_UTILIZATOR, MODE_PRIVATE);
         String utilizator = sharedPreferences.getString(getString(R.string.utilizator), "");
 
-        Query<Student> query = getDaoSession().getStudentDao().queryBuilder().where(
-                StudentDao.Properties.Utilizator.eq(utilizator)).build();
+        if (networkConnectionService.isInternetAvailable()) {
+            StudentService studentService = ServiceBuilder.buildService(StudentService.class);
+            Call<Student> studentRequest = studentService.getStudentByUtilizator(utilizator);
+            studentRequest.enqueue(new Callback<Student>() {
+                @Override
+                public void onResponse(Call<Student> call, Response<Student> response) {
+                    student = response.body();
+                }
 
-        return query.list().get(0);
+                @Override
+                public void onFailure(Call<Student> call, Throwable t) {
+
+                }
+            });
+            return student;
+        } else {
+            Query<Student> query = getDaoSession().getStudentDao().queryBuilder().where(
+                    StudentDao.Properties.Utilizator.eq(utilizator)).build();
+
+            return query.list().get(0);
+        }
     }
 
     public IntrebareGrila getIntrebareGrila(long idIntrebare)
     {
-        //COSMIN - TO DO SELECT INTREBARE CU ID-UL PRIMIT
+        if (networkConnectionService.isInternetAvailable()) {
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService
+                    .getIntrebareGrilaById((int)(long)idIntrebare);
+            intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                @Override
+                public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                 intrebareGrila = response.body();
+                }
 
-        Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                IntrebareGrilaDao.Properties.Id.eq(idIntrebare)).build();
-        return query.list().get(0);
+                @Override
+                public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+
+                }
+            });
+            return intrebareGrila;
+        } else {
+
+
+            Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                    IntrebareGrilaDao.Properties.Id.eq(idIntrebare)).build();
+            return query.list().get(0);
+        }
+
     }
 
     public Test getTest(long idTest)
     {
-        //COSMIN - TO DO SELECT TEST CU ID-UL PRIMIT
 
-        Query<Test> query = getDaoSession().getTestDao().queryBuilder().where(
-                TestDao.Properties.Id.eq(idTest)).build();
-        return query.list().get(0);
+        if (networkConnectionService.isInternetAvailable()) {
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<Test> testRequest = testService.getTestById((int)(long)idTest);
+            testRequest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    test = response.body();
+
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+
+                }
+            });
+            return test;
+        } else {
+
+            Query<Test> query = getDaoSession().getTestDao().queryBuilder().where(
+                    TestDao.Properties.Id.eq(idTest)).build();
+            return query.list().get(0);
+        }
     }
 
     public RezultatTestStudent getRezultatTest(long idRezultatTest)
     {
-        //COSMIN - TO DO SELECT REZULTAT TEST CU ID-UL PRIMIT
+        if (networkConnectionService.isInternetAvailable()) {
+            RezultatTestStudentService rezultatTestStudentService = ServiceBuilder.buildService(RezultatTestStudentService.class);
+            Call<RezultatTestStudent> rezultatTestStudentRequest = rezultatTestStudentService
+                    .getRezultatTestStudentById((int)(long)idRezultatTest);
+            rezultatTestStudentRequest.enqueue(new Callback<RezultatTestStudent>() {
+                @Override
+                public void onResponse(Call<RezultatTestStudent> call, Response<RezultatTestStudent> response) {
+                    rezultatTestStudent = response.body();
+                }
 
-        Query<RezultatTestStudent> query = getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
-                RezultatTestStudentDao.Properties.Id.eq(idRezultatTest)).build();
-        return query.list().get(0);
+                @Override
+                public void onFailure(Call<RezultatTestStudent> call, Throwable t) {
+
+                }
+            });
+            return rezultatTestStudent;
+        } else {
+            Query<RezultatTestStudent> query = getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
+                    RezultatTestStudentDao.Properties.Id.eq(idRezultatTest)).build();
+            return query.list().get(0);
+        }
+
+
     }
 
 
@@ -136,11 +242,31 @@ public class App extends Application {
         for (RaspunsIntrebareGrila raspuns: raspunsuri ) {
             punctaj += raspuns.getPunctajObtinut();
 
-            //COSMIN - TO DO SELECT INTREBARI CU ID-UL RASPUNSULUI CURENT
 
-            Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
-            punctajMaxim+=query.list().get(0).getDificultate();
+            if (networkConnectionService.isInternetAvailable()) {
+                IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+                Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService
+                        .getIntrebareGrilaById((int)(long)raspuns.getIntrebareId());
+                intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                    @Override
+                    public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                        intrebareGrila2 = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+
+                    }
+                });
+                punctajMaxim+=intrebareGrila2.getDificultate();
+
+            } else {
+
+
+                Query<IntrebareGrila> query = getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                        IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+                punctajMaxim += query.list().get(0).getDificultate();
+            }
         }
         float coef = 100/punctajMaxim;
         return punctaj*coef;
@@ -148,6 +274,10 @@ public class App extends Application {
 
     public Test getTestLive()
     {
+
+        // de luat id test ce ruleaza pe server dar mai ai nevoie de un param cu id prof  insa nu
+        // mai situ exact unde era apelata functia
+        // VEZI AICI
         // O SA DISPARA
         //COSMIN - TO DO ID-UL TESTULUI CURENT TREBUIE PRELUAT DE PE SERVER
 

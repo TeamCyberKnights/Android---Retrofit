@@ -22,11 +22,18 @@ import com.qdemy.clase.Test;
 import com.qdemy.clase.TestPartajat;
 import com.qdemy.clase.TestPartajatDao;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestPartajatService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TestAdapter extends ArrayAdapter<Test> {
 
@@ -39,6 +46,8 @@ public class TestAdapter extends ArrayAdapter<Test> {
     private TesteActivity activity;
     private long profesorId;
     private boolean estePartajat;
+    private TestPartajat testPartajat;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public TestAdapter(@NonNull Context context, int resource,
                        @NonNull List<Test> objects, LayoutInflater inflater, Boolean removable,
@@ -91,16 +100,38 @@ public class TestAdapter extends ArrayAdapter<Test> {
             nume.setText(teste.get(position).getNume());
 
             //verificare test partajat
-            //COSMIN - TO DO SELECT TEST PARTAJAT CURENT
-            Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
-                    TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
-                    TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
-            if (queryTestPartajat.list().size() < 1) {
-                partajat.setVisibility(View.INVISIBLE);
-                estePartajat = false;
+
+
+            if (networkConnectionService.isInternetAvailable()) {
+                TestPartajatService testPartajatService = ServiceBuilder.buildService(TestPartajatService.class);
+                Call<TestPartajat> testPartajatRequest = testPartajatService
+                        .getTestPartajatByTestIdAndProfesorId((int)(long)teste.get(position).getId(), (int)(long)profesorId);
+                testPartajatRequest.enqueue(new Callback<TestPartajat>() {
+                    @Override
+                    public void onResponse(Call<TestPartajat> call, Response<TestPartajat> response) {
+                        testPartajat = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<TestPartajat> call, Throwable t) {
+
+                    }
+                });
+                if (testPartajat==null) {
+                    partajat.setVisibility(View.INVISIBLE);
+                    estePartajat = false;
+                }
+            } else {
+
+                Query<TestPartajat> queryTestPartajat = ((App) activity.getApplication()).getDaoSession().getTestPartajatDao().queryBuilder().where(
+                        TestPartajatDao.Properties.TestId.eq(teste.get(position).getId()),
+                        TestPartajatDao.Properties.ProfesorId.eq(profesorId)).build();
+                if (queryTestPartajat.list().size() < 1) {
+                    partajat.setVisibility(View.INVISIBLE);
+                    estePartajat = false;
+                }
+
             }
-
-
             nume.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

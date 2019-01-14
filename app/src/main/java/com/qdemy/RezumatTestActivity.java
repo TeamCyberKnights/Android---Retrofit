@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
@@ -37,12 +40,19 @@ import com.qdemy.clase_adapter.RezumatStudentAdapter;
 import com.qdemy.clase_adapter.RezumatTestIntrebariAdapter;
 import com.qdemy.clase_adapter.RezumatTestStudentiAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
+import com.qdemy.servicii.TestSustinutService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class RezumatTestActivity extends AppCompatActivity {
@@ -64,9 +74,12 @@ public class RezumatTestActivity extends AppCompatActivity {
     private BarChart barchart;
     private RezumatTestStudentiAdapter adapterStudenti;
     private RezumatTestIntrebariAdapter adapterIntrebari;
+    private TestSustinut testSustinut;
+    private Test testAux;
 
     private long testSustinutId;
     private float[] note = new float[12];
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -77,7 +90,14 @@ public class RezumatTestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rezumat_test);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -98,119 +118,253 @@ public class RezumatTestActivity extends AppCompatActivity {
         //endregion
 
         testSustinutId = getIntent().getLongExtra(Constante.CHEIE_TRANSFER, -1);
-        //COSMIN - TO DO SELECT TESTUL SUSTINUT SELECTAT
-        final Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
-                TestSustinutDao.Properties.Id.eq(testSustinutId)).build();
 
-        //COSMIN - TO DO SELECT TEST AFERENT TESTULUI SUSTINUT
-        Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                TestDao.Properties.Id.eq(queryTestSustinut.list().get(0).getTestId())).build();
-
-        adapterStudenti = new RezumatTestStudentiAdapter(getApplicationContext(), R.layout.item_text_text,
-                queryTestSustinut.list().get(0).getRezultate(), getLayoutInflater(), RezumatTestActivity.this);
-        adapterIntrebari = new RezumatTestIntrebariAdapter(getApplicationContext(), R.layout.item_text_text,
-                queryTest.list().get(0).getIntrebari(), getLayoutInflater(), RezumatTestActivity.this, testSustinutId);
-        informatiiList.setAdapter(adapterStudenti);
-
-
-        //generare grafic
-        for ( RezultatTestStudent rezultat:queryTestSustinut.list().get(0).getRezultate()) {
-            note[(int)((App) getApplication()).getPunctajTest(rezultat.getRaspunsuri())]++;
-        }
-        setBarChart(queryTestSustinut.list().get(0).getRezultate().size());
-
-
-        optiuni.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                if(intrebariRadioButton.isChecked())
-                {
-                    scor.setText(getString(R.string.corecte));
-                    nume.setText(getString(R.string.ntrebare));
-                    informatiiList.setAdapter(adapterIntrebari);
+        if (internetIsAvailable) {
+            TestSustinutService testSustinutService = ServiceBuilder.buildService(TestSustinutService.class);
+            Call<TestSustinut> testSustinutRequest = testSustinutService.getTestSustinutById((int)(long)testSustinutId);
+            testSustinutRequest.enqueue(new Callback<TestSustinut>() {
+                @Override
+                public void onResponse(Call<TestSustinut> call, Response<TestSustinut> response) {
+                    testSustinut = response.body();
                 }
-                else
-                {
-                    scor.setText(getString(R.string.punctaj));
-                    nume.setText(getString(R.string.Nume_student1));
-                    informatiiList.setAdapter(adapterStudenti);
+
+                @Override
+                public void onFailure(Call<TestSustinut> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
                 }
+            });
+
+            TestService testService = ServiceBuilder.buildService(TestService.class);
+            Call<Test> testRequest = testService.getTestByTestSustinutId((int)(long)testSustinutId);
+            testRequest.enqueue(new Callback<Test>() {
+                @Override
+                public void onResponse(Call<Test> call, Response<Test> response) {
+                    testAux = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<Test> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi testul", Toast.LENGTH_SHORT).show();
+                }
+            });
+            adapterStudenti = new RezumatTestStudentiAdapter(getApplicationContext(), R.layout.item_text_text,
+                    testSustinut.getRezultate(), getLayoutInflater(), RezumatTestActivity.this);
+            adapterIntrebari = new RezumatTestIntrebariAdapter(getApplicationContext(), R.layout.item_text_text,
+                    testAux.getIntrebari(), getLayoutInflater(), RezumatTestActivity.this, testSustinutId);
+            informatiiList.setAdapter(adapterStudenti);
+
+            //generare grafic
+            for ( RezultatTestStudent rezultat:testSustinut.getRezultate()) {
+                note[(int)((App) getApplication()).getPunctajTest(rezultat.getRaspunsuri())]++;
             }
-        });
+            setBarChart(testSustinut.getRezultate().size());
 
-        informatiiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(studentiRadioButton.isChecked()) {
-                    Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
-                    intent.putExtra(Constante.CHEIE_TRANSFER, queryTestSustinut.list().get(0).getRezultat(position).getId());
-                    startActivity(intent);
-                    finish();
+
+            optiuni.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                    if(intrebariRadioButton.isChecked())
+                    {
+                        scor.setText(getString(R.string.corecte));
+                        nume.setText(getString(R.string.ntrebare));
+                        informatiiList.setAdapter(adapterIntrebari);
+                    }
+                    else
+                    {
+                        scor.setText(getString(R.string.punctaj));
+                        nume.setText(getString(R.string.Nume_student1));
+                        informatiiList.setAdapter(adapterStudenti);
+                    }
                 }
-            }
-        });
+            });
 
-        //region Meniu
-
-        inapoi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(v.getContext());
-                dlgAlert.setMessage(R.string.deconectare_message);
-                dlgAlert.setTitle(R.string.deconectare_title);
-                dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            informatiiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if(studentiRadioButton.isChecked()) {
+                        Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
+                        intent.putExtra(Constante.CHEIE_TRANSFER, testSustinut.getRezultat(position).getId());
                         startActivity(intent);
                         finish();
                     }
-                });
-                dlgAlert.setNegativeButton(R.string.nu, null);
-                dlgAlert.setCancelable(true);
-                AlertDialog dialog = dlgAlert.create();
-                dialog.show();
-                dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
-            }
-        });
+                }
+            });
 
-        acasa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+            //region Meniu
 
-        testeleMele.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
-                startActivity(intent);
-                finish();
-            }
-        });
+            inapoi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(v.getContext());
+                    dlgAlert.setMessage(R.string.deconectare_message);
+                    dlgAlert.setTitle(R.string.deconectare_title);
+                    dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    dlgAlert.setNegativeButton(R.string.nu, null);
+                    dlgAlert.setCancelable(true);
+                    AlertDialog dialog = dlgAlert.create();
+                    dialog.show();
+                    dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
+                }
+            });
 
-        intrebarileMele.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
-                startActivity(intent);
-                finish();
-            }
-        });
+            acasa.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
 
-        istoric.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
-                startActivity(intent);
-                finish();
+            testeleMele.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            intrebarileMele.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            istoric.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+
+        } else {
+
+            final Query<TestSustinut> queryTestSustinut = ((App) getApplication()).getDaoSession().getTestSustinutDao().queryBuilder().where(
+                    TestSustinutDao.Properties.Id.eq(testSustinutId)).build();
+
+
+            Query<Test> queryTest = ((App) getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                    TestDao.Properties.Id.eq(queryTestSustinut.list().get(0).getTestId())).build();
+
+            adapterStudenti = new RezumatTestStudentiAdapter(getApplicationContext(), R.layout.item_text_text,
+                    queryTestSustinut.list().get(0).getRezultate(), getLayoutInflater(), RezumatTestActivity.this);
+            adapterIntrebari = new RezumatTestIntrebariAdapter(getApplicationContext(), R.layout.item_text_text,
+                    queryTest.list().get(0).getIntrebari(), getLayoutInflater(), RezumatTestActivity.this, testSustinutId);
+            informatiiList.setAdapter(adapterStudenti);
+
+
+            //generare grafic
+            for ( RezultatTestStudent rezultat:queryTestSustinut.list().get(0).getRezultate()) {
+                note[(int)((App) getApplication()).getPunctajTest(rezultat.getRaspunsuri())]++;
             }
-        });
+            setBarChart(queryTestSustinut.list().get(0).getRezultate().size());
+
+            optiuni.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                    if (intrebariRadioButton.isChecked()) {
+                        scor.setText(getString(R.string.corecte));
+                        nume.setText(getString(R.string.ntrebare));
+                        informatiiList.setAdapter(adapterIntrebari);
+                    } else {
+                        scor.setText(getString(R.string.punctaj));
+                        nume.setText(getString(R.string.Nume_student1));
+                        informatiiList.setAdapter(adapterStudenti);
+                    }
+                }
+            });
+
+            informatiiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (studentiRadioButton.isChecked()) {
+                        Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
+                        intent.putExtra(Constante.CHEIE_TRANSFER, queryTestSustinut.list().get(0).getRezultat(position).getId());
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            });
+
+            //region Meniu
+
+            inapoi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(v.getContext());
+                    dlgAlert.setMessage(R.string.deconectare_message);
+                    dlgAlert.setTitle(R.string.deconectare_title);
+                    dlgAlert.setPositiveButton(R.string.da, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    dlgAlert.setNegativeButton(R.string.nu, null);
+                    dlgAlert.setCancelable(true);
+                    AlertDialog dialog = dlgAlert.create();
+                    dialog.show();
+                    dialog.getWindow().setBackgroundDrawableResource(R.color.bej);
+                }
+            });
+
+            acasa.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), ProfesorActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            testeleMele.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.testele_mele));
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            intrebarileMele.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), MateriiActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, getString(R.string.ntreb_rile_mele));
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            istoric.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), IstoricProfesorActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
 
         //endregion
 

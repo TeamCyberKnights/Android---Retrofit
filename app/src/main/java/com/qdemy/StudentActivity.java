@@ -3,6 +3,8 @@ package com.qdemy;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,12 +20,18 @@ import com.qdemy.clase.Profesor;
 import com.qdemy.clase.ProfesorDao;
 import com.qdemy.clase.Student;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class StudentActivity extends AppCompatActivity {
@@ -33,6 +41,8 @@ public class StudentActivity extends AppCompatActivity {
     private ImageView mail;
     private ImageView istoric;
     private ImageView testePublice;
+    private List<Profesor> profesori;
+    private boolean internetIsAvailable;
 
     private Student student;
 
@@ -45,7 +55,14 @@ public class StudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -108,10 +125,36 @@ public class StudentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
                 List<String> mailuriProfesori = new ArrayList<>();
-                for (Profesor profesor : query.list()) {
-                    mailuriProfesori.add(profesor.getMail());}
+
+                if (internetIsAvailable) {
+                    ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+                    Call<List<Profesor>> profesorsRequest = profesorService.getProfesori();
+                    profesorsRequest.enqueue(new Callback<List<Profesor>>() {
+                        @Override
+                        public void onResponse(Call<List<Profesor>> call, Response<List<Profesor>> response) {
+                            profesori = response.body();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Profesor>> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Nu s-au putut gasi profesori", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    for (Profesor profesor : profesori) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+
+                }
+                else {
+                    Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
+                    for (Profesor profesor : query.list()) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+                }
+
+
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(R.string.alege_profesorul);

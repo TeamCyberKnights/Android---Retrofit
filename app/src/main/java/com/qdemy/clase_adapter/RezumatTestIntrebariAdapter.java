@@ -19,10 +19,19 @@ import com.qdemy.clase.RezultatTestStudentDao;
 import com.qdemy.clase.Student;
 import com.qdemy.clase.TestSustinut;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.RaspunsIntrebareGrilaService;
+import com.qdemy.servicii.RezultatTestStudentService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
 
@@ -33,6 +42,9 @@ public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
     private TestSustinut test;
     private RezumatTestActivity activity;
     private long testSustinutId;
+    private List<RezultatTestStudent> rezultateTestStudent;
+    private RaspunsIntrebareGrila raspunsIntrebareGrila;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public RezumatTestIntrebariAdapter(@NonNull Context context, int resource,
                                        @NonNull List<IntrebareGrila> objects, LayoutInflater inflater,
@@ -61,18 +73,60 @@ public class RezumatTestIntrebariAdapter extends ArrayAdapter<IntrebareGrila> {
             IntrebareGrila intrebare = intrebari.get(position);
             nume.setText(intrebare.getText());
 
-            //COSMIN - TO DO SELECT REZULTAT TEST STUDENT CURENT
-            Query<RezultatTestStudent> queryRezultate = ((App) activity.getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
-                    RezultatTestStudentDao.Properties.Id.eq(testSustinutId)).build();
-            for (RezultatTestStudent rezultat : queryRezultate.list()) {
-                //COSMIN - TO DO SELECT RASPUNS INTREBARE GRILA CURENTA
-                Query<RaspunsIntrebareGrila> queryRaspuns = ((App) activity.getApplication()).getDaoSession().getRaspunsIntrebareGrilaDao().queryBuilder().where(
-                        RaspunsIntrebareGrilaDao.Properties.IntrebareId.eq(intrebare.getId()),
-                        RaspunsIntrebareGrilaDao.Properties.RezultatTestStudentId.eq(rezultat.getId())).build();
-                if (queryRaspuns.list().get(0).getPunctajObtinut() == intrebare.getDificultate())
-                    nrCorecte++;
+
+            if (networkConnectionService.isInternetAvailable()) {
+                RezultatTestStudentService rezultatTestStudentService = ServiceBuilder.buildService(RezultatTestStudentService.class);
+                Call<List<RezultatTestStudent>> rezultateTesteStudentRequest = rezultatTestStudentService
+                        .getRezultateTesteStudentByTestSustinutId((int) (long) testSustinutId);
+                rezultateTesteStudentRequest.enqueue(new Callback<List<RezultatTestStudent>>() {
+                    @Override
+                    public void onResponse(Call<List<RezultatTestStudent>> call, Response<List<RezultatTestStudent>> response) {
+                        rezultateTestStudent = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<RezultatTestStudent>> call, Throwable t) {
+
+                    }
+                });
+
+                for (RezultatTestStudent rezultat : rezultateTestStudent) {
+
+
+                    RaspunsIntrebareGrilaService raspunsIntrebareGrilaService = ServiceBuilder.buildService(RaspunsIntrebareGrilaService.class);
+                    Call<RaspunsIntrebareGrila> raspunsIntrebareGrilaRequest = raspunsIntrebareGrilaService
+                            .getRaspunsIntrebareGrilaByIntrebareIdAndRezultatTestStudentId((int) (long) intrebare.getId(), (int) (long) rezultat.getId());
+                    raspunsIntrebareGrilaRequest.enqueue(new Callback<RaspunsIntrebareGrila>() {
+                        @Override
+                        public void onResponse(Call<RaspunsIntrebareGrila> call, Response<RaspunsIntrebareGrila> response) {
+                            raspunsIntrebareGrila = response.body();
+                        }
+
+                        @Override
+                        public void onFailure(Call<RaspunsIntrebareGrila> call, Throwable t) {
+
+                        }
+                    });
+
+
+                    if (raspunsIntrebareGrila.getPunctajObtinut() == intrebare.getDificultate())
+                        nrCorecte++;
+                }
+                corecte.setText(nrCorecte + "/" + rezultateTestStudent.size());
+            } else {
+
+                Query<RezultatTestStudent> queryRezultate = ((App) activity.getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
+                        RezultatTestStudentDao.Properties.Id.eq(testSustinutId)).build();
+                for (RezultatTestStudent rezultat : queryRezultate.list()) {
+
+                    Query<RaspunsIntrebareGrila> queryRaspuns = ((App) activity.getApplication()).getDaoSession().getRaspunsIntrebareGrilaDao().queryBuilder().where(
+                            RaspunsIntrebareGrilaDao.Properties.IntrebareId.eq(intrebare.getId()),
+                            RaspunsIntrebareGrilaDao.Properties.RezultatTestStudentId.eq(rezultat.getId())).build();
+                    if (queryRaspuns.list().get(0).getPunctajObtinut() == intrebare.getDificultate())
+                        nrCorecte++;
+                }
+                corecte.setText(nrCorecte + "/" + queryRezultate.list().size());
             }
-            corecte.setText(nrCorecte + "/" + queryRezultate.list().size());
         }
         catch (Exception e) {}
 

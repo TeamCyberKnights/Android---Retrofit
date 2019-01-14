@@ -19,10 +19,17 @@ import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.RaspunsIntrebareGrila;
 import com.qdemy.clase.RezultatTestStudent;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RezumatTestStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
@@ -31,6 +38,8 @@ public class RezumatTestStudentAdapter extends ArrayAdapter<RaspunsIntrebareGril
     private List<RaspunsIntrebareGrila> raspunsuri;
     private LayoutInflater inflater;
     private RezumatTestStudentActivity activity;
+    private IntrebareGrila intrebareGrila;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
 
     public RezumatTestStudentAdapter(@NonNull Context context, int resource,
                                  @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater,
@@ -55,15 +64,37 @@ public class RezumatTestStudentAdapter extends ArrayAdapter<RaspunsIntrebareGril
 
         try {
             final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
-            //COSMIN - TO DO SELECT INTREBARE GRILA CURENTA
-            Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
 
-            nume.setText(queryIntrebare.list().get(0).getText());
-            punctaj.setText(String.valueOf(raspuns.getPunctajObtinut()));
-            punctaj.setTextColor(raspuns.getPunctajObtinut() == 0 ? ContextCompat.getColor(rand.getContext(), R.color.rosu) :
-                    raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? ContextCompat.getColor(rand.getContext(), R.color.verde) :
-                            ContextCompat.getColor(rand.getContext(), R.color.galben));
+            if (networkConnectionService.isInternetAvailable()) {
+                IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+                final Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService.getIntrebareGrilaById((int)(long)raspuns.getIntrebareId());
+                intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                    @Override
+                    public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                        intrebareGrila = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+
+                    }
+                });
+                nume.setText(intrebareGrila.getText());
+                punctaj.setText(String.valueOf(raspuns.getPunctajObtinut()));
+                punctaj.setTextColor(raspuns.getPunctajObtinut() == 0 ? ContextCompat.getColor(rand.getContext(), R.color.rosu) :
+                        raspuns.getPunctajObtinut() == intrebareGrila.getDificultate() ? ContextCompat.getColor(rand.getContext(), R.color.verde) :
+                                ContextCompat.getColor(rand.getContext(), R.color.galben));
+            } else {
+                Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                        IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+                nume.setText(queryIntrebare.list().get(0).getText());
+                punctaj.setText(String.valueOf(raspuns.getPunctajObtinut()));
+                punctaj.setTextColor(raspuns.getPunctajObtinut() == 0 ? ContextCompat.getColor(rand.getContext(), R.color.rosu) :
+                        raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? ContextCompat.getColor(rand.getContext(), R.color.verde) :
+                                ContextCompat.getColor(rand.getContext(), R.color.galben));
+            }
+
+
         }
         catch (Exception e) {}
 

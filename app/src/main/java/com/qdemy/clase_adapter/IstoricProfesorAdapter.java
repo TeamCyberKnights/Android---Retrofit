@@ -18,10 +18,17 @@ import com.qdemy.clase.Test;
 import com.qdemy.clase.TestDao;
 import com.qdemy.clase.TestSustinut;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.TestService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class IstoricProfesorAdapter extends ArrayAdapter<TestSustinut> {
 
@@ -30,6 +37,9 @@ public class IstoricProfesorAdapter extends ArrayAdapter<TestSustinut> {
     private List<TestSustinut> teste;
     private LayoutInflater inflater;
     private IstoricProfesorActivity activity;
+    private Test test2;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
+
 
     public IstoricProfesorAdapter(@NonNull Context context, int resource,
                             @NonNull List<TestSustinut> objects, LayoutInflater inflater,
@@ -55,13 +65,32 @@ public class IstoricProfesorAdapter extends ArrayAdapter<TestSustinut> {
 
         try {
             final TestSustinut test = teste.get(position);
-            //COSMIN - TO DO SELECT TEST CURENT
-            Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
-                    TestDao.Properties.Id.eq(test.getTestId())).build();
 
-            nume.setText(queryTest.list().get(0).getNume());
-            data.setText(test.getData());
-            media.setText(String.valueOf(test.getMedia()));
+            if (networkConnectionService.isInternetAvailable()) {
+                TestService testService = ServiceBuilder.buildService(TestService.class);
+                Call<Test> testRequest = testService.getTestById((int) (long) test.getTestId());
+                testRequest.enqueue(new Callback<Test>() {
+                    @Override
+                    public void onResponse(Call<Test> call, Response<Test> response) {
+                        test2 = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Test> call, Throwable t) {
+
+                    }
+                });
+                nume.setText(test2.getNume());
+                data.setText(test.getData());
+                media.setText(String.valueOf(test.getMedia()));
+            } else {
+                Query<Test> queryTest = ((App) activity.getApplication()).getDaoSession().getTestDao().queryBuilder().where(
+                        TestDao.Properties.Id.eq(test.getTestId())).build();
+
+                nume.setText(queryTest.list().get(0).getNume());
+                data.setText(test.getData());
+                media.setText(String.valueOf(test.getMedia()));
+            }
         }
         catch (Exception e) {}
 

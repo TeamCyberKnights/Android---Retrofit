@@ -17,10 +17,17 @@ import com.qdemy.clase.IntrebareGrilaDao;
 import com.qdemy.clase.RaspunsIntrebareGrila;
 import com.qdemy.clase.RezultatTestStudent;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> {
 
@@ -29,6 +36,9 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
     private List<RaspunsIntrebareGrila> raspunsuri;
     private LayoutInflater inflater;
     private RezultatStudentActivity activity;
+    private IntrebareGrila intrebareGrila;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
+
 
     public RezultatStudentAdapter(@NonNull Context context, int resource,
                                   @NonNull List<RaspunsIntrebareGrila> objects, LayoutInflater inflater,
@@ -53,13 +63,36 @@ public class RezultatStudentAdapter extends ArrayAdapter<RaspunsIntrebareGrila> 
 
         try {
             final RaspunsIntrebareGrila raspuns = raspunsuri.get(position);
-            //COSMIN - TO DO SELECT INTREBARE CURENTA
-            Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
-                    IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
-            nume.setText(queryIntrebare.list().get(0).getText());
-            corect.setBackgroundResource(raspuns.getPunctajObtinut() == 0 ? R.drawable.ic_picat :
-                    raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? R.drawable.ic_promovat :
-                            R.drawable.ic_mediu);
+
+
+            if (networkConnectionService.isInternetAvailable()) {
+                IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+                final Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService.getIntrebareGrilaById((int) (long) raspuns.getIntrebareId());
+                intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                    @Override
+                    public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                        intrebareGrila = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+
+                    }
+                });
+                nume.setText(intrebareGrila.getText());
+                corect.setBackgroundResource(raspuns.getPunctajObtinut() == 0 ? R.drawable.ic_picat :
+                        raspuns.getPunctajObtinut() == intrebareGrila.getDificultate() ? R.drawable.ic_promovat :
+                                R.drawable.ic_mediu);
+            } else {
+
+
+                Query<IntrebareGrila> queryIntrebare = ((App) activity.getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
+                        IntrebareGrilaDao.Properties.Id.eq(raspuns.getIntrebareId())).build();
+                nume.setText(queryIntrebare.list().get(0).getText());
+                corect.setBackgroundResource(raspuns.getPunctajObtinut() == 0 ? R.drawable.ic_picat :
+                        raspuns.getPunctajObtinut() == queryIntrebare.list().get(0).getDificultate() ? R.drawable.ic_promovat :
+                                R.drawable.ic_mediu);
+            }
         }
         catch (Exception e) {}
 

@@ -3,6 +3,8 @@ package com.qdemy;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,12 +26,20 @@ import com.qdemy.clase.Profesor;
 import com.qdemy.clase.VariantaRaspuns;
 import com.qdemy.clase.VariantaRaspunsDao;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.VariantaRaspunsService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class EditeazaIntrebareActivity extends AppCompatActivity {
@@ -58,6 +68,9 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
     private List<VariantaRaspuns> varianteRaspuns = new ArrayList<>();
     private List<Boolean> raspunsuri = new ArrayList<>();
     private SharedPreferences sharedPreferences;
+    private List<VariantaRaspuns> varianteRaspuns2;
+    private IntrebareGrila intrebareGrila;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -68,7 +81,14 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editeaza_intrebare);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -307,7 +327,131 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
     private void actualizeazaIntrebare() {
 
-        //COSMIN - TO DO SELECT VARIANTELE RASPUNS ALE INTREBARII CURENTE
+
+        if (internetIsAvailable) {
+            VariantaRaspunsService variantaRaspunsService = ServiceBuilder.buildService(VariantaRaspunsService.class);
+            Call<List<VariantaRaspuns>> varianteRaspunsRequest = variantaRaspunsService.getVarianteRaspunsByIntrebareId((int)(long)intrebare.getId());
+            varianteRaspunsRequest.enqueue(new Callback<List<VariantaRaspuns>>() {
+                @Override
+                public void onResponse(Call<List<VariantaRaspuns>> call, Response<List<VariantaRaspuns>> response) {
+                    varianteRaspuns2 = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<VariantaRaspuns>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Variantele de raspuns nu au putut fi gasite", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            List<VariantaRaspuns> varianteRaspunsActualizate = new ArrayList<>();
+            //preluare variante care NU se modifica + stergere variante care nu exista
+            for ( VariantaRaspuns varianta : varianteRaspuns2) {
+                boolean exista = false;
+                for (int i = 0; i < varianteRaspuns.size(); i++)
+                    if (varianta.getText().equals(varianteRaspuns.get(i).getText()) &&
+                            varianta.getCorect() == varianteRaspuns.get(i).getCorect())
+                    { varianteRaspunsActualizate.add(varianteRaspuns.get(i));
+                        exista = true; break;}
+                if(exista==false)
+                {
+                    Call<VariantaRaspuns> deleteVariantaRaspuns = variantaRaspunsService.deleteVariantaRaspunsById((int)(long)varianta.getId());
+                    deleteVariantaRaspuns.enqueue(new Callback<VariantaRaspuns>() {
+                        @Override
+                        public void onResponse(Call<VariantaRaspuns> call, Response<VariantaRaspuns> response) {
+                            Toast.makeText(getApplicationContext(), "Varianta de raspuns a fost stearsa cu succes", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<VariantaRaspuns> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Varianta de raspuns nu a putut fi stearsa", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+            }
+            //preluare variante care se modifica + adaugare in bd
+            for ( VariantaRaspuns varianta : varianteRaspuns) {
+                boolean exista = false;
+                for (int i = 0; i < varianteRaspunsActualizate.size(); i++)
+                    if (varianta.getText().equals(varianteRaspunsActualizate.get(i).getText()) &&
+                            varianta.getCorect() == varianteRaspunsActualizate.get(i).getCorect())
+                        exista=true;
+                if(exista==false) {
+                    varianteRaspunsActualizate.add(varianta);
+
+                    Call<VariantaRaspuns> insertVariantaRaspuns = variantaRaspunsService
+                            .saveVariantaRaspuns(new VariantaRaspuns(varianta.getText(), varianta.getCorect(), intrebare.getId()));
+                    insertVariantaRaspuns.enqueue(new Callback<VariantaRaspuns>() {
+                        @Override
+                        public void onResponse(Call<VariantaRaspuns> call, Response<VariantaRaspuns> response) {
+                            Toast.makeText(getApplicationContext(), "Varianta de raspuns a fost salvata cu succes", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<VariantaRaspuns> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Varianta de raspuns nu a putut fi salvata", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+
+            //actualizare intrebare
+
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            final Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService.getIntrebareGrilaById((int)(long)intrebare.getId());
+            intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                @Override
+                public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                    intrebareGrila = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea nu a putut fi gasita", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+
+            IntrebareGrila intrebareDeActualizat = intrebareGrila ;
+            intrebareDeActualizat.setText(text.getText().toString());
+            intrebareDeActualizat.setDificultate(dificultatiSpinner.getSelectedItemPosition()+1);
+            intrebareDeActualizat.setVariante(varianteRaspunsActualizate);
+
+            Call<IntrebareGrila> updateIntrebareGrila = intrebareGrilaService.updateIntrebareGrila((int)(long)intrebareDeActualizat.getId(), intrebare);
+            updateIntrebareGrila.enqueue(new Callback<IntrebareGrila>() {
+                @Override
+                public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea a fost actualizata", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea nu a putut fi actualizata", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            //actualizare profesor
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+            Call<Profesor> updateProfesorRequest = profesorService.updateProfesor((int)(long)profesor.getId(), profesor);
+            updateProfesorRequest.enqueue(new Callback<Profesor>() {
+                @Override
+                public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                    Toast.makeText(getApplicationContext(), "Datele au fost actualizate", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Profesor> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Datele nu au putut fi actualizate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+
+
         Query<VariantaRaspuns> queryVarianteRaspuns = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao().queryBuilder().where(
                 VariantaRaspunsDao.Properties.IntrebareId.eq(intrebare.getId())).build();
 
@@ -339,19 +483,19 @@ public class EditeazaIntrebareActivity extends AppCompatActivity {
 
         /////////////////// stergere variante
 
-        //COSMIN - TO DO SELECT INTREBARE CURENTA
+
         //actualizare intrebare
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Id.eq(intrebare.getId())).build();
 
-        //COSMIN - TO DO UPDATE INTREBARE CU NOUA LISTA DE VARIANTE RASPUNS
+
         IntrebareGrila intrebareDeActualizat = queryIntrebare.list().get(0);
         intrebareDeActualizat.setText(text.getText().toString());
         intrebareDeActualizat.setDificultate(dificultatiSpinner.getSelectedItemPosition()+1);
         intrebareDeActualizat.setVariante(varianteRaspunsActualizate);
         ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().update(intrebare);
 
-        //COSMIN - TO DO UPDATE PROFESOR CU INTREBAREA ACTUALIZATA
+
         //actualizare profesor
         profesor.setIntrebare(intrebareDeActualizat);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);

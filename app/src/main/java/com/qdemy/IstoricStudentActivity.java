@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -32,12 +34,19 @@ import com.qdemy.clase.Student;
 import com.qdemy.clase_adapter.IstoricProfesorAdapter;
 import com.qdemy.clase_adapter.IstoricStudentAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.RezultatTestStudentService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class IstoricStudentActivity extends AppCompatActivity {
@@ -51,8 +60,9 @@ public class IstoricStudentActivity extends AppCompatActivity {
     private PieChart pieChart;
     public float promovate=0;
     public float picate=0;
-
-    private Student student;
+    private List<RezultatTestStudent> rezultateTesteStudent;
+    private List<Profesor> profesori;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -63,7 +73,14 @@ public class IstoricStudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_istoric_student);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
 
     }
@@ -82,37 +99,79 @@ public class IstoricStudentActivity extends AppCompatActivity {
         //region Initializare teste
         Student student = ((App) getApplication()).getStudent();
 
-        //COSMIN - TO DO SELECT REZULTATELE TESTELOR STUDENTULUI
+        if (internetIsAvailable) {
+            RezultatTestStudentService rezultatTestStudentService = ServiceBuilder.buildService(RezultatTestStudentService.class);
+            final Call<List<RezultatTestStudent>> rezultatTestStudentRequest = rezultatTestStudentService.getRezultateTesteStudentByStudentId((int) (long) student.getId());
+            rezultatTestStudentRequest.enqueue(new Callback<List<RezultatTestStudent>>() {
+                @Override
+                public void onResponse(Call<List<RezultatTestStudent>> call, Response<List<RezultatTestStudent>> response) {
+                    rezultateTesteStudent = response.body();
+                }
 
-        final Query<RezultatTestStudent> queryRezultateTeste = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
-                RezultatTestStudentDao.Properties.StudentId.eq(student.getId())).build();
+                @Override
+                public void onFailure(Call<List<RezultatTestStudent>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-a putut gasi rezultatul studentului", Toast.LENGTH_SHORT).show();
+                }
 
-        IstoricStudentAdapter adapter = new IstoricStudentAdapter(getApplicationContext(),
-                R.layout.item_text_text_text, queryRezultateTeste.list(), getLayoutInflater(), IstoricStudentActivity.this);
-        testeList.setAdapter(adapter);
 
-        for (RezultatTestStudent rezultat : queryRezultateTeste.list()) {
-            if(rezultat.isPromovat()) promovate++;
-            else picate++;
+            });
+            IstoricStudentAdapter adapter = new IstoricStudentAdapter(getApplicationContext(),
+                    R.layout.item_text_text_text, rezultateTesteStudent, getLayoutInflater(), IstoricStudentActivity.this);
+            testeList.setAdapter(adapter);
+
+            for (RezultatTestStudent rezultat : rezultateTesteStudent) {
+                if(rezultat.isPromovat()) promovate++;
+                else picate++;
+            }
+
+            setPieChart(rezultateTesteStudent.size());
+            //endregion
+
+
+            testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, rezultateTesteStudent.get(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+            //region Meniu
+        } else {
+
+            final Query<RezultatTestStudent> queryRezultateTeste = ((App) getApplication()).getDaoSession().getRezultatTestStudentDao().queryBuilder().where(
+                    RezultatTestStudentDao.Properties.StudentId.eq(student.getId())).build();
+
+            IstoricStudentAdapter adapter = new IstoricStudentAdapter(getApplicationContext(),
+                    R.layout.item_text_text_text, queryRezultateTeste.list(), getLayoutInflater(), IstoricStudentActivity.this);
+            testeList.setAdapter(adapter);
+
+            for (RezultatTestStudent rezultat : queryRezultateTeste.list()) {
+                if (rezultat.isPromovat()) promovate++;
+                else picate++;
+            }
+
+            setPieChart(queryRezultateTeste.list().size());
+            //endregion
+
+
+            testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
+                    intent.putExtra(Constante.CHEIE_TRANSFER, queryRezultateTeste.list().get(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+            //region Meniu
         }
 
-        setPieChart(queryRezultateTeste.list().size());
-
-        //endregion
-
-
-        testeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), RezumatStudentActivity.class);
-                intent.putExtra(Constante.CHEIE_TRANSFER, queryRezultateTeste.list().get(position).getId());
-                startActivity(intent);
-                finish();
-            }
-        });
-
-
-        //region Meniu
 
         inapoi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,10 +209,34 @@ public class IstoricStudentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
-                List<String> mailuriProfesori = new ArrayList<>();
-                for (Profesor profesor : query.list()) {
-                    mailuriProfesori.add(profesor.getMail());}
+                 List<String> mailuriProfesori = new ArrayList<>();
+
+                if (internetIsAvailable) {
+                    ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+                    Call<List<Profesor>> profesoriRequest = profesorService.getProfesori();
+                    profesoriRequest.enqueue(new Callback<List<Profesor>>() {
+                        @Override
+                        public void onResponse(Call<List<Profesor>> call, Response<List<Profesor>> response) {
+                            profesori = response.body();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Profesor>> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Nu s-au putut incarca profesorii", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                    for (Profesor profesor : profesori) {
+                        mailuriProfesori.add(profesor.getMail());}
+                } else {
+
+                    Query<Profesor> query = ((App) getApplication()).getDaoSession().getProfesorDao().queryBuilder().build();
+
+                    for (Profesor profesor : query.list()) {
+                        mailuriProfesori.add(profesor.getMail());
+                    }
+                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(R.string.alege_profesorul);

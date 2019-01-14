@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -34,12 +36,21 @@ import com.qdemy.clase.VariantaRaspuns;
 import com.qdemy.clase.VariantaRaspunsDao;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.EvidentaIntrebariTesteService;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ProfesorService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.VariantaRaspunsService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class IntrebariMaterieActivity extends AppCompatActivity {
@@ -56,6 +67,12 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
     private String materie;
     private List<IntrebareGrila> intrebari = new ArrayList<>();
     private IntrebareAdapter adapter;
+    private List<IntrebareGrila> intrebariGrila2;
+    private IntrebareGrila intrebareGrila;
+    private List<VariantaRaspuns> varianteRaspuns;
+    private List<EvidentaIntrebariTeste> evidentaIntrebariTeste;
+    private List<IntrebareGrila> intrebariActualizate = new ArrayList<>();
+    private boolean internetIsAvailable;
 
     private Profesor profesor;
 
@@ -68,7 +85,14 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intrebari_materie);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -96,15 +120,40 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         materie = getIntent().getStringExtra(Constante.CHEIE_TRANSFER);
         materieTitlu.setText(materie);
 
+        if (internetIsAvailable) {
 
-        for(int i=0;i<profesor.getIntrebari().size();i++)
-            if(profesor.getIntrebari(i).getMaterie().equals(materie))
-                //COSMIN - TO DO SELECT INTREBARI DIN MATERIA SELECTATA ALE PROFESORULUI CURENT
-                intrebari.add(profesor.getIntrebari(i));
-        adapter = new IntrebareAdapter(getApplicationContext(),
-                R.layout.item_text_button, intrebari, getLayoutInflater(), IntrebariMaterieActivity.this);
-        intrebariList.setAdapter(adapter);
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            Call<List<IntrebareGrila>> intrebariGrilaRequest = intrebareGrilaService.getIntrebariGrilaByProfesorId((int)(long)profesor.getId());
+            intrebariGrilaRequest.enqueue(new Callback<List<IntrebareGrila>>() {
+                @Override
+                public void onResponse(Call<List<IntrebareGrila>> call, Response<List<IntrebareGrila>> response) {
+                    intrebariGrila2 = response.body();
+                }
 
+                @Override
+                public void onFailure(Call<List<IntrebareGrila>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut incarca intrebarile", Toast.LENGTH_SHORT).show();
+                }
+            });
+            for(int i=0;i<intrebariGrila2.size();i++)
+                if(intrebariGrila2.get(i).getMaterie().equals(materie))
+
+                    intrebari.add(intrebariGrila2.get(i));
+            adapter = new IntrebareAdapter(getApplicationContext(),
+                    R.layout.item_text_button, intrebari, getLayoutInflater(), IntrebariMaterieActivity.this);
+            intrebariList.setAdapter(adapter);
+
+
+        } else {
+
+            for (int i = 0; i < profesor.getIntrebari().size(); i++)
+                if (profesor.getIntrebari(i).getMaterie().equals(materie))
+
+                    intrebari.add(profesor.getIntrebari(i));
+            adapter = new IntrebareAdapter(getApplicationContext(),
+                    R.layout.item_text_button, intrebari, getLayoutInflater(), IntrebariMaterieActivity.this);
+            intrebariList.setAdapter(adapter);
+        }
         //endregion
 
 
@@ -207,16 +256,142 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
 
     public void stergeIntrebare(String textIntrebare)
     {
-        //COSMIN - TO DO SELECT INTREBAREA CURENTA
+
         //selectareintrebare
+
+        if (internetIsAvailable) {
+
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            final Call<IntrebareGrila> intrebareGrilaRequest = intrebareGrilaService
+                    .getIntrebareGrilaByTextMaterieAndProfesorId(textIntrebare, materie, (int)(long)profesor.getId());
+            intrebareGrilaRequest.enqueue(new Callback<IntrebareGrila>() {
+                @Override
+                public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                    intrebareGrila = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea nu a putut fi gasita", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            VariantaRaspunsService variantaRaspunsService = ServiceBuilder.buildService(VariantaRaspunsService.class);
+            Call<List<VariantaRaspuns>> varianteRaspunsRequest = variantaRaspunsService.getVarianteRaspunsByIntrebareId((int)(long)intrebareGrila.getId());
+            varianteRaspunsRequest.enqueue(new Callback<List<VariantaRaspuns>>() {
+                @Override
+                public void onResponse(Call<List<VariantaRaspuns>> call, Response<List<VariantaRaspuns>> response) {
+                    varianteRaspuns = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<VariantaRaspuns>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu au fost gasite raspunsuri pentru intrebare", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            for ( VariantaRaspuns varianta : varianteRaspuns) {
+
+                Call<VariantaRaspuns> deleteVarianteRaspunsRequest = variantaRaspunsService.deleteVariantaRaspunsById((int)(long)varianta.getId());
+                deleteVarianteRaspunsRequest.enqueue(new Callback<VariantaRaspuns>() {
+                    @Override
+                    public void onResponse(Call<VariantaRaspuns> call, Response<VariantaRaspuns> response) {
+                        Toast.makeText(getApplicationContext(), "Variantele de raspuns au fost sterse cu succes", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Call<VariantaRaspuns> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Variantele de raspuns nu au putut fi sterse", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            EvidentaIntrebariTesteService evidentaIntrebariTesteService = ServiceBuilder.buildService(EvidentaIntrebariTesteService.class);
+            Call<List<EvidentaIntrebariTeste>> evidentaIntrebariTesteRequest = evidentaIntrebariTesteService
+                    .getEvidentaIntrebariTesteByIntrebareId((int)(long)intrebareGrila.getId());
+            evidentaIntrebariTesteRequest.enqueue(new Callback<List<EvidentaIntrebariTeste>>() {
+                @Override
+                public void onResponse(Call<List<EvidentaIntrebariTeste>> call, Response<List<EvidentaIntrebariTeste>> response) {
+                    evidentaIntrebariTeste = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<EvidentaIntrebariTeste>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu au putut fi gasite intrebari in evidenta", Toast.LENGTH_SHORT).show();
+                }
+            });
+            for ( EvidentaIntrebariTeste evidenta : evidentaIntrebariTeste) {
+
+            Call<EvidentaIntrebariTeste> deleteEvidentaIntrebariTeste = evidentaIntrebariTesteService.
+                    deleteEvidentaIntrebariTesteById((int)(long)evidenta.getId());
+            deleteEvidentaIntrebariTeste.enqueue(new Callback<EvidentaIntrebariTeste>() {
+                @Override
+                public void onResponse(Call<EvidentaIntrebariTeste> call, Response<EvidentaIntrebariTeste> response) {
+                    Toast.makeText(getApplicationContext(), "Evidenta a fost stearsa cu succes", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<EvidentaIntrebariTeste> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Evidenta nu a putut fi stearsa", Toast.LENGTH_SHORT).show();
+                }
+            });
+            }
+
+
+
+            Call<List<IntrebareGrila>> intrebariGrilaRequest = intrebareGrilaService.getIntrebariGrilaByProfesorId((int)(long)profesor.getId());
+            intrebariGrilaRequest.enqueue(new Callback<List<IntrebareGrila>>() {
+                @Override
+                public void onResponse(Call<List<IntrebareGrila>> call, Response<List<IntrebareGrila>> response) {
+                    intrebariActualizate = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<IntrebareGrila>> call, Throwable t) {
+
+                }
+            });
+
+
+            intrebariActualizate.remove(intrebareGrila);
+            profesor.setIntrebari(intrebariActualizate);
+
+
+            ProfesorService profesorService = ServiceBuilder.buildService(ProfesorService.class);
+            Call<Profesor> updateProfesor = profesorService.updateProfesor((int) (long)profesor.getId(), profesor);
+            updateProfesor.enqueue(new Callback<Profesor>() {
+                @Override
+                public void onResponse(Call<Profesor> call, Response<Profesor> response) {
+                    Toast.makeText(getApplicationContext(), "Datele au fost modificate cu succes", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Profesor> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Datele nu au putut fi modificate", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            Call<IntrebareGrila> deleteIntrebareGrila = intrebareGrilaService.deleteIntrebareGrilaById((int)(long)intrebareGrila.getId());
+            deleteIntrebareGrila.enqueue(new Callback<IntrebareGrila>() {
+                @Override
+                public void onResponse(Call<IntrebareGrila> call, Response<IntrebareGrila> response) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea a fost stearsa cu succces", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<IntrebareGrila> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Intrebarea nu a putut fi stearsa", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
         Query<IntrebareGrila> queryIntrebare = ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().queryBuilder().where(
                 IntrebareGrilaDao.Properties.Text.eq(textIntrebare),
                 IntrebareGrilaDao.Properties.Materie.eq(materie),
                 IntrebareGrilaDao.Properties.ProfesorId.eq(profesor.getId())).build();
 
-
-        //COSMIN - TO DO DELETE VARIANTE RASPOUNS INTREBAREA CURENTA
-        //stergere variante raspuns
         Query<VariantaRaspuns> queryVarianteRaspuns = ((App) getApplication()).getDaoSession().getVariantaRaspunsDao()
                 .queryBuilder().where(VariantaRaspunsDao.Properties.IntrebareId.eq(queryIntrebare.list().get(0).getId())).build();
         for ( VariantaRaspuns varianta : queryVarianteRaspuns.list()) {
@@ -224,8 +399,6 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
         }
 
 
-        //COSMIN - TO DO DELETE STERGERE INTREBARE DIN TOATE TESTELE CARE O CONTIN
-        //        //stergere evidente intrebari test
         Query<EvidentaIntrebariTeste> queryEvidenta = ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao()
                 .queryBuilder().where(EvidentaIntrebariTesteDao.Properties.IntrebareId.eq(queryIntrebare.list().get(0).getId())).build();
 
@@ -233,14 +406,11 @@ public class IntrebariMaterieActivity extends AppCompatActivity {
             ((App) getApplication()).getDaoSession().getEvidentaIntrebariTesteDao().deleteByKey(evidenta.getId()); }
 
 
-
-        //actualizare profesor
-        //COSMIN - TO DO UPDATE PROFESOR LISTA INTREBARI FARA CEA STERASA ACUM
         List<IntrebareGrila> intrebariActualizate = profesor.getIntrebari();
         intrebariActualizate.remove(queryIntrebare.list().get(0));
         profesor.setIntrebari(intrebariActualizate);
         ((App) getApplication()).getDaoSession().getProfesorDao().update(profesor);
-        //COSMIN - TO DO DELETE INTREBARE DIN TABELE
+
         ((App) getApplication()).getDaoSession().getIntrebareGrilaDao().deleteByKey(queryIntrebare.list().get(0).getId());
     }
 

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -36,12 +38,18 @@ import com.qdemy.clase.VariantaRaspunsDao;
 import com.qdemy.clase_adapter.IntrebareAdapter;
 import com.qdemy.clase_adapter.TestAdapter;
 import com.qdemy.db.App;
+import com.qdemy.servicii.IntrebareGrilaService;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class TestPartajatDetaliiActivity extends AppCompatActivity {
@@ -60,6 +68,8 @@ public class TestPartajatDetaliiActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private List<String> intrebari = new ArrayList<>();
     private Test test;
+    private List<IntrebareGrila> intrebariGrila;
+    private boolean internetIsAvailable;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -70,7 +80,14 @@ public class TestPartajatDetaliiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_partajat_detalii);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if ( activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            internetIsAvailable = true;
+        }
         initializare();
     }
 
@@ -93,9 +110,29 @@ public class TestPartajatDetaliiActivity extends AppCompatActivity {
         //region Initializare test partajat
         test = ((App) getApplication()).getTest(getIntent().getLongExtra(Constante.CHEIE_TRANSFER,-1));
 
-        //COSMIN - TO DO SELECT INTREBARI TEST CURENT
-        for (IntrebareGrila intrebare : test.getIntrebari()) {
-            intrebari.add(intrebare.getText());
+        if (internetIsAvailable) {
+            IntrebareGrilaService intrebareGrilaService = ServiceBuilder.buildService(IntrebareGrilaService.class);
+            Call<List<IntrebareGrila>> intrebariGrilaRequest = intrebareGrilaService.getIntrebariGrilaByTestId((int)(long)test.getId());
+            intrebariGrilaRequest.enqueue(new Callback<List<IntrebareGrila>>() {
+                @Override
+                public void onResponse(Call<List<IntrebareGrila>> call, Response<List<IntrebareGrila>> response) {
+                    intrebariGrila = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<List<IntrebareGrila>> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Nu s-au putut gasi intrebari", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            for (IntrebareGrila intrebare : intrebariGrila) {
+                intrebari.add(intrebare.getText());
+            }
+        }
+        else {
+            for (IntrebareGrila intrebare : test.getIntrebari()) {
+                intrebari.add(intrebare.getText());
+            }
         }
         nume.setText(test.getNume());
         descriere.setText(test.getDescriere());

@@ -16,10 +16,17 @@ import com.qdemy.clase.StudentDao;
 import com.qdemy.clase.TestSustinut;
 import com.qdemy.clase.Student;
 import com.qdemy.db.App;
+import com.qdemy.servicii.NetworkConnectionService;
+import com.qdemy.servicii.ServiceBuilder;
+import com.qdemy.servicii.StudentService;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RezultatTestAdapter extends ArrayAdapter<RezultatTestStudent> {
 
@@ -30,6 +37,9 @@ public class RezultatTestAdapter extends ArrayAdapter<RezultatTestStudent> {
     private String numeTest;
     private String data;
     private ScorLiveActivity activity;
+    private Student student2;
+    private NetworkConnectionService networkConnectionService = new NetworkConnectionService();
+
 
     public RezultatTestAdapter(@NonNull Context context, int resource,
                                @NonNull List<RezultatTestStudent> objects, LayoutInflater inflater,
@@ -53,13 +63,32 @@ public class RezultatTestAdapter extends ArrayAdapter<RezultatTestStudent> {
         TextView punctaj = rand.findViewById(R.id.text2_itt);
 
         try {
-            //COSMIN - TO DO SELECT STUDENTUL ASOCIAT REZULTATULUI CURENT
-            Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
-                    StudentDao.Properties.Id.eq(rezultate.get(position).getStudentId())).build();
-            final Student student = queryStudent.list().get(0);
 
-            nume.setText(student.getNume());
-            punctaj.setText(String.valueOf(((App) activity.getApplication()).getPunctajTest(rezultate.get(position).getRaspunsuri())));
+            if (networkConnectionService.isInternetAvailable()) {
+                StudentService studentService = ServiceBuilder.buildService(StudentService.class);
+                Call<Student> studentRequest = studentService.getStudentById((int) (long) rezultate.get(position).getStudentId());
+                studentRequest.enqueue(new Callback<Student>() {
+                    @Override
+                    public void onResponse(Call<Student> call, Response<Student> response) {
+                        student2 = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Student> call, Throwable t) {
+
+                    }
+                });
+                final Student student = student2;
+                nume.setText(student.getNume());
+                punctaj.setText(String.valueOf(((App) activity.getApplication()).getPunctajTest(rezultate.get(position).getRaspunsuri())));
+            } else {
+                Query<Student> queryStudent = ((App) activity.getApplication()).getDaoSession().getStudentDao().queryBuilder().where(
+                        StudentDao.Properties.Id.eq(rezultate.get(position).getStudentId())).build();
+                final Student student = queryStudent.list().get(0);
+
+                nume.setText(student.getNume());
+                punctaj.setText(String.valueOf(((App) activity.getApplication()).getPunctajTest(rezultate.get(position).getRaspunsuri())));
+            }
         }
         catch (Exception e) {}
 
